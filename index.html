@@ -244,7 +244,7 @@
             <div class="mt-6 pt-4 border-t border-slate-100 space-y-3">
                 <button onclick="requestConversionWithCheck()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-200 transition flex items-center justify-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    <span>生成并解锁 70x70 图纸</span>
+                    <span>生成并处理 70x70 图纸</span>
                 </button>
                 <button onclick="downloadPatternImage()" id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2 cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -342,7 +342,7 @@
             <h3 class="text-lg font-bold text-slate-900">📖 使用与充值说明</h3>
             <div class="space-y-3 text-sm text-slate-600">
                 <p><strong>1. 免费额度：</strong> 新用户首次进入自动赠送 <strong>1 次免费导出</strong>。</p>
-                <p><strong>2. 备注单号充值：</strong> 免费次数用完后点击导出，系统会弹出收银台并生成专属的 <strong>4 位随机单号</strong>。转账时在微信/支付宝备注该数字，回到网页输入核对即可瞬间自动充值 5 次，循环使用！</p>
+                <p><strong>2. 备注单号充值：</strong> 次数用完后点击导出，系统会弹出收银台并生成专属的 <strong>4 位随机单号</strong>。转账时在微信/支付宝备注该数字，回到网页输入核对即可瞬间自动充值 5 次，循环使用！</p>
             </div>
             <div class="flex justify-end pt-2">
                 <button onclick="closeHelpModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">开始创作</button>
@@ -393,12 +393,11 @@
         let sourceImage = null;
         let currentGridSize = 70;
         let activeTool = 'draw';
-        let activePaletteColor = {code: 'P01', name: '纯白', hex: '#FFFFFF'};
-        let beadGridData = []; // 存储每个网格的颜色信息
+        let activeColor = {code: 'P01', name: '纯白', hex: '#FFFFFF'};
+        let beadGridData = []; 
         let isDrawing = false;
         let scaleZoom = 1.0;
 
-        // 标准拼豆色板定义
         const standardPalettes = {
             perler: [
                 {code: 'P01', name: '纯白', hex: '#FFFFFF'},
@@ -436,7 +435,6 @@
             initQuickPalette();
         });
 
-        // 弹窗控制
         function openHelpModal() { document.getElementById('helpModal').classList.remove('hidden'); }
         function closeHelpModal() { document.getElementById('helpModal').classList.add('hidden'); }
         
@@ -545,10 +543,8 @@
             canvas.width = currentGridSize;
             canvas.height = currentGridSize;
 
-            // 绘制压缩到目标网格的图像
             ctx.drawImage(sourceImage, 0, 0, currentGridSize, currentGridSize);
 
-            // 初始化网格数据矩阵
             const imgData = ctx.getImageData(0, 0, currentGridSize, currentGridSize);
             const data = imgData.data;
             beadGridData = [];
@@ -558,8 +554,6 @@
                 for (let x = 0; x < currentGridSize; x++) {
                     let idx = (y * currentGridSize + x) * 4;
                     let r = data[idx], g = data[idx+1], b = data[idx+2];
-                    
-                    // 匹配最近的调色板颜色
                     let matched = findClosestPaletteColor(r, g, b);
                     row.push(matched);
                 }
@@ -651,7 +645,6 @@
             document.getElementById('totalBeadsBadge').innerText = `总计 ${total} 颗`;
         }
 
-        // --- 画笔工具与调色板初始化 ---
         function initQuickPalette() {
             const grid = document.getElementById('quickPaletteGrid');
             grid.innerHTML = '';
@@ -684,7 +677,6 @@
             }
         }
 
-        // 画布鼠标绘制交互
         function getCanvasCoord(e) {
             const canvas = document.getElementById('pixelCanvas');
             const rect = canvas.getBoundingClientRect();
@@ -702,7 +694,6 @@
 
         function drawOnCanvas(e) {
             if (!isDrawing) {
-                // 实时显示 Inspector 坐标和颜色
                 let coord = getCanvasCoord(e);
                 if (coord.x >= 0 && coord.x < currentGridSize && coord.y >= 0 && coord.y < currentGridSize) {
                     let bead = beadGridData[coord.y][coord.x];
@@ -732,7 +723,6 @@
             }
         }
 
-        // 触摸屏适配
         function handleTouchStart(e) {
             if (e.touches.length === 1) {
                 isDrawing = true;
@@ -745,19 +735,17 @@
             }
         }
 
-        // --- 核心付费与高清导出闭环逻辑 ---
+        // --- 付费与高清导出闭环 ---
         function downloadPatternImage() {
             if (!sourceImage) {
                 alert("请先上传照片并生成图纸！");
                 return;
             }
             let quota = getUserQuota();
-            // 如果免费次数耗尽（<= 0），自动弹出 4 位单号备注收银台
             if (quota <= 0) {
                 openPaymentModal();
                 return;
             }
-            // 扣除 1 次额度
             setUserQuota(quota - 1);
 
             const canvas = document.getElementById('pixelCanvas');
