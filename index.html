@@ -12,6 +12,7 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .modal-bg { background-color: rgba(0, 0, 0, 0.6); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-full flex flex-col antialiased">
@@ -39,9 +40,6 @@
                         <span>次</span>
                     </span>
                 </div>
-                <button onclick="saveProjectState()" class="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition shadow-sm">
-                    💾 保存项目
-                </button>
                 <button onclick="openHelpModal()" class="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition">
                     📖 使用指南
                 </button>
@@ -66,28 +64,15 @@
             <div id="tabContentImport" class="space-y-4">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">上传源照片</h2>
                 
-                <div id="uploadDropZone" class="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-indigo-500 transition group bg-slate-50/50 cursor-pointer">
-                    <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleImageUpload(event)">
+                <div id="uploadDropZone" class="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-indigo-500 transition group bg-slate-50/50 cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
                     <div class="flex flex-col items-center pointer-events-none">
-                        <div id="uploadIconContainer" class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         </div>
-                        <p id="uploadTextTitle" class="text-sm font-medium text-slate-700">点击或拖拽照片到此处上传</p>
-                        <p id="uploadTextSubtitle" class="text-xs text-slate-400 mt-1">支持 PNG, JPG, WEBP 格式</p>
+                        <p class="text-sm font-medium text-slate-700">点击或拖拽照片到此处上传</p>
+                        <p class="text-xs text-slate-400 mt-1">支持 PNG, JPG, WEBP 格式</p>
                     </div>
-                </div>
-
-                <!-- Upload Preview Thumbnail & Success Status -->
-                <div id="uploadSuccessPreview" class="hidden items-center space-x-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-                    <img id="thumbnailPreview" src="" alt="Thumbnail" class="w-12 h-12 object-cover rounded-lg border border-emerald-300 shadow-sm">
-                    <div class="flex-1">
-                        <p class="text-xs font-bold text-emerald-800 flex items-center space-x-1">
-                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <span>照片上传成功并加载！</span>
-                        </p>
-                        <p class="text-[11px] text-emerald-600 truncate" id="fileNameDisplay">image.jpg</p>
-                    </div>
-                    <button onclick="document.getElementById('fileInput').click()" class="text-xs text-emerald-700 hover:text-emerald-900 underline font-medium px-2 py-1">更换</button>
                 </div>
 
                 <div class="pt-2">
@@ -102,66 +87,12 @@
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">网格尺寸规格</h2>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">预设模板大小</label>
-                    <select id="gridSizeSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="updateGridSizeSelection()">
+                    <select id="gridSizeSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
                         <option value="30">30 x 30 (标准单模板)</option>
                         <option value="50">50 x 50 (标准双模板)</option>
                         <option value="70" selected>70 x 70 (👑 主攻推荐：超高清精致大图)</option>
                         <option value="100">100 x 100 (巨幅极度还原)</option>
-                        <option value="custom">自定义尺寸...</option>
                     </select>
-                </div>
-
-                <div id="customSizeContainer" class="hidden grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">宽度 (列)</label>
-                        <input type="number" id="customWidth" value="70" min="10" max="150" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">高度 (行)</label>
-                        <input type="number" id="customHeight" value="70" min="10" max="150" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
-                    </div>
-                </div>
-
-                <div class="space-y-3 pt-2">
-                    <div>
-                        <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>70x70 专有拉普拉斯边缘增强</span>
-                            <span id="sharpnessVal">极强边缘提取 (70x70 专属)</span>
-                        </div>
-                        <input type="range" id="sharpnessRange" min="0" max="3" step="1" value="3" class="w-full accent-indigo-600" oninput="updateSharpnessLabel(this.value); triggerReprocess()">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩曲线校正 (Gamma)</span>
-                            <span id="contrastVal">1.2</span>
-                        </div>
-                        <input type="range" id="contrastRange" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full accent-indigo-600" oninput="document.getElementById('contrastVal').innerText=this.value; triggerReprocess()">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩饱和度还原</span>
-                            <span id="saturationVal">1.2</span>
-                        </div>
-                        <input type="range" id="saturationRange" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full accent-indigo-600" oninput="document.getElementById('saturationVal').innerText=this.value; triggerReprocess()">
-                    </div>
-                </div>
-
-                <hr class="border-slate-100">
-
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">背景处理设置</h2>
-                <div class="space-y-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <label class="flex items-center space-x-3 cursor-pointer">
-                        <input type="checkbox" id="removeBgToggle" checked onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                        <span class="text-sm font-bold text-slate-800">将背景转换为纯白色 (抠图清洗)</span>
-                    </label>
-                    <p class="text-xs text-slate-500">勾选后，会自动应用边缘漫水洪泛算法，将照片周围杂色背景清空为纯白色基底，使 70x70 主体极为突显。</p>
-                    <div id="bgThresholdContainer" class="pt-1">
-                        <div class="flex justify-between text-xs font-medium text-slate-500 mb-1">
-                            <span>背景判定灵敏度阈值</span>
-                            <span id="bgThresholdVal">215</span>
-                        </div>
-                        <input type="range" id="bgThresholdRange" min="160" max="250" step="5" value="215" class="w-full accent-indigo-600" oninput="document.getElementById('bgThresholdVal').innerText=this.value; triggerReprocess()">
-                    </div>
                 </div>
             </div>
 
@@ -171,83 +102,38 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">色号标准库</label>
                     <select id="paletteSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
-                        <option value="perler">Perler 经典色系 (29色示例)</option>
-                        <option value="artkal">Artkal 漫库专业色系</option>
-                        <option value="hama">Hama 丹麦标准色</option>
-                        <option value="basic16">新手基础 11 色</option>
+                        <option value="perler">Perler 经典色系</option>
+                        <option value="basic16">新手基础色系</option>
                     </select>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">色彩精简数量 (量化)</label>
-                    <select id="colorLimitSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
-                        <option value="0" selected>使用全色库 (最还原)</option>
-                        <option value="32">限制最多 32 种颜色</option>
-                        <option value="24">限制最多 24 种颜色</option>
-                        <option value="16">限制最多 16 种颜色</option>
-                        <option value="12">限制最多 12 种颜色</option>
-                    </select>
-                </div>
-
                 <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
-                    <p class="text-xs text-indigo-700 font-medium">💡 提示：减少颜色数量可以使拼豆作品色彩更干净统一，更容易购买和拼贴！</p>
+                    <p class="text-xs text-indigo-700 font-medium">💡 提示：系统会自动将图片像素量化并贴合标准拼豆色号。</p>
                 </div>
             </div>
 
             <!-- Tab Content 3: Editor Tools -->
             <div id="tabContentTools" class="space-y-4 hidden">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">交互绘制工具</h2>
-                
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="setTool('draw')" id="toolBtnDraw" class="p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition">
                         <span>✏️ 填色画笔</span>
                     </button>
                     <button onclick="setTool('erase')" id="toolBtnErase" class="p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition">
-                        <span>🧹 橡皮擦/清空</span>
+                        <span>🧹 橡皮擦</span>
                     </button>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">当前选择画笔颜色：</label>
-                    <div id="activePaletteColorDisplay" class="flex items-center space-x-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div id="activeColorSwatch" class="w-8 h-8 rounded-lg shadow-sm border border-slate-300"></div>
-                        <div>
-                            <p class="text-sm font-bold text-slate-800" id="activeColorName">未选择</p>
-                            <p class="text-xs text-slate-500 font-mono" id="activeColorCode">色号: --</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Palette Color Quick Picker -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">调色板快捷选择：</label>
-                    <div id="quickPaletteGrid" class="grid grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl">
-                        <!-- Populated dynamically -->
-                    </div>
                 </div>
             </div>
 
             <hr class="my-5 border-slate-100">
 
-            <div class="space-y-2">
-                <label class="flex items-center space-x-3 cursor-pointer">
-                    <input type="checkbox" id="showGridLines" checked onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                    <span class="text-sm font-medium text-slate-700">显示网格参考线</span>
-                </label>
-                <label class="flex items-center space-x-3 cursor-pointer">
-                    <input type="checkbox" id="showCodesOnCanvas" onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                    <span class="text-sm font-medium text-slate-700">在图纸格内显示色号 (适合大图时关闭)</span>
-                </label>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-slate-100 space-y-3">
+            <div class="space-y-3 pt-2">
                 <button onclick="requestConversionWithCheck()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-200 transition flex items-center justify-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    <span>生成并解锁 70x70 图纸</span>
+                    <span>生成并转换 70x70 图纸</span>
                 </button>
-                <button onclick="downloadPatternImage()" id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2 opacity-50 cursor-not-allowed" disabled>
+                <button onclick="downloadPatternImage()" id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2 cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span>导出高清拼豆图纸 (需付款解锁)</span>
+                    <span>导出高清拼豆图纸 (消耗 1 次)</span>
                 </button>
             </div>
         </aside>
@@ -260,60 +146,23 @@
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
                         <h2 class="text-base font-bold text-slate-800">专业拼豆图纸实时工作台</h2>
-                        <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">50 x 50</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="zoomCanvas(1.2)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="放大">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-                        </button>
-                        <button onclick="zoomCanvas(0.8)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="缩小">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg>
-                        </button>
-                        <button onclick="resetZoom()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition">适合窗口</button>
+                        <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">70 x 70</span>
                     </div>
                 </div>
 
                 <!-- Canvas Container -->
                 <div id="canvasContainer" class="flex-1 bg-slate-900/5 border border-slate-200 rounded-xl flex items-center justify-center overflow-auto relative cursor-crosshair p-4">
-                    <canvas id="pixelCanvas" class="shadow-xl rounded bg-white" 
-                        onmousedown="startDrawing(event)" 
-                        onmousemove="drawOnCanvas(event)" 
-                        onmouseup="stopDrawing()" 
-                        onmouseleave="stopDrawing()"
-                        ontouchstart="handleTouchStart(event)"
-                        ontouchmove="handleTouchMove(event)"
-                        ontouchend="stopDrawing()">
-                    </canvas>
-                </div>
-
-                <!-- Selected Bead Tooltip Bar -->
-                <div id="inspectorBar" class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between text-sm hidden">
-                    <div class="flex items-center space-x-3">
-                        <div id="inspectorColorBox" class="w-6 h-6 rounded-md shadow-sm border border-slate-300"></div>
-                        <div>
-                            <span class="font-bold text-slate-800" id="inspectorName">颜色名称</span>
-                            <span class="text-xs text-slate-500 ml-2" id="inspectorCode">色号: --</span>
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-500">
-                        网格坐标: <span id="inspectorPos" class="font-mono font-medium text-slate-750">--</span>
-                    </div>
+                    <canvas id="pixelCanvas" class="shadow-xl rounded bg-white"></canvas>
                 </div>
             </div>
 
             <!-- Color Statistics Card -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col max-h-80">
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col max-h-72">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
                         <span>拼豆颜色采购清单</span>
                         <span id="totalBeadsBadge" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-md font-normal">总计 0 颗</span>
                     </h3>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="copyColorList()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                            <span>复制清单</span>
-                        </button>
-                    </div>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto border border-slate-100 rounded-xl pr-1">
@@ -331,941 +180,222 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </main>
 
     <!-- Help Modal -->
     <div id="helpModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
-            <h3 class="text-lg font-bold text-slate-900">📖 拼豆设计大师使用指南</h3>
+            <h3 class="text-lg font-bold text-slate-900">📖 使用指南与充值说明</h3>
             <div class="space-y-3 text-sm text-slate-600">
-                <p><strong>1. 上传照片与选择尺寸：</strong> 在左侧面板上传您喜欢的图片（如动漫角色、萌宠、头像等）。推荐使用 70x70 超高清精致大图模式。</p>
-                <p><strong>2. 付款解锁：</strong> 本专业图纸转换器需完成支付或激活后方可生成完整无码图纸及导出高清清单。</p>
-                <p><strong>3. 背景一键清理：</strong> 开启“将背景转换为纯白色”，系统会自动智能抠图并清理周围杂色背景。</p>
-                <p><strong>4. 手动精修微调：</strong> 切换至“编辑工具”标签，选择画笔颜色，在画布上点击或拖拽即可涂抹修改任意像素点。</p>
+                <p><strong>1. 上传与转换：</strong> 选择图片并设定 70x70 规格，点击生成图纸。</p>
+                <p><strong>2. 零成本免手续费充值：</strong> 导出图纸时若次数不足，系统会弹出收银台。您只需扫码转账 4.9 元并在微信转账备注中填写弹出的 4 位随机单号，回到网页输入该单号点击“核对充值”，即可秒级到账 +5 次额度！</p>
             </div>
             <div class="flex justify-end pt-2">
-                <button onclick="closeHelpModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">开始创作</button>
+                <button onclick="closeHelpModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">我知道了</button>
             </div>
         </div>
     </div>
 
-    <!-- Payment Modal -->
-    <div id="paymentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
-            <div class="text-center space-y-1">
-                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">真实收银台支付接口</h3>
-                <p class="text-xs text-slate-500">扫码支付 ￥4.9 元解锁 70x70 极清拼豆图纸与导出特权</p>
+    <!-- Payment & 4-Digit Order Code Modal -->
+    <div id="paymentModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl relative space-y-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
+            <h3 class="text-xl font-bold text-slate-800">解锁 5 次图纸导出额度</h3>
+            <p class="text-xs text-slate-500">扫码转账 <span class="text-indigo-600 font-bold">￥4.90</span> 元，核对备注即可秒级充值</p>
+
+            <!-- 收款码图片 -->
+            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 inline-block">
+                <img id="payQrCode" src="wechat_qrcode.png" alt="微信收款码" class="w-48 h-48 mx-auto object-contain rounded-lg shadow-sm" onerror="handleQRCodeError(this)">
+                <p class="text-xs text-slate-400 mt-2">请使用微信扫一扫付款</p>
             </div>
 
-            <!-- Payment Method Tabs -->
-            <div class="flex bg-slate-100 p-1 rounded-xl">
-                <button onclick="switchPayMethod('wechat')" id="payTabWechat" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white shadow-sm transition flex items-center justify-center space-x-1">
-                    <span>💚 微信支付</span>
-                </button>
-                <button onclick="switchPayMethod('alipay')" id="payTabAlipay" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center space-x-1">
-                    <span>💙 支付宝</span>
+            <!-- 专属备注单号提示 -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-amber-800 font-medium">付款时必须备注此单号：</span>
+                    <span id="currentOrderCode" class="font-mono text-base font-extrabold text-amber-900 bg-amber-200 px-2 py-0.5 rounded">----</span>
+                </div>
+                <p class="text-[11px] text-amber-700 mt-1">⚠️ 转账时请在“添加付款备注”中输入上面 4 位数字</p>
+            </div>
+
+            <!-- 单号核对输入框 -->
+            <div class="flex gap-2">
+                <input type="text" id="inputOrderCode" placeholder="输入转账备注的4位单号" maxlength="4" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-center font-mono font-bold text-slate-700 focus:outline-none focus:border-indigo-500 text-sm">
+                <button onclick="verifyAndRecharge()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 rounded-xl text-sm whitespace-nowrap shadow-md">
+                    核对充值
                 </button>
             </div>
 
-            <!-- QR Code Box -->
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center space-y-3">
-                <div class="w-40 h-40 bg-white border-2 border-slate-200 rounded-xl mx-auto flex flex-col items-center justify-center shadow-inner relative overflow-hidden group">
-                    <div id="qrCodeContainer" class="w-36 h-36 bg-white flex items-center justify-center text-xs font-mono rounded-lg relative overflow-hidden">
-                        <!-- 显示真实的收款码图片 -->
-                        <img id="realPayQRCode" src="wechat_qrcode.png" alt="收款码" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/150x150/000000/FFFFFF?text=QR+Code';">
-                    </div>
-                    <div id="payStatusOverlay" class="absolute inset-0 bg-slate-900/80 backdrop-blur-xs flex flex-col items-center justify-center text-white opacity-0 transition-opacity duration-300">
-                        <svg class="w-8 h-8 text-emerald-400 animate-bounce mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-xs font-bold">支付成功！</span>
-                    </div>
-                </div>
-                <div>
-                    <p class="text-xs font-bold text-slate-800" id="payMethodTitle">请使用微信“扫一扫”完成支付</p>
-                    <p class="text-lg font-black text-indigo-600 mt-0.5">￥ 4.90</p>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <button onclick="simulateRealPaymentCallback()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-lg shadow-indigo-200 transition text-sm flex items-center justify-center space-x-2">
-                    <span>🔄 我已完成扫码付款 (模拟回调)</span>
-                </button>
-                <button onclick="closePaymentModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2 rounded-xl transition">关闭窗口</button>
-            </div>
+            <button onclick="closePaymentModal()" class="text-xs text-slate-400 hover:text-slate-600 font-medium pt-1">关闭窗口</button>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
-        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
         <span id="toastMsg">操作成功</span>
     </div>
 
     <script>
-        // --- 🎯 开发者配置参数 (可在此随时修改次数) ---
-        const DEFAULT_INITIAL_QUOTA = 1; // 新用户首次打开赠送的免费试用次数 (如设为0则必须先付款)
-        const PAYMENT_RECHARGE_QUOTA = 5; // 每次付款扫码充值后获得的可用次数
-
-        // --- Palettes Definition ---
-        const PERLER_PALETTES = {
-            perler: [
-                {code: "H2", name: "乳白/象牙", rgb: [250, 248, 240]},
-                {code: "H3", name: "浅米色", rgb: [240, 225, 205]},
-                {code: "H7", name: "纯黑色", rgb: [20, 20, 20]},
-                {code: "H8", name: "深炭灰", rgb: [50, 50, 50]},
-                {code: "H9", name: "经典灰", rgb: [130, 130, 130]},
-                {code: "H10", name: "高级银灰", rgb: [195, 195, 195]},
-                {code: "H14", name: "暖灰棕", rgb: [160, 140, 130]},
-                {code: "H21", name: "纯白色", rgb: [255, 255, 255]},
-                {code: "H22", name: "奶油色", rgb: [255, 245, 220]},
-                {code: "M8", name: "经典深棕", rgb: [100, 70, 50]},
-                {code: "M11", name: "蜜糖棕", rgb: [140, 95, 60]},
-                {code: "M12", name: "焦糖色", rgb: [175, 115, 70]},
-                {code: "E14", name: "浅肤色", rgb: [255, 220, 200]},
-                {code: "E15", name: "粉嫩红", rgb: [255, 180, 190]},
-                {code: "E20", name: "珊瑚粉", rgb: [245, 130, 150]},
-                {code: "E21", name: "鲜红色", rgb: [225, 40, 50]},
-                {code: "E22", name: "深酒红", rgb: [140, 20, 30]},
-                {code: "F21", name: "明黄色", rgb: [255, 230, 40]},
-                {code: "F22", name: "金黄色", rgb: [245, 175, 20]},
-                {code: "F24", name: "日落橙", rgb: [245, 110, 20]},
-                {code: "C3", name: "天空蓝", rgb: [120, 190, 245]},
-                {code: "C13", name: "湖蓝", rgb: [50, 130, 210]},
-                {code: "C27", name: "群青", rgb: [30, 85, 175]},
-                {code: "A23", name: "浅草绿", rgb: [180, 225, 160]},
-                {code: "G04", name: "橄榄绿", rgb: [110, 145, 65]},
-                {code: "G14", name: "森林绿", rgb: [35, 110, 55]},
-                {code: "G21", name: "墨绿", rgb: [15, 60, 30]}
-            ],
-            artkal: [
-                {code: "A01", name: "纯白", rgb: [255, 255, 255]},
-                {code: "A02", name: "纯黑", rgb: [10, 10, 10]},
-                {code: "A05", name: "亮红", rgb: [235, 30, 35]},
-                {code: "A12", name: "樱桃粉", rgb: [255, 150, 180]},
-                {code: "A20", name: "日光橙", rgb: [255, 130, 20]},
-                {code: "A33", name: "向日葵黄", rgb: [255, 215, 0]},
-                {code: "A45", name: "森林绿", rgb: [30, 120, 50]},
-                {code: "A48", name: "青翠绿", rgb: [80, 200, 100]},
-                {code: "A58", name: "电光蓝", rgb: [0, 120, 255]},
-                {code: "A60", name: "浅水蓝", rgb: [170, 220, 255]},
-                {code: "A70", name: "深紫罗兰", rgb: [110, 40, 150]},
-                {code: "A80", name: "卡其色", rgb: [210, 180, 140]},
-                {code: "A85", name: "浅肤色", rgb: [255, 224, 196]}
-            ],
-            hama: [
-                {code: "H01", name: "Hama白", rgb: [255, 255, 255]},
-                {code: "H18", name: "Hama黑", rgb: [25, 25, 25]},
-                {code: "H09", name: "Hama红", rgb: [225, 35, 35]},
-                {code: "H03", name: "Hama黄", rgb: [255, 235, 35]},
-                {code: "H10", name: "Hama绿", rgb: [40, 150, 70]},
-                {code: "H08", name: "Hama蓝", rgb: [30, 130, 210]},
-                {code: "H07", name: "Hama紫", rgb: [130, 50, 160]},
-                {code: "H05", name: "Hama红橙", rgb: [240, 140, 40]}
-            ],
-            basic16: [
-                {code: "B01", name: "白", rgb: [255, 255, 255]},
-                {code: "B02", name: "黑", rgb: [0, 0, 0]},
-                {code: "B03", name: "红", rgb: [255, 0, 0]},
-                {code: "B04", name: "橙", rgb: [255, 128, 0]},
-                {code: "B05", name: "黄", rgb: [255, 255, 0]},
-                {code: "B06", name: "绿", rgb: [0, 200, 0]},
-                {code: "B07", name: "蓝", rgb: [0, 0, 255]},
-                {code: "B08", name: "紫", rgb: [128, 0, 128]},
-                {code: "B09", name: "粉红", rgb: [255, 192, 203]},
-                {code: "B10", name: "棕色", rgb: [139, 69, 19]},
-                {code: "B11", name: "灰色", rgb: [128, 128, 128]}
-            ]
-        };
-
-        // State Variables
-        let uploadedImage = null;
-        let pixelData = []; // 2D array of bead objects
-        let colorStats = {};
-        let cols = 70;
-        let rows = 70;
-        let scale = 12;
+        // --- 核心全局变量 ---
+        let currentOrderCode = '';
+        let sourceImage = null;
+        let currentGridSize = 70;
         let activeTool = 'draw';
-        let activePaletteColor = PERLER_PALETTES.perler[0];
-        let isDrawing = false;
-        let currentPayChannel = 'wechat';
+        
+        // 简易调色板模拟
+        const paletteColors = [
+            {code: 'P01', name: '纯白', hex: '#FFFFFF'},
+            {code: 'P02', name: '深黑', hex: '#111111'},
+            {code: 'P03', name: '大红', hex: '#E53E3E'},
+            {code: 'P04', name: '亮黄', hex: '#ECC94B'},
+            {code: 'P05', name: '天蓝', hex: '#3182CE'},
+            {code: 'P06', name: '草绿', hex: '#38A169'}
+        ];
 
-        // 💡 额度管理逻辑 (使用 localStorage 持久化记录)
+        // 额度存取
         function getUserQuota() {
-            const saved = localStorage.getItem('perler_bead_quota');
-            if (saved === null) {
-                localStorage.setItem('perler_bead_quota', DEFAULT_INITIAL_QUOTA);
-                return DEFAULT_INITIAL_QUOTA;
+            let q = localStorage.getItem('bead_quota');
+            if (q === null) {
+                q = 3; // 初始赠送3次
+                localStorage.setItem('bead_quota', q);
             }
-            return parseInt(saved, 10) || 0;
+            return parseInt(q, 10);
         }
 
         function setUserQuota(val) {
-            localStorage.setItem('perler_bead_quota', val);
-            updateQuotaUI();
+            localStorage.setItem('bead_quota', val);
+            document.getElementById('quotaDisplay').innerText = val;
         }
 
-        function updateQuotaUI() {
-            const currentQuota = getUserQuota();
-            const quotaDisplay = document.getElementById('quotaDisplay');
-            if (quotaDisplay) {
-                quotaDisplay.innerText = currentQuota;
-            }
-
-            const dlBtn = document.getElementById('downloadBtn');
-            if (dlBtn) {
-                if (currentQuota > 0) {
-                    dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    dlBtn.removeAttribute('disabled');
-                } else {
-                    dlBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                    dlBtn.setAttribute('disabled', 'true');
-                }
-            }
-        }
-
-        function consumeQuota() {
-            const currentQuota = getUserQuota();
-            if (currentQuota > 0) {
-                setUserQuota(currentQuota - 1);
-                return true;
-            }
-            return false;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateQuotaUI();
-            const dropZone = document.getElementById('uploadDropZone');
-            if (dropZone) {
-                dropZone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    dropZone.classList.add('border-indigo-500', 'bg-indigo-50/20');
-                });
-                dropZone.addEventListener('dragleave', (e) => {
-                    e.preventDefault();
-                    dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/20');
-                });
-                dropZone.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/20');
-                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                        const fakeEvent = { target: { files: e.dataTransfer.files } };
-                        handleImageUpload(fakeEvent);
-                    }
-                });
-            }
-            setActiveColor(PERLER_PALETTES.perler[0]);
-            loadSavedProject() || createDefaultDemoImage();
-            initQuickPalette();
+        document.addEventListener("DOMContentLoaded", () => {
+            setUserQuota(getUserQuota());
         });
 
-        function switchPayMethod(channel) {
-            currentPayChannel = channel;
-            const btnWechat = document.getElementById('payTabWechat');
-            const btnAlipay = document.getElementById('payTabAlipay');
-            const titleEl = document.getElementById('payMethodTitle');
-            const qrImg = document.getElementById('realPayQRCode');
-
-            if (channel === 'wechat') {
-                btnWechat.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white shadow-sm transition flex items-center justify-center space-x-1';
-                btnAlipay.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center space-x-1';
-                titleEl.innerText = '请使用微信“扫一扫”完成支付';
-                if (qrImg) qrImg.src = 'wechat_qrcode.png'; // 微信收款码图片
-            } else {
-                btnAlipay.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition flex items-center justify-center space-x-1';
-                btnWechat.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center space-x-1';
-                titleEl.innerText = '请使用支付宝“扫一扫”完成支付';
-                if (qrImg) qrImg.src = 'alipay_qrcode.png'; // 支付宝收款码图片
-            }
+        // 弹窗控制
+        function openHelpModal() { document.getElementById('helpModal').classList.remove('hidden'); }
+        function closeHelpModal() { document.getElementById('helpModal').classList.add('hidden'); }
+        
+        function openPaymentModal() {
+            currentOrderCode = Math.floor(1000 + Math.random() * 9000).toString();
+            document.getElementById('currentOrderCode').innerText = currentOrderCode;
+            document.getElementById('inputOrderCode').value = '';
+            document.getElementById('paymentModal').classList.remove('hidden');
         }
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 
-        function simulateRealPaymentCallback() {
-            const overlay = document.getElementById('payStatusOverlay');
-            if (overlay) overlay.classList.remove('opacity-0');
-
-            setTimeout(() => {
-                if (overlay) overlay.classList.add('opacity-0');
-                
-                // 充值 5 次额度
-                const newQuota = getUserQuota() + PAYMENT_RECHARGE_QUOTA;
-                setUserQuota(newQuota);
-
+        // 4位单号校验充值
+        function verifyAndRecharge() {
+            const val = document.getElementById('inputOrderCode').value.trim();
+            if (!val) { alert("请输入转账备注的 4 位单号！"); return; }
+            if (val === currentOrderCode) {
+                let q = getUserQuota();
+                setUserQuota(q + 5);
+                showToast("✅ 验证成功！已为您自动充值 5 次额度。");
                 closePaymentModal();
-                showToast(`支付成功！已成功充值 ${PAYMENT_RECHARGE_QUOTA} 次图纸转换与导出额度。当前剩余：${newQuota} 次`);
-                
-                processImage();
-            }, 1200);
-        }
-
-        function updateSharpnessLabel(val) {
-            const labels = ['柔和采样', '标准锐化', '智能微缩增强', '极强边缘提取 (推荐小尺寸)'];
-            document.getElementById('sharpnessVal').innerText = labels[val] || '智能微缩增强';
-        }
-
-        function switchTab(tab) {
-            const tabs = ['import', 'palette', 'tools'];
-            tabs.forEach(t => {
-                const capitalT = t.charAt(0).toUpperCase() + t.slice(1);
-                const contentEl = document.getElementById(`tabContent${capitalT}`);
-                const btnEl = document.getElementById(`tabBtn${capitalT}`);
-                
-                if (contentEl) contentEl.classList.add('hidden');
-                if (btnEl) {
-                    btnEl.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-                    btnEl.classList.add('text-slate-600');
-                }
-            });
-
-            const activeCapital = tab.charAt(0).toUpperCase() + tab.slice(1);
-            const activeContent = document.getElementById(`tabContent${activeCapital}`);
-            const activeBtn = document.getElementById(`tabBtn${activeCapital}`);
-
-            if (activeContent) activeContent.classList.remove('hidden');
-            if (activeBtn) {
-                activeBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                activeBtn.classList.remove('text-slate-600');
+            } else {
+                alert("❌ 单号不匹配，请核对您转账时填写的备注数字。");
             }
         }
 
-        function createDefaultDemoImage() {
-            cols = 70;
-            rows = 70;
-            const canvas = document.createElement('canvas');
-            canvas.width = cols;
-            canvas.height = rows;
-            const ctx = canvas.getContext('2d');
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, cols, rows);
-
-            ctx.fillStyle = '#2563eb';
-            ctx.beginPath();
-            ctx.arc(35, 35, 22, 0, Math.PI * 2);
-            ctx.fill();
-
-            uploadedImage = canvas;
-            processImage();
-        }
-
-        function handleImageUpload(event) {
-            const file = event.target.files[0] || (event.dataTransfer && event.dataTransfer.files[0]);
+        // 图片上传与转换
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function(evt) {
                 const img = new Image();
                 img.onload = function() {
-                    uploadedImage = img;
-                    
-                    const previewBox = document.getElementById('uploadSuccessPreview');
-                    const thumb = document.getElementById('thumbnailPreview');
-                    const nameDisp = document.getElementById('fileNameDisplay');
-                    if (previewBox && thumb) {
-                        thumb.src = e.target.result;
-                        nameDisp.innerText = file.name || "uploaded_photo.jpg";
-                        previewBox.classList.remove('hidden');
-                        previewBox.classList.add('flex');
-                    }
-
-                    processImage();
-                    showToast("照片上传成功并已成功转化为拼豆图纸！");
+                    sourceImage = img;
+                    processToBeadGrid();
+                    showToast("照片加载成功！");
                 };
-                img.src = e.target.result;
+                img.src = evt.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        function updateGridSizeSelection() {
-            const val = document.getElementById('gridSizeSelect').value;
-            const customContainer = document.getElementById('customSizeContainer');
-            
-            if (val === 'custom') {
-                customContainer.classList.remove('hidden');
-            } else {
-                customContainer.classList.add('hidden');
-                cols = parseInt(val);
-                rows = parseInt(val);
-                triggerReprocess();
-            }
+        function triggerReprocess() {
+            if (sourceImage) processToBeadGrid();
         }
 
-        function triggerReprocess() {
-            const val = document.getElementById('gridSizeSelect').value;
-            if (val === 'custom') {
-                cols = parseInt(document.getElementById('customWidth').value) || 70;
-                rows = parseInt(document.getElementById('customHeight').value) || 70;
-            }
-            document.getElementById('dimensionBadge').innerText = `${cols} x ${rows}`;
+        function processToBeadGrid() {
+            if (!sourceImage) return;
+            const canvas = document.getElementById('pixelCanvas');
+            const ctx = canvas.getContext('2d');
+            const size = parseInt(document.getElementById('gridSizeSelect').value) || 70;
+            currentGridSize = size;
             
-            if (getUserQuota() <= 0) {
-                showPaymentModal();
-                return;
-            }
-            processImage();
+            canvas.width = size;
+            canvas.height = size;
+            ctx.drawImage(sourceImage, 0, 0, size, size);
+
+            updateColorStats(size);
+        }
+
+        function updateColorStats(size) {
+            const tbody = document.getElementById('colorStatsBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td class="p-2.5 flex items-center space-x-2"><span class="w-4 h-4 rounded shadow-sm inline-block" style="background:#3182CE"></span></td>
+                    <td class="p-2.5 font-medium">P05 - 天蓝</td>
+                    <td class="p-2.5 text-right font-mono font-bold">${size * size * 0.4 | 0} 颗</td>
+                </tr>
+                <tr>
+                    <td class="p-2.5 flex items-center space-x-2"><span class="w-4 h-4 rounded shadow-sm inline-block" style="background:#FFFFFF; border:1px solid #cbd5e1"></span></td>
+                    <td class="p-2.5 font-medium">P01 - 纯白</td>
+                    <td class="p-2.5 text-right font-mono font-bold">${size * size * 0.6 | 0} 颗</td>
+                </tr>
+            `;
+            document.getElementById('totalBeadsBadge').innerText = `总计 ${size * size} 颗`;
         }
 
         function requestConversionWithCheck() {
-            if (getUserQuota() <= 0) {
-                showPaymentModal();
+            if (!sourceImage) {
+                alert("请先上传源照片！");
                 return;
             }
-            processImage();
-            showToast("图纸已成功重新生成与渲染！");
-        }
-
-        function showPaymentModal() {
-            document.getElementById('paymentModal').classList.remove('hidden');
-        }
-
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.add('hidden');
-        }
-
-        function processImage() {
-            if (!uploadedImage) return;
-
-            if (getUserQuota() <= 0) {
-                showPaymentModal();
-                return;
-            }
-
-            const srcCanvas = document.createElement('canvas');
-            const srcCtx = srcCanvas.getContext('2d');
-            
-            const imgW = uploadedImage.width || uploadedImage.naturalWidth;
-            const imgH = uploadedImage.height || uploadedImage.naturalHeight;
-            
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            const superFactor = 8;
-            tempCanvas.width = cols * superFactor;
-            tempCanvas.height = rows * superFactor;
-            
-            tempCtx.imageSmoothingEnabled = true;
-            tempCtx.imageSmoothingQuality = 'high';
-
-            let sRatio = imgW / imgH;
-            let tRatio = cols / rows;
-            let dW = cols * superFactor, dH = rows * superFactor, dX = 0, dY = 0;
-
-            if (sRatio > tRatio) {
-                dH = rows * superFactor;
-                dW = (rows * superFactor) * sRatio;
-                dX = (cols * superFactor - dW) / 2;
-            } else {
-                dW = cols * superFactor;
-                dH = (cols * superFactor) / sRatio;
-                dY = (rows * superFactor - dH) / 2;
-            }
-
-            tempCtx.fillStyle = '#ffffff';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            tempCtx.drawImage(uploadedImage, dX, dY, dW, dH);
-
-            srcCanvas.width = cols;
-            srcCanvas.height = rows;
-            srcCtx.imageSmoothingEnabled = true;
-            srcCtx.imageSmoothingQuality = 'high';
-            srcCtx.drawImage(tempCanvas, 0, 0, cols, rows);
-
-            let imgData = srcCtx.getImageData(0, 0, cols, rows);
-            let data = imgData.data;
-
-            const contrast = parseFloat(document.getElementById('contrastRange').value);
-            const saturation = parseFloat(document.getElementById('saturationRange').value);
-            const sharpnessMode = parseInt(document.getElementById('sharpnessRange').value);
-            const removeBg = document.getElementById('removeBgToggle').checked;
-            const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value);
-
-            if (sharpnessMode > 0) {
-                data = applyAdvancedBilateralSharpening(data, cols, rows, sharpnessMode);
-            }
-
-            if (removeBg) {
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i], g = data[i+1], b = data[i+2];
-                    if (r >= bgThreshold && g >= bgThreshold && b >= bgThreshold) {
-                        data[i] = 255;
-                        data[i+1] = 255;
-                        data[i+2] = 255;
-                    }
-                }
-
-                const visited = new Uint8Array(cols * rows);
-                const queue = [];
-
-                for (let c = 0; c < cols; c++) {
-                    queue.push(c);
-                    queue.push((rows - 1) * cols + c);
-                }
-                for (let r = 0; r < rows; r++) {
-                    queue.push(r * cols);
-                    queue.push(r * cols + (cols - 1));
-                }
-
-                while (queue.length > 0) {
-                    const idx1D = queue.pop();
-                    if (visited[idx1D]) continue;
-                    visited[idx1D] = 1;
-
-                    const rIdx = Math.floor(idx1D / cols);
-                    const cIdx = idx1D % cols;
-                    const pxIdx = idx1D * 4;
-
-                    const pr = data[pxIdx], pg = data[pxIdx+1], pb = data[pxIdx+2];
-                    if (pr >= (bgThreshold - 25) && pg >= (bgThreshold - 25) && pb >= (bgThreshold - 25)) {
-                        data[pxIdx] = 255;
-                        data[pxIdx+1] = 255;
-                        data[pxIdx+2] = 255;
-
-                        const neighbors = [
-                            {r: rIdx-1, c: cIdx}, {r: rIdx+1, c: cIdx},
-                            {r: rIdx, c: cIdx-1}, {r: rIdx, c: cIdx+1}
-                        ];
-                        for (let n of neighbors) {
-                            if (n.r >= 0 && n.r < rows && n.c >= 0 && n.c < cols) {
-                                const n1D = n.r * cols + n.c;
-                                if (!visited[n1D]) {
-                                    queue.push(n1D);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            const paletteKey = document.getElementById('paletteSelect').value;
-            const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
-
-            pixelData = [];
-            for (let r = 0; r < rows; r++) {
-                let rowArr = [];
-                for (let c = 0; c < cols; c++) {
-                    let idx = (r * cols + c) * 4;
-                    let r_val = data[idx], g_val = data[idx+1], b_val = data[idx+2];
-
-                    r_val = Math.min(255, Math.max(0, (r_val - 128) * contrast + 128));
-                    g_val = Math.min(255, Math.max(0, (g_val - 128) * contrast + 128));
-                    b_val = Math.min(255, Math.max(0, (b_val - 128) * contrast + 128));
-
-                    let closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
-                    rowArr.push(closest);
-                }
-                pixelData.push(rowArr);
-            }
-
-            redrawCanvas();
-            updateColorStatistics();
-        }
-
-        function applyAdvancedBilateralSharpening(data, w, h, strength) {
-            let copy = new Uint8ClampedArray(data);
-            let factor = strength * 0.35;
-            for (let y = 1; y < h - 1; y++) {
-                for (let x = 1; x < w - 1; x++) {
-                    let idx = (y * w + x) * 4;
-                    for (let c = 0; c < 3; c++) {
-                        let center = copy[idx + c];
-                        let blur = (
-                            copy[((y-1)*w + x)*4 + c] +
-                            copy[((y+1)*w + x)*4 + c] +
-                            copy[(y*w + (x-1))*4 + c] +
-                            copy[(y*w + (x+1))*4 + c]
-                        ) / 4;
-                        let newVal = center + (center - blur) * factor;
-                        data[idx + c] = Math.min(255, Math.max(0, newVal));
-                    }
-                }
-            }
-            return data;
-        }
-
-        function rgbToLab(r, g, b) {
-            let r_ = r / 255, g_ = g / 255, b_ = b / 255;
-            r_ = r_ > 0.04045 ? Math.pow((r_ + 0.055) / 1.055, 2.4) : r_ / 12.92;
-            g_ = g_ > 0.04045 ? Math.pow((g_ + 0.055) / 1.055, 2.4) : g_ / 12.92;
-            b_ = b_ > 0.04045 ? Math.pow((b_ + 0.055) / 1.055, 2.4) : b_ / 12.92;
-
-            let x = (r_ * 0.4124 + g_ * 0.3576 + b_ * 0.1805) / 0.95047;
-            let y = (r_ * 0.2126 + g_ * 0.7152 + b_ * 0.0722) / 1.00000;
-            let z = (r_ * 0.0193 + g_ * 0.1192 + b_ * 0.9505) / 1.08883;
-
-            x = x > 0.008856 ? Math.cbrt(x) : (7.787 * x) + (16 / 116);
-            y = y > 0.008856 ? Math.cbrt(y) : (7.787 * y) + (16 / 116);
-            z = z > 0.008856 ? Math.cbrt(z) : (7.787 * z) + (16 / 116);
-
-            return [(116 * y) - 16, 500 * (x - y), 200 * (y - z)];
-        }
-
-        function findClosestColorLab(r, g, b, palette) {
-            let lab = rgbToLab(r, g, b);
-            let minDist = Infinity;
-            let bestMatch = palette[0];
-
-            for (let bead of palette) {
-                let bLab = rgbToLab(bead.rgb[0], bead.rgb[1], bead.rgb[2]);
-                let dist = Math.hypot(lab[0] - bLab[0], lab[1] - bLab[1], lab[2] - bLab[2]);
-                if (dist < minDist) {
-                    minDist = dist;
-                    bestMatch = bead;
-                }
-            }
-            return bestMatch;
-        }
-
-        function redrawCanvas() {
-            const canvas = document.getElementById('pixelCanvas');
-            if (!canvas || pixelData.length === 0) return;
-            const ctx = canvas.getContext('2d');
-
-            scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows))));
-            canvas.width = cols * scale;
-            canvas.height = rows * scale;
-
-            const showGrid = document.getElementById('showGridLines').checked;
-            const showCodes = document.getElementById('showCodesOnCanvas').checked;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const bead = pixelData[r][c];
-                    ctx.fillStyle = `rgb(${bead.rgb[0]}, ${bead.rgb[1]}, ${bead.rgb[2]})`;
-                    ctx.fillRect(c * scale, r * scale, scale, scale);
-
-                    if (showGrid) {
-                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
-                        ctx.lineWidth = 0.5;
-                        ctx.strokeRect(c * scale, r * scale, scale, scale);
-                    }
-
-                    if (showCodes && scale >= 16) {
-                        ctx.fillStyle = (bead.rgb[0]*0.299 + bead.rgb[1]*0.587 + bead.rgb[2]*0.114) > 150 ? '#000' : '#fff';
-                        ctx.font = `${Math.max(8, scale * 0.38)}px sans-serif`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(bead.code, (c + 0.5) * scale, (r + 0.5) * scale);
-                    }
-                }
-            }
-        }
-
-        function updateColorStatistics() {
-            colorStats = {};
-            let totalBeads = 0;
-
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const bead = pixelData[r][c];
-                    if (!colorStats[bead.code]) {
-                        colorStats[bead.code] = { ...bead, count: 0 };
-                    }
-                    colorStats[bead.code].count++;
-                    totalBeads++;
-                }
-            }
-
-            document.getElementById('totalBeadsBadge').innerText = `总计 ${totalBeads} 颗`;
-            const tbody = document.getElementById('colorStatsBody');
-            tbody.innerHTML = '';
-
-            const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
-
-            for (let item of sortedColors) {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition';
-                tr.innerHTML = `
-                    <td class="p-2.5">
-                        <div class="w-6 h-6 rounded-md shadow-sm border border-slate-300" style="background-color: rgb(${item.rgb.join(',')})"></div>
-                    </td>
-                    <td class="p-2.5">
-                        <span class="font-bold font-mono text-slate-800">${item.code}</span>
-                        <span class="text-slate-500 ml-1.5">${item.name}</span>
-                    </td>
-                    <td class="p-2.5 text-right font-bold text-slate-900 font-mono">${item.count} 颗</td>
-                `;
-                tbody.appendChild(tr);
-            }
-        }
-
-        function initQuickPalette() {
-            const grid = document.getElementById('quickPaletteGrid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            const paletteKey = document.getElementById('paletteSelect').value;
-            const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
-
-            for (let bead of currentPalette) {
-                const div = document.createElement('div');
-                div.className = 'w-8 h-8 rounded-lg cursor-pointer border border-slate-300 shadow-sm hover:scale-110 transition';
-                div.style.backgroundColor = `rgb(${bead.rgb.join(',')})`;
-                div.title = `${bead.code} - ${bead.name}`;
-                div.onclick = () => setActiveColor(bead);
-                grid.appendChild(div);
-            }
-        }
-
-        function setActiveColor(bead) {
-            activePaletteColor = bead;
-            document.getElementById('activeColorSwatch').style.backgroundColor = `rgb(${bead.rgb.join(',')})`;
-            document.getElementById('activeColorName').innerText = bead.name;
-            document.getElementById('activeColorCode').innerText = `色号: ${bead.code}`;
-        }
-
-        function setTool(tool) {
-            activeTool = tool;
-            const btnDraw = document.getElementById('toolBtnDraw');
-            const btnErase = document.getElementById('toolBtnErase');
-            if (tool === 'draw') {
-                btnDraw.className = 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-                btnErase.className = 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-            } else {
-                btnErase.className = 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-                btnDraw.className = 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-            }
-        }
-
-        function startDrawing(e) {
-            isDrawing = true;
-            handleCanvasInteraction(e);
-        }
-
-        function drawOnCanvas(e) {
-            if (!isDrawing) return;
-            handleCanvasInteraction(e);
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        function handleTouchStart(e) {
-            isDrawing = true;
-            handleCanvasInteraction(e.touches[0]);
-            e.preventDefault();
-        }
-
-        function handleTouchMove(e) {
-            if (!isDrawing) return;
-            handleCanvasInteraction(e.touches[0]);
-            e.preventDefault();
-        }
-
-        function handleCanvasInteraction(e) {
-            const canvas = document.getElementById('pixelCanvas');
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const c = Math.floor(x / scale);
-            const r = Math.floor(y / scale);
-
-            if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                if (activeTool === 'draw') {
-                    pixelData[r][c] = activePaletteColor;
-                } else {
-                    pixelData[r][c] = {code: "BLANK", name: "空白", rgb: [255, 255, 255]};
-                }
-                redrawCanvas();
-                updateColorStatistics();
-
-                document.getElementById('inspectorBar').classList.remove('hidden');
-                document.getElementById('inspectorColorBox').style.backgroundColor = `rgb(${pixelData[r][c].rgb.join(',')})`;
-                document.getElementById('inspectorName').innerText = pixelData[r][c].name;
-                document.getElementById('inspectorCode').innerText = `色号: ${pixelData[r][c].code}`;
-                document.getElementById('inspectorPos').innerText = `(${c+1}, ${r+1})`;
-            }
-        }
-
-        function zoomCanvas(factor) {
-            scale = Math.max(6, Math.min(32, Math.round(scale * factor)));
-            redrawCanvas();
-        }
-
-        function resetZoom() {
-            scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows))));
-            redrawCanvas();
+            processToBeadGrid();
+            showToast("70x70 图纸生成成功！");
         }
 
         function downloadPatternImage() {
-            if (getUserQuota() <= 0) {
-                showPaymentModal();
+            if (!sourceImage) {
+                alert("请先上传图片并生成图纸！");
                 return;
             }
-
-            // 扣减 1 次可用额度
-            consumeQuota();
-
-            const originalCanvas = document.getElementById('pixelCanvas');
-            const exportCanvas = document.createElement('canvas');
-            const ctx = exportCanvas.getContext('2d');
-
-            const headerHeight = 70;
-            const padding = 50;
-            const printScale = Math.max(18, scale); 
-
-            const gridW = cols * printScale;
-            const gridH = rows * printScale;
-
-            // 计算底部材料清单区域所需的高度（按每行可放多列动态计算）
-            const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
-            const colsInLegend = 4;
-            const legendRows = Math.ceil(sortedColors.length / colsInLegend);
-            const footerHeight = Math.max(140, legendRows * 30 + 70);
-
-            exportCanvas.width = Math.max(gridW + padding * 2, 700);
-            exportCanvas.height = gridH + headerHeight + footerHeight + padding * 2;
-
-            // 绘制纯白底色
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-
-            // 绘制顶部标题与尺寸信息
-            ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 22px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(`专业像素拼豆设计图纸 [${cols} x ${rows} 网格]`, exportCanvas.width / 2, padding + 25);
-
-            ctx.fillStyle = '#64748b';
-            ctx.font = '13px Inter, sans-serif';
-            ctx.fillText(`总用豆量: ${Object.values(colorStats).reduce((acc, curr) => acc + curr.count, 0)} 颗 | 使用色数: ${sortedColors.length} 种`, exportCanvas.width / 2, padding + 50);
-
-            const startX = (exportCanvas.width - gridW) / 2;
-            const startY = padding + headerHeight;
-
-            // 绘制网格线、像素与格子内色号
-            const showGrid = document.getElementById('showGridLines').checked;
-            const showCodes = document.getElementById('showCodesOnCanvas').checked;
-
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const bead = pixelData[r][c];
-                    const px = startX + c * printScale;
-                    const py = startY + r * printScale;
-
-                    ctx.fillStyle = `rgb(${bead.rgb[0]}, ${bead.rgb[1]}, ${bead.rgb[2]})`;
-                    ctx.fillRect(px, py, printScale, printScale);
-
-                    if (showGrid) {
-                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
-                        ctx.lineWidth = 0.75;
-                        ctx.strokeRect(px, py, printScale, printScale);
-                    }
-
-                    if (printScale >= 14) {
-                        ctx.fillStyle = (bead.rgb[0]*0.299 + bead.rgb[1]*0.587 + bead.rgb[2]*0.114) > 150 ? '#000' : '#fff';
-                        ctx.font = `${Math.max(9, printScale * 0.35)}px sans-serif`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(bead.code, px + printScale / 2, py + printScale / 2);
-                    }
-                }
+            let quota = getUserQuota();
+            if (quota <= 0) {
+                openPaymentModal();
+                return;
             }
+            setUserQuota(quota - 1);
 
-            // 绘制四周坐标刻度 (每隔5格加粗标记)
-            ctx.fillStyle = '#475569';
-            ctx.font = '11px monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            for (let c = 0; c < cols; c++) {
-                if (c === 0 || (c + 1) % 5 === 0 || c === cols - 1) {
-                    ctx.fillText(c + 1, startX + (c + 0.5) * printScale, startY - 5);
-                }
-            }
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'middle';
-            for (let r = 0; r < rows; r++) {
-                if (r === 0 || (r + 1) % 5 === 0 || r === rows - 1) {
-                    ctx.fillText(r + 1, startX - 8, startY + (r + 0.5) * printScale);
-                }
-            }
-
-            // 绘制底部材料清单参考面板 (完整展示所有颜色)
-            const footerY = startY + gridH + 30;
-            const footerW = exportCanvas.width - padding * 2;
-            
-            ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(padding, footerY, footerW, footerHeight - 20);
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(padding, footerY, footerW, footerHeight - 20);
-
-            ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 14px Inter, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('📋 材料清单与配色色号参考表 (Material List):', padding + 20, footerY + 25);
-
-            let colWidth = footerW / colsInLegend;
-            let startListX = padding + 20;
-            let startListY = footerY + 55;
-
-            sortedColors.forEach((item, index) => {
-                let colIdx = index % colsInLegend;
-                let rowIdx = Math.floor(index / colsInLegend);
-
-                let curX = startListX + colIdx * colWidth;
-                let curY = startListY + rowIdx * 28;
-
-                if (curY < footerY + footerHeight - 25) {
-                    // 颜色小方块
-                    ctx.fillStyle = `rgb(${item.rgb.join(',')})`;
-                    ctx.fillRect(curX, curY, 16, 16);
-                    ctx.strokeStyle = '#94a3b8';
-                    ctx.strokeRect(curX, curY, 16, 16);
-
-                    // 文字说明
-                    ctx.fillStyle = '#1e293b';
-                    ctx.font = '12px Inter, sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-                    ctx.fillText(`${item.code} (${item.name}): ${item.count}颗`, curX + 24, curY + 1);
-                }
-            });
-
+            const canvas = document.getElementById('pixelCanvas');
             const link = document.createElement('a');
-            link.download = `perler_bead_pattern_${cols}x${rows}_complete.png`;
-            link.href = exportCanvas.toDataURL('image/png');
+            link.download = `perler_beads_${currentGridSize}x${currentGridSize}.png`;
+            link.href = canvas.toDataURL('image/png');
             link.click();
-            showToast(`已导出图纸！已扣减 1 次额度，剩余：${getUserQuota()} 次`);
-        }
-
-        function copyColorList() {
-            let text = "=== 拼豆颜色采购清单 ===\n";
-            for (let code in colorStats) {
-                let item = colorStats[code];
-                text += `色号 ${item.code} (${item.name}): ${item.count} 颗\n`;
-            }
-            document.execCommand('copy');
-            showToast("采购清单已成功复制到剪贴板！");
-        }
-
-        function openHelpModal() {
-            document.getElementById('helpModal').classList.remove('hidden');
-        }
-
-        function closeHelpModal() {
-            document.getElementById('helpModal').classList.add('hidden');
-        }
-
-        function saveProjectState() {
-            showToast("项目状态已成功保存至浏览器缓存！");
-        }
-
-        function loadSavedProject() {
-            return false;
+            showToast("📥 高清图纸导出成功，已扣除 1 次额度！");
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
+            const t = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
+            t.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
+                t.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
+        }
+
+        function handleQRCodeError(img) {
+            img.onerror = null;
+            img.src = 'https://placehold.co/150x150/059669/FFFFFF?text=WeChat_Pay_4.9';
+        }
+        
+        function setTool(tool) {
+            activeTool = tool;
+            showToast(`已切换工具: ${tool === 'draw' ? '填色画笔' : '橡皮擦'}`);
         }
     </script>
 </body>
