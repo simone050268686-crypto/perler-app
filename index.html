@@ -375,15 +375,9 @@
             <!-- QR Code Box -->
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center space-y-3">
                 <div class="w-40 h-40 bg-white border-2 border-slate-200 rounded-xl mx-auto flex flex-col items-center justify-center shadow-inner relative overflow-hidden group">
-                    <div id="qrCodeContainer" class="w-36 h-36 bg-slate-900 flex items-center justify-center text-white text-xs font-mono rounded-lg relative">
-                        <!-- Simulated QR Code visual pattern -->
-                        <div class="grid grid-cols-6 gap-1 w-28 h-28 p-2 bg-white rounded">
-                            <div class="bg-slate-900 col-span-2 row-span-2"></div>
-                            <div class="bg-slate-100"></div><div class="bg-slate-900"></div><div class="bg-slate-100"></div><div class="bg-slate-900"></div>
-                            <div class="bg-slate-900 col-span-2 row-span-2"></div>
-                            <div class="bg-slate-900"></div><div class="bg-slate-100"></div><div class="bg-slate-900"></div><div class="bg-slate-100"></div>
-                            <div class="bg-slate-100"></div><div class="bg-slate-900"></div><div class="bg-slate-100"></div><div class="bg-slate-900"></div><div class="bg-slate-100"></div><div class="bg-slate-900"></div>
-                        </div>
+                    <div id="qrCodeContainer" class="w-36 h-36 bg-white flex items-center justify-center text-xs font-mono rounded-lg relative overflow-hidden">
+                        <!-- 显示真实的收款码图片 -->
+                        <img id="realPayQRCode" src="wechat_qrcode.png" alt="收款码" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/150x150/000000/FFFFFF?text=QR+Code';">
                     </div>
                     <div id="payStatusOverlay" class="absolute inset-0 bg-slate-900/80 backdrop-blur-xs flex flex-col items-center justify-center text-white opacity-0 transition-opacity duration-300">
                         <svg class="w-8 h-8 text-emerald-400 animate-bounce mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -579,12 +573,12 @@
                 btnWechat.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white shadow-sm transition flex items-center justify-center space-x-1';
                 btnAlipay.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center space-x-1';
                 titleEl.innerText = '请使用微信“扫一扫”完成支付';
-                if (qrImg) qrImg.src = 'wechat_qrcode.png'; // 👈 你的微信收款码文件名
+                if (qrImg) qrImg.src = 'wechat_qrcode.png'; // 微信收款码图片
             } else {
                 btnAlipay.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition flex items-center justify-center space-x-1';
                 btnWechat.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center space-x-1';
                 titleEl.innerText = '请使用支付宝“扫一扫”完成支付';
-                if (qrImg) qrImg.src = 'alipay_qrcode.png'; // 👈 你的支付宝收款码文件名
+                if (qrImg) qrImg.src = 'alipay_qrcode.png'; // 支付宝收款码图片
             }
         }
 
