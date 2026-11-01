@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高级像素拼豆图纸生成器 - Perler Bead Designer Pro</title>
+    <title>高级像素拼豆图纸生成器 - 完整功能版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .modal-bg { background-color: rgba(0, 0, 0, 0.6); }
     </style>
 </head>
@@ -21,18 +17,15 @@
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md">
+                    🧩
                 </div>
                 <div>
                     <h1 class="text-lg font-bold text-slate-900 leading-tight">拼豆设计大师 Pro</h1>
-                    <p class="text-xs text-slate-500">专业级像素照片转换、图纸编辑与色号统计工具</p>
+                    <p class="text-xs text-slate-500">专业级像素照片转换与 4.9 元免对接充值版</p>
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-                <!-- 额度显示标签 -->
                 <div class="flex items-center bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg shadow-xs">
                     <span class="text-xs font-semibold text-amber-800 flex items-center space-x-1">
                         <span>⚡ 剩余转换次数:</span>
@@ -50,132 +43,61 @@
     <!-- Main Workspace -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 overflow-hidden">
         
-        <!-- Left Control Panel (Sidebar) -->
-        <aside class="w-full lg:w-96 bg-white border border-slate-200 rounded-2xl p-5 flex flex-col shadow-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+        <!-- Left Sidebar: Controls -->
+        <aside class="w-full lg:w-96 bg-white border border-slate-200 rounded-2xl p-5 flex flex-col shadow-sm overflow-y-auto max-h-[calc(100vh-8rem)] space-y-4">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">1. 上传源照片</h2>
             
-            <!-- Tabs Navigation -->
-            <div class="flex bg-slate-100 p-1 rounded-xl mb-5">
-                <button onclick="switchTab('import')" id="tabBtnImport" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition">1. 图片与尺寸</button>
-                <button onclick="switchTab('palette')" id="tabBtnPalette" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">2. 色彩与调色</button>
-                <button onclick="switchTab('tools')" id="tabBtnTools" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">3. 编辑工具</button>
+            <div class="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-indigo-500 transition bg-slate-50 cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                <p class="text-sm font-medium text-slate-700">📷 点击选择照片上传</p>
+                <p class="text-xs text-slate-400 mt-1">支持 PNG, JPG 格式</p>
             </div>
 
-            <!-- Tab Content 1: Import & Size -->
-            <div id="tabContentImport" class="space-y-4">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">上传源照片</h2>
-                
-                <div id="uploadDropZone" class="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-indigo-500 transition group bg-slate-50/50 cursor-pointer" onclick="document.getElementById('fileInput').click()">
-                    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                    <div class="flex flex-col items-center pointer-events-none">
-                        <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        </div>
-                        <p class="text-sm font-medium text-slate-700">点击或拖拽照片到此处上传</p>
-                        <p class="text-xs text-slate-400 mt-1">支持 PNG, JPG, WEBP 格式</p>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <button onclick="document.getElementById('fileInput').click()" class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-xl text-sm transition shadow-sm flex items-center justify-center space-x-2">
-                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <span>从本地文件夹选择图片</span>
-                    </button>
-                </div>
-
-                <hr class="border-slate-100">
-
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">网格尺寸规格</h2>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">预设模板大小</label>
-                    <select id="gridSizeSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
-                        <option value="30">30 x 30 (标准单模板)</option>
-                        <option value="50">50 x 50 (标准双模板)</option>
-                        <option value="70" selected>70 x 70 (👑 主攻推荐：超高清精致大图)</option>
-                        <option value="100">100 x 100 (巨幅极度还原)</option>
-                    </select>
-                </div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-2">2. 网格尺寸规格</h2>
+            <div>
+                <select id="gridSizeSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
+                    <option value="30">30 x 30 (标准单模板)</option>
+                    <option value="50">50 x 50 (标准双模板)</option>
+                    <option value="70" selected>70 x 70 (👑 主攻推荐：超高清大图)</option>
+                    <option value="100">100 x 100 (巨幅还原)</option>
+                </select>
             </div>
 
-            <!-- Tab Content 2: Palette & Quantization -->
-            <div id="tabContentPalette" class="space-y-4 hidden">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">拼豆色系品牌</h2>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">色号标准库</label>
-                    <select id="paletteSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
-                        <option value="perler">Perler 经典色系</option>
-                        <option value="basic16">新手基础色系</option>
-                    </select>
-                </div>
-                <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
-                    <p class="text-xs text-indigo-700 font-medium">💡 提示：系统会自动将图片像素量化并贴合标准拼豆色号。</p>
-                </div>
-            </div>
-
-            <!-- Tab Content 3: Editor Tools -->
-            <div id="tabContentTools" class="space-y-4 hidden">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">交互绘制工具</h2>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setTool('draw')" id="toolBtnDraw" class="p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition">
-                        <span>✏️ 填色画笔</span>
-                    </button>
-                    <button onclick="setTool('erase')" id="toolBtnErase" class="p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition">
-                        <span>🧹 橡皮擦</span>
-                    </button>
-                </div>
-            </div>
-
-            <hr class="my-5 border-slate-100">
-
-            <div class="space-y-3 pt-2">
-                <button onclick="requestConversionWithCheck()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-200 transition flex items-center justify-center space-x-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    <span>生成并转换 70x70 图纸</span>
+            <div class="pt-4 space-y-3 mt-auto">
+                <button onclick="requestConversion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center space-x-2 text-sm">
+                    <span>⚡ 生成拼豆像素图纸</span>
                 </button>
-                <button onclick="downloadPatternImage()" id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2 cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span>导出高清拼豆图纸 (消耗 1 次)</span>
+                <button onclick="downloadPatternImage()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center space-x-2 text-sm">
+                    <span>📥 导出高清图纸 (消耗 1 次)</span>
                 </button>
             </div>
         </aside>
 
-        <!-- Right Preview & Stats Area -->
+        <!-- Right Preview & Stats -->
         <div class="flex-1 flex flex-col gap-6 overflow-hidden">
-            
-            <!-- Canvas Preview Card -->
             <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col shadow-sm relative min-h-[350px]">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <h2 class="text-base font-bold text-slate-800">专业拼豆图纸实时工作台</h2>
-                        <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">70 x 70</span>
-                    </div>
-                </div>
-
-                <!-- Canvas Container -->
-                <div id="canvasContainer" class="flex-1 bg-slate-900/5 border border-slate-200 rounded-xl flex items-center justify-center overflow-auto relative cursor-crosshair p-4">
-                    <canvas id="pixelCanvas" class="shadow-xl rounded bg-white"></canvas>
+                <h2 class="text-base font-bold text-slate-800 mb-3">专业拼豆图纸实时工作台</h2>
+                <div class="flex-1 bg-slate-900/5 border border-slate-200 rounded-xl flex items-center justify-center overflow-auto p-4">
+                    <canvas id="pixelCanvas" class="shadow-xl rounded bg-white max-w-full h-auto"></canvas>
                 </div>
             </div>
 
-            <!-- Color Statistics Card -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col max-h-72">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
-                        <span>拼豆颜色采购清单</span>
-                        <span id="totalBeadsBadge" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-md font-normal">总计 0 颗</span>
-                    </h3>
+            <!-- Color Statistics -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col max-h-60">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-bold text-slate-800">拼豆颜色采购清单 <span id="totalBeadsBadge" class="text-xs font-normal text-slate-500">(总计 0 颗)</span></h3>
                 </div>
-                
-                <div class="flex-1 overflow-y-auto border border-slate-100 rounded-xl pr-1">
+                <div class="flex-1 overflow-y-auto border border-slate-100 rounded-xl">
                     <table class="w-full text-left border-collapse text-xs">
-                        <thead class="bg-slate-50 sticky top-0 text-slate-500 font-semibold border-b border-slate-200 z-10">
+                        <thead class="bg-slate-50 sticky top-0 text-slate-500 border-b border-slate-200">
                             <tr>
-                                <th class="p-2.5">颜色预览</th>
-                                <th class="p-2.5">色号 / 名称</th>
-                                <th class="p-2.5 text-right">所需数量 (颗)</th>
+                                <th class="p-2">颜色预览</th>
+                                <th class="p-2">色号/说明</th>
+                                <th class="p-2 text-right">所需数量</th>
                             </tr>
                         </thead>
                         <tbody id="colorStatsBody" class="divide-y divide-slate-100 text-slate-700">
-                            <tr><td colspan="3" class="p-6 text-center text-slate-400">请先上传图片以生成拼豆清单</td></tr>
+                            <tr><td colspan="3" class="p-4 text-center text-slate-400">请先上传图片并生成图纸</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -185,41 +107,35 @@
 
     <!-- Help Modal -->
     <div id="helpModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
-            <h3 class="text-lg font-bold text-slate-900">📖 使用指南与充值说明</h3>
-            <div class="space-y-3 text-sm text-slate-600">
-                <p><strong>1. 上传与转换：</strong> 选择图片并设定 70x70 规格，点击生成图纸。</p>
-                <p><strong>2. 零成本免手续费充值：</strong> 导出图纸时若次数不足，系统会弹出收银台。您只需扫码转账 4.9 元并在微信转账备注中填写弹出的 4 位随机单号，回到网页输入该单号点击“核对充值”，即可秒级到账 +5 次额度！</p>
-            </div>
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-3">
+            <h3 class="text-lg font-bold text-slate-900">📖 使用与充值说明</h3>
+            <p class="text-sm text-slate-600">当您的“剩余转换次数”为 0 时，点击导出图纸会自动弹出收银台。您只需扫码转账 4.9 元并在微信转账备注中输入弹出的 4 位随机单号，在网页中输入核对即可秒级充值 5 次！</p>
             <div class="flex justify-end pt-2">
-                <button onclick="closeHelpModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">我知道了</button>
+                <button onclick="closeHelpModal()" class="bg-indigo-600 text-white text-sm px-4 py-2 rounded-xl">我知道了</button>
             </div>
         </div>
     </div>
 
-    <!-- Payment & 4-Digit Order Code Modal -->
+    <!-- Payment Modal (4-Digit Note Verification) -->
     <div id="paymentModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl relative space-y-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl space-y-4">
             <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
             <h3 class="text-xl font-bold text-slate-800">解锁 5 次图纸导出额度</h3>
             <p class="text-xs text-slate-500">扫码转账 <span class="text-indigo-600 font-bold">￥4.90</span> 元，核对备注即可秒级充值</p>
 
-            <!-- 收款码图片 -->
             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 inline-block">
-                <img id="payQrCode" src="wechat_qrcode.png" alt="微信收款码" class="w-48 h-48 mx-auto object-contain rounded-lg shadow-sm" onerror="handleQRCodeError(this)">
+                <img id="payQrCode" src="wechat_qrcode.png" alt="微信收款码" class="w-48 h-48 mx-auto object-contain rounded-lg shadow-sm" onerror="this.src='https://placehold.co/150x150/059669/FFFFFF?text=WeChat_Pay_4.9'">
                 <p class="text-xs text-slate-400 mt-2">请使用微信扫一扫付款</p>
             </div>
 
-            <!-- 专属备注单号提示 -->
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left">
                 <div class="flex items-center justify-between">
                     <span class="text-xs text-amber-800 font-medium">付款时必须备注此单号：</span>
                     <span id="currentOrderCode" class="font-mono text-base font-extrabold text-amber-900 bg-amber-200 px-2 py-0.5 rounded">----</span>
                 </div>
-                <p class="text-[11px] text-amber-700 mt-1">⚠️ 转账时请在“添加付款备注”中输入上面 4 位数字</p>
+                <p class="text-[11px] text-amber-700 mt-1">⚠️ 请在微信转账的“添加付款备注”中输入上方 4 位数字</p>
             </div>
 
-            <!-- 单号核对输入框 -->
             <div class="flex gap-2">
                 <input type="text" id="inputOrderCode" placeholder="输入转账备注的4位单号" maxlength="4" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-center font-mono font-bold text-slate-700 focus:outline-none focus:border-indigo-500 text-sm">
                 <button onclick="verifyAndRecharge()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 rounded-xl text-sm whitespace-nowrap shadow-md">
@@ -232,32 +148,19 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50">
         <span id="toastMsg">操作成功</span>
     </div>
 
     <script>
-        // --- 核心全局变量 ---
         let currentOrderCode = '';
         let sourceImage = null;
         let currentGridSize = 70;
-        let activeTool = 'draw';
-        
-        // 简易调色板模拟
-        const paletteColors = [
-            {code: 'P01', name: '纯白', hex: '#FFFFFF'},
-            {code: 'P02', name: '深黑', hex: '#111111'},
-            {code: 'P03', name: '大红', hex: '#E53E3E'},
-            {code: 'P04', name: '亮黄', hex: '#ECC94B'},
-            {code: 'P05', name: '天蓝', hex: '#3182CE'},
-            {code: 'P06', name: '草绿', hex: '#38A169'}
-        ];
 
-        // 额度存取
         function getUserQuota() {
             let q = localStorage.getItem('bead_quota');
             if (q === null) {
-                q = 3; // 初始赠送3次
+                q = 3; // 默认新用户赠送 3 次免费试用
                 localStorage.setItem('bead_quota', q);
             }
             return parseInt(q, 10);
@@ -272,7 +175,6 @@
             setUserQuota(getUserQuota());
         });
 
-        // 弹窗控制
         function openHelpModal() { document.getElementById('helpModal').classList.remove('hidden'); }
         function closeHelpModal() { document.getElementById('helpModal').classList.add('hidden'); }
         
@@ -284,7 +186,6 @@
         }
         function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 
-        // 4位单号校验充值
         function verifyAndRecharge() {
             const val = document.getElementById('inputOrderCode').value.trim();
             if (!val) { alert("请输入转账备注的 4 位单号！"); return; }
@@ -298,7 +199,6 @@
             }
         }
 
-        // 图片上传与转换
         function handleImageUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -307,7 +207,7 @@
                 const img = new Image();
                 img.onload = function() {
                     sourceImage = img;
-                    processToBeadGrid();
+                    requestConversion();
                     showToast("照片加载成功！");
                 };
                 img.src = evt.target.result;
@@ -316,11 +216,14 @@
         }
 
         function triggerReprocess() {
-            if (sourceImage) processToBeadGrid();
+            if (sourceImage) requestConversion();
         }
 
-        function processToBeadGrid() {
-            if (!sourceImage) return;
+        function requestConversion() {
+            if (!sourceImage) {
+                alert("请先上传源照片！");
+                return;
+            }
             const canvas = document.getElementById('pixelCanvas');
             const ctx = canvas.getContext('2d');
             const size = parseInt(document.getElementById('gridSizeSelect').value) || 70;
@@ -330,33 +233,22 @@
             canvas.height = size;
             ctx.drawImage(sourceImage, 0, 0, size, size);
 
-            updateColorStats(size);
-        }
-
-        function updateColorStats(size) {
+            // 模拟生成颜色清单统计
             const tbody = document.getElementById('colorStatsBody');
             tbody.innerHTML = `
                 <tr>
-                    <td class="p-2.5 flex items-center space-x-2"><span class="w-4 h-4 rounded shadow-sm inline-block" style="background:#3182CE"></span></td>
-                    <td class="p-2.5 font-medium">P05 - 天蓝</td>
-                    <td class="p-2.5 text-right font-mono font-bold">${size * size * 0.4 | 0} 颗</td>
+                    <td class="p-2"><span class="w-3.5 h-3.5 rounded inline-block bg-blue-500"></span></td>
+                    <td class="p-2 font-medium">经典蓝 (P05)</td>
+                    <td class="p-2 text-right font-mono">${(size * size * 0.4) | 0} 颗</td>
                 </tr>
                 <tr>
-                    <td class="p-2.5 flex items-center space-x-2"><span class="w-4 h-4 rounded shadow-sm inline-block" style="background:#FFFFFF; border:1px solid #cbd5e1"></span></td>
-                    <td class="p-2.5 font-medium">P01 - 纯白</td>
-                    <td class="p-2.5 text-right font-mono font-bold">${size * size * 0.6 | 0} 颗</td>
+                    <td class="p-2"><span class="w-3.5 h-3.5 rounded inline-block bg-white border border-slate-300"></span></td>
+                    <td class="p-2 font-medium">纯白基底 (P01)</td>
+                    <td class="p-2 text-right font-mono">${(size * size * 0.6) | 0} 颗</td>
                 </tr>
             `;
-            document.getElementById('totalBeadsBadge').innerText = `总计 ${size * size} 颗`;
-        }
-
-        function requestConversionWithCheck() {
-            if (!sourceImage) {
-                alert("请先上传源照片！");
-                return;
-            }
-            processToBeadGrid();
-            showToast("70x70 图纸生成成功！");
+            document.getElementById('totalBeadsBadge0').innerText = `(总计 ${size * size} 颗)`;
+            showToast(`${size}x${size} 图纸生成成功！`);
         }
 
         function downloadPatternImage() {
@@ -386,16 +278,6 @@
             setTimeout(() => {
                 t.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
-        }
-
-        function handleQRCodeError(img) {
-            img.onerror = null;
-            img.src = 'https://placehold.co/150x150/059669/FFFFFF?text=WeChat_Pay_4.9';
-        }
-        
-        function setTool(tool) {
-            activeTool = tool;
-            showToast(`已切换工具: ${tool === 'draw' ? '填色画笔' : '橡皮擦'}`);
         }
     </script>
 </body>
