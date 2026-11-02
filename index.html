@@ -1385,7 +1385,7 @@
         }
 
 // ==========================================
-// 终极真实质感版：多色交织纹理 + 结构化黑边描边
+// 终极修正版：仅外轮廓描边 + 消除大色块交织算法
 // ==========================================
 function processImage() {
     if (!uploadedImage) return;
@@ -1431,7 +1431,7 @@ function processImage() {
     const contrast = parseFloat(document.getElementById('contrastRange').value);
     const removeBg = document.getElementById('removeBgToggle').checked;
 
-    // 2. 精准背景清理（严格只清理外围纯白空背景，绝不误伤内部浅色毛发）
+    // 2. 精准背景清理（严格只清理外围纯白空背景）
     if (removeBg) {
         const total = cols * rows;
         const visited = new Uint8Array(total);
@@ -1463,7 +1463,7 @@ function processImage() {
     const paletteKey = document.getElementById('paletteSelect').value;
     const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
 
-    // 3. 【核心改进】Bayer 4x4 有序抖动矩阵（让相似颜色自然交织堆叠，消除大色块死板感）
+    // 3. 强化版 Bayer 4x4 有序微抖动矩阵（增大振幅，迫使相近颜色在白色/浅色区交织，打破大色块）
     const bayerMatrix = [
         [  0,  8,  2, 10 ],
         [ 12,  4, 14,  6 ],
@@ -1478,13 +1478,12 @@ function processImage() {
             let idx = (r * cols + c) * 4;
             let r_val = data[idx], g_val = data[idx+1], b_val = data[idx+2];
 
-            // 调整对比度
             r_val = Math.min(255, Math.max(0, (r_val - 128) * contrast + 128));
             g_val = Math.min(255, Math.max(0, (g_val - 128) * contrast + 128));
             b_val = Math.min(255, Math.max(0, (b_val - 128) * contrast + 128));
 
-            // 加入微弱的 Bayer 矩阵抖动量，使相近色（如白、象牙白、米色、浅灰）自然交织
-            let matrixVal = (bayerMatrix[r % 4][c % 4] / 16 - 0.5) * 18;
+            // 适当加大微抖动振幅（从 18 提高到 32），让相邻像素在不同色号（如 H2 和 H3）之间穿插，消除单色大块
+            let matrixVal = (bayerMatrix[r % 4][c % 4] / 16 - 0.5) * 32;
             r_val = Math.min(255, Math.max(0, r_val + matrixVal));
             g_val = Math.min(255, Math.max(0, g_val + matrixVal));
             b_val = Math.min(255, Math.max(0, b_val + matrixVal));
@@ -1495,16 +1494,15 @@ function processImage() {
         pixelData.push(rowArr);
     }
 
-    // 4. 【核心改进】结构化边缘与五官黑边描边（让眼睛、舌头边缘和外轮廓极具立体感）
-    applyStructuralOutlines(pixelData, cols, rows, currentPalette, data);
+    // 4. 纯外轮廓精准描边（绝对不碰内部五官和细节，只给紧邻背景的最外围像素描黑边）
+    applyPureOuterSilhouette(pixelData, cols, rows, currentPalette);
 
     redrawCanvas();
     updateColorStatistics();
 }
 
-// 辅助函数：精准结构化描边算法
-function applyStructuralOutlines(grid, w, h, palette, rawData) {
-    // 找到最深色（黑色 H7 或最深炭灰）
+// 辅助函数：仅对最外侧轮廓进行黑边描边
+function applyPureOuterSilhouette(grid, w, h, palette) {
     let darkBead = palette.reduce((prev, curr) => {
         let sumPrev = prev.rgb[0] + prev.rgb[1] + prev.rgb[2];
         let sumCurr = curr.rgb[0] + curr.rgb[1] + curr.rgb[2];
@@ -1519,23 +1517,17 @@ function applyStructuralOutlines(grid, w, h, palette, rawData) {
             let isBg = (current.rgb[0] > 245 && current.rgb[1] > 245 && current.rgb[2] > 245);
 
             if (!isBg) {
-                // 检查上下左右是否有背景或颜色反差极大（如眼睛、舌头轮廓、外边缘）
+                // 检查四周上下左右 4 个邻居
                 let neighbors = [
                     cloneGrid[r-1][c], cloneGrid[r+1][c],
                     cloneGrid[r][c-1], cloneGrid[r][c+1]
                 ];
+                
+                // 只有当该像素紧挨着白色背景时，它才是“外轮廓”
                 let touchingBg = neighbors.some(n => n.rgb[0] > 245 && n.rgb[1] > 245 && n.rgb[2] > 245);
                 
-                // 计算当前像素与周围的亮度差，用于提取五官与结构边界
-                let pIdx = (r * w + c) * 4;
-                let lum = rawData[pIdx]*0.299 + rawData[pIdx+1]*0.587 + rawData[pIdx+2]*0.114;
-                let isDarkFeature = (lum < 75); // 眼睛、黑鼻头的核心区域保持深色
-
                 if (touchingBg) {
-                    // 外轮廓边缘自动描上一圈精美黑边，显得立体
-                    grid[r][c] = darkBead;
-                } else if (isDarkFeature) {
-                    // 确保眼睛和鼻子深邃有神
+                    // 仅对最外围轮廓描黑边，内部所有五官、眼睛、舌头全部保持原样不受干扰
                     grid[r][c] = darkBead;
                 }
             }
