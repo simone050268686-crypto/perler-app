@@ -1385,7 +1385,7 @@
         }
 
 // ==========================================
-// 增强版：支持复杂/灰色背景自动剥离的拼豆算法
+// 纯净无黑点版：智能抠图 + 自然色彩平滑渐变（无任何随机描边）
 // ==========================================
 function processImage() {
     if (!uploadedImage) return;
@@ -1431,10 +1431,9 @@ function processImage() {
     const contrast = parseFloat(document.getElementById('contrastRange').value);
     const removeBg = document.getElementById('removeBgToggle').checked;
 
-    // 2. 【核心升级】智能泛洪背景剥离（自动采样四角背景色，不管是白墙还是灰色瓷砖都能精准切除）
+    // 2. 智能背景剥离（自动识别并切除周围的灰色瓷砖或杂色背景）
     if (removeBg) {
         const total = cols * rows;
-        // 采样四个角的颜色作为背景基准
         const cornerColors = [
             [data[0], data[1], data[2]],
             [data[(cols - 1) * 4], data[(cols - 1) * 4 + 1], data[(cols - 1) * 4 + 2]],
@@ -1468,7 +1467,6 @@ function processImage() {
             const db = data[p + 2] - avgBgB;
             const dist = Math.sqrt(dr * dr + dg * dg + db * db);
 
-            // 只要颜色与四角背景相近（容差范围内的灰色/杂色），就判定为背景并转为纯白
             if (dist < 45) {
                 data[p] = 255; data[p + 1] = 255; data[p + 2] = 255;
                 const x = id % cols, y = Math.floor(id / cols);
@@ -1480,7 +1478,7 @@ function processImage() {
     const paletteKey = document.getElementById('paletteSelect').value;
     const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
 
-    // 3. Floyd-Steinberg 误差扩散算法
+    // 3. 经典的 Floyd-Steinberg 误差扩散算法（保证颜色自然细腻渐变，没有生硬大色块）
     pixelData = [];
     for (let r = 0; r < rows; r++) {
         let rowArr = [];
@@ -1516,12 +1514,16 @@ function processImage() {
         pixelData.push(rowArr);
     }
 
-    // 4. 外轮廓描边增强
-    enhanceSilhouetteOutlines(pixelData, cols, rows, currentPalette);
+    // ⚠️ 已完全移除 enhanceSilhouetteOutlines 描边函数，脸上绝对不会再有任何突兀的黑点！
 
     redrawCanvas();
     updateColorStatistics();
 }
+
+
+        
+
+        
 
         function applyAdvancedBilateralSharpening(data, w, h, strength) {
 
