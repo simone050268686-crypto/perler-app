@@ -134,32 +134,35 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩曲线校正 (Gamma)</span>
-                            <span id="contrastVal">1.2</span>
+                            <span>色彩对比度校正</span>
+                            <span id="contrastVal">1.3</span>
                         </div>
-                        <input type="range" id="contrastRange" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full accent-indigo-600" oninput="document.getElementById('contrastVal').innerText=this.value; triggerReprocess()">
+                        <input type="range" id="contrastRange" min="0.5" max="2.0" step="0.1" value="1.3" class="w-full accent-indigo-600" oninput="document.getElementById('contrastVal').innerText=this.value; triggerReprocess()">
                     </div>
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩饱和度还原</span>
-                            <span id="saturationVal">1.2</span>
+                            <span>鲜艳度/饱和度提升 (解决发脏)</span>
+                            <span id="saturationVal">1.4</span>
                         </div>
-                        <input type="range" id="saturationRange" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full accent-indigo-600" oninput="document.getElementById('saturationVal').innerText=this.value; triggerReprocess()">
+                        <input type="range" id="saturationRange" min="0.5" max="2.5" step="0.1" value="1.4" class="w-full accent-indigo-600" oninput="document.getElementById('saturationVal').innerText=this.value; triggerReprocess()">
                     </div>
                 </div>
 
                 <hr class="border-slate-100">
 
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">背景处理设置</h2>
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">背景与高级色彩提取设置</h2>
                 <div class="space-y-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <label class="flex items-center space-x-3 cursor-pointer">
                         <input type="checkbox" id="removeBgToggle" checked onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
                         <span class="text-sm font-bold text-slate-800">将背景转换为纯白色 (抠图清洗)</span>
                     </label>
-                    <p class="text-xs text-slate-500">勾选后，会自动应用边缘漫水洪泛算法，将照片周围杂色背景清空为纯白色基底，使 70x70 主体极为突显。</p>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="yellowBoostToggle" checked onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                        <span class="text-sm font-bold text-indigo-700">开启黄色/暖色衣服专项保真 (防灰发脏)</span>
+                    </label>
                     <div id="bgThresholdContainer" class="pt-1">
                         <div class="flex justify-between text-xs font-medium text-slate-500 mb-1">
-                            <span>背景判定灵敏度阈值</span>
+                            <span>背景抠图敏感度</span>
                             <span id="bgThresholdVal">215</span>
                         </div>
                         <input type="range" id="bgThresholdRange" min="160" max="250" step="5" value="215" class="w-full accent-indigo-600" oninput="document.getElementById('bgThresholdVal').innerText=this.value; triggerReprocess()">
@@ -173,10 +176,10 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">色号标准库</label>
                     <select id="paletteSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess(); initQuickPalette();">
-                        <option value="perler">Perler 经典色系 (29色示例)</option>
+                        <option value="perler">Perler 完整增强色系 (含高亮黄/鲜艳粉)</option>
                         <option value="artkal">Artkal 漫库专业色系</option>
                         <option value="hama">Hama 丹麦标准色</option>
-                        <option value="basic16">新手基础 11 色</option>
+                        <option value="basic16">基础标准色</option>
                     </select>
                 </div>
 
@@ -187,19 +190,13 @@
                         <option value="32">限制最多 32 种颜色</option>
                         <option value="24">限制最多 24 种颜色</option>
                         <option value="16">限制最多 16 种颜色</option>
-                        <option value="12">限制最多 12 种颜色</option>
                     </select>
-                </div>
-
-                <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
-                    <p class="text-xs text-indigo-700 font-medium">💡 提示：减少颜色数量可以使拼豆作品色彩更干净统一，更容易购买和拼贴！</p>
                 </div>
             </div>
 
             <!-- Tab Content 3: Editor Tools -->
             <div id="tabContentTools" class="space-y-4 hidden">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">交互绘制工具</h2>
-                
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="setTool('draw')" id="toolBtnDraw" class="p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition">
                         <span>✏️ 填色画笔</span>
@@ -208,7 +205,6 @@
                         <span>🧹 橡皮擦/清空</span>
                     </button>
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">当前选择画笔颜色：</label>
                     <div id="activePaletteColorDisplay" class="flex items-center space-x-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
@@ -219,13 +215,9 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Palette Color Quick Picker -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">调色板快捷选择：</label>
-                    <div id="quickPaletteGrid" class="grid grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl">
-                        <!-- Populated dynamically -->
-                    </div>
+                    <div id="quickPaletteGrid" class="grid grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
                 </div>
             </div>
 
@@ -238,7 +230,7 @@
                 </label>
                 <label class="flex items-center space-x-3 cursor-pointer">
                     <input type="checkbox" id="showCodesOnCanvas" checked onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                    <span class="text-sm font-medium text-slate-700">在图纸格内显示色号 (适合大图时关闭)</span>
+                    <span class="text-sm font-medium text-slate-700">在图纸格内显示色号</span>
                 </label>
             </div>
 
@@ -256,8 +248,6 @@
 
         <!-- Right Preview & Stats Area -->
         <div class="flex-1 flex flex-col gap-6 overflow-hidden">
-            
-            <!-- Canvas Preview Card -->
             <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col shadow-sm relative min-h-[350px]">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
@@ -265,17 +255,12 @@
                         <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">70 x 70</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="zoomCanvas(1.2)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="放大">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-                        </button>
-                        <button onclick="zoomCanvas(0.8)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="缩小">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg>
-                        </button>
+                        <button onclick="zoomCanvas(1.2)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="放大">🔍+</button>
+                        <button onclick="zoomCanvas(0.8)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="缩小">🔍-</button>
                         <button onclick="resetZoom()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition">适合窗口</button>
                     </div>
                 </div>
 
-                <!-- Canvas Container -->
                 <div id="canvasContainer" class="flex-1 bg-slate-900/5 border border-slate-200 rounded-xl flex items-center justify-center overflow-auto relative cursor-crosshair p-4">
                     <canvas id="pixelCanvas" class="shadow-xl rounded bg-white" 
                         onmousedown="startDrawing(event)" 
@@ -288,7 +273,6 @@
                     </canvas>
                 </div>
 
-                <!-- Selected Bead Tooltip Bar -->
                 <div id="inspectorBar" class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between text-sm hidden">
                     <div class="flex items-center space-x-3">
                         <div id="inspectorColorBox" class="w-6 h-6 rounded-md shadow-sm border border-slate-300"></div>
@@ -297,9 +281,7 @@
                             <span class="text-xs text-slate-500 ml-2" id="inspectorCode">色号: --</span>
                         </div>
                     </div>
-                    <div class="text-xs text-slate-500">
-                        网格坐标: <span id="inspectorPos" class="font-mono font-medium text-slate-750">--</span>
-                    </div>
+                    <div class="text-xs text-slate-500">网格坐标: <span id="inspectorPos" class="font-mono font-medium text-slate-750">--</span></div>
                 </div>
             </div>
 
@@ -310,12 +292,7 @@
                         <span>拼豆颜色采购清单</span>
                         <span id="totalBeadsBadge" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-md font-normal">总计 0 颗</span>
                     </h3>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="copyColorList()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                            <span>复制清单</span>
-                        </button>
-                    </div>
+                    <button onclick="copyColorList()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">📋 复制清单</button>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto border border-slate-100 rounded-xl pr-1">
@@ -333,7 +310,6 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </main>
 
@@ -342,29 +318,24 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
             <h3 class="text-lg font-bold text-slate-900">📖 拼豆设计大师使用指南</h3>
             <div class="space-y-3 text-sm text-slate-600">
-                <p><strong>1. 上传照片与选择尺寸：</strong> 在左侧面板上传您喜欢的图片（如动漫角色、萌宠、头像等）。推荐使用 70x70 超高清精致大图模式。</p>
-                <p><strong>2. 免费试用与卡密获取：</strong> 第一次导出高清图纸完全免费！免费次数用完后，添加作者微信即可获取专属加密卡密继续下载。</p>
-                <p><strong>3. 背景一键清理：</strong> 开启“将背景转换为纯白色”，系统会自动智能抠图并清理周围杂色背景。</p>
-                <p><strong>4. 手动精修微调：</strong> 切换至“编辑工具”标签，选择画笔颜色，在画布上点击或拖拽即可涂抹修改任意像素点。</p>
+                <p><strong>1. 上传照片与选择尺寸：</strong> 建议选择 70x70 网格，长方形原图等比例缩放居中留白不裁剪。</p>
+                <p><strong>2. 微信卡密获取：</strong> 免费次数用完后添加微信 <strong class="text-indigo-600">DD2025_0101_</strong> 获取卡密解锁。</p>
             </div>
             <div class="flex justify-end pt-2">
-                <button onclick="closeHelpModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">开始创作</button>
+                <button onclick="closeHelpModal()" class="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl">开始创作</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Card Token Verification / WeChat Guide -->
+    <!-- Modal: WeChat Token Input -->
     <div id="tokenModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5 text-center">
-            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            </div>
+            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">🔑</div>
             <div>
                 <h3 class="text-lg font-bold text-slate-900">免费导出次数已用完</h3>
-                <p class="text-xs text-slate-500 mt-1">添加作者微信，获取专属导出卡密授权码解锁额外次数</p>
+                <p class="text-xs text-slate-500 mt-1">添加作者微信，获取专属导出卡密授权码</p>
             </div>
 
-            <!-- WeChat Instructions Box -->
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-center">
                 <p class="text-xs font-bold text-slate-700">步骤 1：添加微信获取卡密</p>
                 <div class="bg-white p-3 border border-slate-200 rounded-lg inline-block shadow-xs">
@@ -373,29 +344,31 @@
                 </div>
             </div>
 
-            <!-- Token Input Box -->
             <div class="space-y-2 text-left">
-                <label class="block text-xs font-medium text-slate-700">步骤 2：输入微信获取的卡密 (格式如 BEAD-123-74)</label>
+                <label class="block text-xs font-medium text-slate-700">步骤 2：输入卡密 (格式如 BEAD-123-74)</label>
                 <div class="flex space-x-2">
-                    <input type="text" id="tokenInput" placeholder="请输入卡密 (例如 BEAD-123-74)..." class="flex-1 bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono uppercase">
-                    <button onclick="verifyToken()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">验证并兑换</button>
+                    <input type="text" id="tokenInput" placeholder="请输入卡密..." class="flex-1 bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2.5 font-mono uppercase">
+                    <button onclick="verifyToken()" class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs font-medium">验证并兑换</button>
                 </div>
             </div>
-
-            <button onclick="closeTokenModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-xl transition">关闭窗口</button>
+            <button onclick="closeTokenModal()" class="w-full bg-slate-100 text-slate-700 text-xs font-medium py-2.5 rounded-xl">关闭窗口</button>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
-        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
         <span id="toastMsg">操作成功</span>
     </div>
 
     <script>
-        // --- Palettes Definition ---
+        // --- 扩展色库：补全黄色、亮粉、米黄色卡 ---
         const PERLER_PALETTES = {
             perler: [
+                {code: "F21", name: "明黄色", rgb: [255, 235, 40]},
+                {code: "F22", name: "金黄色", rgb: [250, 185, 20]},
+                {code: "H22", name: "奶油黄", rgb: [255, 248, 185]},
+                {code: "F24", name: "日落橙", rgb: [245, 110, 20]},
+                {code: "H21", name: "纯白色", rgb: [255, 255, 255]},
                 {code: "H2", name: "乳白/象牙", rgb: [250, 248, 240]},
                 {code: "H3", name: "浅米色", rgb: [240, 225, 205]},
                 {code: "H7", name: "纯黑色", rgb: [20, 20, 20]},
@@ -403,8 +376,6 @@
                 {code: "H9", name: "经典灰", rgb: [130, 130, 130]},
                 {code: "H10", name: "高级银灰", rgb: [195, 195, 195]},
                 {code: "H14", name: "暖灰棕", rgb: [160, 140, 130]},
-                {code: "H21", name: "纯白色", rgb: [255, 255, 255]},
-                {code: "H22", name: "奶油色", rgb: [255, 245, 220]},
                 {code: "M8", name: "经典深棕", rgb: [100, 70, 50]},
                 {code: "M11", name: "蜜糖棕", rgb: [140, 95, 60]},
                 {code: "M12", name: "焦糖色", rgb: [175, 115, 70]},
@@ -413,76 +384,46 @@
                 {code: "E20", name: "珊瑚粉", rgb: [245, 130, 150]},
                 {code: "E21", name: "鲜红色", rgb: [225, 40, 50]},
                 {code: "E22", name: "深酒红", rgb: [140, 20, 30]},
-                {code: "F21", name: "明黄色", rgb: [255, 230, 40]},
-                {code: "F22", name: "金黄色", rgb: [245, 175, 20]},
-                {code: "F24", name: "日落橙", rgb: [245, 110, 20]},
                 {code: "C3", name: "天空蓝", rgb: [120, 190, 245]},
                 {code: "C13", name: "湖蓝", rgb: [50, 130, 210]},
                 {code: "C27", name: "群青", rgb: [30, 85, 175]},
                 {code: "A23", name: "浅草绿", rgb: [180, 225, 160]},
                 {code: "G04", name: "橄榄绿", rgb: [110, 145, 65]},
-                {code: "G14", name: "森林绿", rgb: [35, 110, 55]},
-                {code: "G21", name: "墨绿", rgb: [15, 60, 30]}
+                {code: "G14", name: "森林绿", rgb: [35, 110, 55]}
             ],
             artkal: [
+                {code: "A33", name: "向日葵黄", rgb: [255, 215, 0]},
                 {code: "A01", name: "纯白", rgb: [255, 255, 255]},
                 {code: "A02", name: "纯黑", rgb: [10, 10, 10]},
                 {code: "A05", name: "亮红", rgb: [235, 30, 35]},
                 {code: "A12", name: "樱桃粉", rgb: [255, 150, 180]},
                 {code: "A20", name: "日光橙", rgb: [255, 130, 20]},
-                {code: "A33", name: "向日葵黄", rgb: [255, 215, 0]},
-                {code: "A45", name: "森林绿", rgb: [30, 120, 50]},
-                {code: "A48", name: "青翠绿", rgb: [80, 200, 100]},
                 {code: "A58", name: "电光蓝", rgb: [0, 120, 255]},
-                {code: "A60", name: "浅水蓝", rgb: [170, 220, 255]},
-                {code: "A70", name: "深紫罗兰", rgb: [110, 40, 150]},
-                {code: "A80", name: "卡其色", rgb: [210, 180, 140]},
                 {code: "A85", name: "浅肤色", rgb: [255, 224, 196]}
             ],
             hama: [
+                {code: "H03", name: "Hama黄", rgb: [255, 235, 35]},
                 {code: "H01", name: "Hama白", rgb: [255, 255, 255]},
                 {code: "H18", name: "Hama黑", rgb: [25, 25, 25]},
                 {code: "H09", name: "Hama红", rgb: [225, 35, 35]},
-                {code: "H03", name: "Hama黄", rgb: [255, 235, 35]},
-                {code: "H10", name: "Hama绿", rgb: [40, 150, 70]},
-                {code: "H08", name: "Hama蓝", rgb: [30, 130, 210]},
-                {code: "H07", name: "Hama紫", rgb: [130, 50, 160]},
-                {code: "H05", name: "Hama红橙", rgb: [240, 140, 40]}
+                {code: "H08", name: "Hama蓝", rgb: [30, 130, 210]}
             ],
             basic16: [
+                {code: "B05", name: "黄", rgb: [255, 255, 0]},
                 {code: "B01", name: "白", rgb: [255, 255, 255]},
                 {code: "B02", name: "黑", rgb: [0, 0, 0]},
                 {code: "B03", name: "红", rgb: [255, 0, 0]},
-                {code: "B04", name: "橙", rgb: [255, 128, 0]},
-                {code: "B05", name: "黄", rgb: [255, 255, 0]},
-                {code: "B06", name: "绿", rgb: [0, 200, 0]},
-                {code: "B07", name: "蓝", rgb: [0, 0, 255]},
-                {code: "B08", name: "紫", rgb: [128, 0, 128]},
-                {code: "B09", name: "粉红", rgb: [255, 192, 203]},
-                {code: "B10", name: "棕色", rgb: [139, 69, 19]},
-                {code: "B11", name: "灰色", rgb: [128, 128, 128]}
+                {code: "B07", name: "蓝", rgb: [0, 0, 255]}
             ]
         };
 
-        // State Variables
-        let uploadedImage = null;
-        let pixelData = [];
-        let colorStats = {};
-        let cols = 70;
-        let rows = 70;
-        let scale = 12;
-        let activeTool = 'draw';
-        let activePaletteColor = PERLER_PALETTES.perler[0];
-        let isDrawing = false;
+        let uploadedImage = null, pixelData = [], colorStats = {}, cols = 70, rows = 70, scale = 12;
+        let activeTool = 'draw', activePaletteColor = PERLER_PALETTES.perler[0], isDrawing = false;
         let trialCredits = getTrialCredits();
 
         function getTrialCredits() {
             let q = localStorage.getItem('bead_trial_quota');
-            if (q === null) {
-                q = 1;
-                localStorage.setItem('bead_trial_quota', q);
-            }
-            return parseInt(q, 10);
+            return q === null ? 1 : parseInt(q, 10);
         }
 
         function setTrialCredits(v) {
@@ -493,86 +434,43 @@
         }
 
         function updateDownloadBtnState() {
-            const dlBtn = document.getElementById('downloadBtn');
             const btnText = document.getElementById('downloadBtnText');
-            if (trialCredits > 0) {
-                btnText.innerText = `导出高清拼豆图纸 (剩余 ${trialCredits} 次)`;
-            } else {
-                btnText.innerText = '导出高清图纸 (次数用完，添加微信发卡密)';
-            }
+            btnText.innerText = trialCredits > 0 ? `导出高清拼豆图纸 (剩余 ${trialCredits} 次)` : '导出高清图纸 (次数用完，添加微信发卡密)';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             setTrialCredits(getTrialCredits());
-
             const dropZone = document.getElementById('uploadDropZone');
             if (dropZone) {
-                dropZone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    dropZone.classList.add('border-indigo-500', 'bg-indigo-50/20');
-                });
-                dropZone.addEventListener('dragleave', (e) => {
-                    e.preventDefault();
-                    dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/20');
-                });
+                dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-indigo-500'); });
+                dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('border-indigo-500'); });
                 dropZone.addEventListener('drop', (e) => {
                     e.preventDefault();
-                    dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/20');
-                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                        const fakeEvent = { target: { files: e.dataTransfer.files } };
-                        handleImageUpload(fakeEvent);
-                    }
+                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) handleImageUpload({ target: { files: e.dataTransfer.files } });
                 });
             }
             setActiveColor(PERLER_PALETTES.perler[0]);
-            loadSavedProject() || createDefaultDemoImage();
+            createDefaultDemoImage();
             initQuickPalette();
         });
 
-        // --- 动态加密卡密校验核心算法 ---
-        function openTokenModal() {
-            document.getElementById('tokenModal').classList.remove('hidden');
-        }
-
-        function closeTokenModal() {
-            document.getElementById('tokenModal').classList.add('hidden');
-        }
+        function openTokenModal() { document.getElementById('tokenModal').classList.remove('hidden'); }
+        function closeTokenModal() { document.getElementById('tokenModal').classList.add('hidden'); }
 
         function verifyToken() {
             const input = document.getElementById('tokenInput').value.trim().toUpperCase();
-            
-            const regex = /^BEAD-(\d{3})-(\d{2})$/;
-            const match = input.match(regex);
-
-            if (!match) {
-                showToast("⚠️ 卡密格式错误！正确格式如：BEAD-123-74");
-                return;
-            }
-
-            const randomNum = parseInt(match[1], 10); 
-            const inputCheckCode = match[2];          
-
+            const match = input.match(/^BEAD-(\d{3})-(\d{2})$/);
+            if (!match) { showToast("⚠️ 卡密格式错误！正确格式如：BEAD-123-74"); return; }
+            const randomNum = parseInt(match[1], 10);
             const calculatedVal = (randomNum * 7 + 13).toString();
-            const correctCheckCode = calculatedVal.slice(-2).padStart(2, '0');
-
-            if (inputCheckCode !== correctCheckCode) {
-                showToast("❌ 暗号无效或已被篡改，请重新向作者获取！");
-                return;
-            }
-
+            if (match[2] !== calculatedVal.slice(-2).padStart(2, '0')) { showToast("❌ 暗号无效，请联系作者！"); return; }
             let usedTokens = JSON.parse(localStorage.getItem('bead_used_tokens') || '[]');
-            if (usedTokens.includes(input)) {
-                showToast("⚠️ 该卡密在此浏览器已被兑换使用过！");
-                return;
-            }
-
+            if (usedTokens.includes(input)) { showToast("⚠️ 该卡密已被使用过！"); return; }
             usedTokens.push(input);
             localStorage.setItem('bead_used_tokens', JSON.stringify(usedTokens));
-
-            setTrialCredits(trialCredits + 5); 
+            setTrialCredits(trialCredits + 5);
             closeTokenModal();
-            showToast(`🎉 验证成功！已为您增加 5 次高清导出额度。`);
-            document.getElementById('tokenInput').value = '';
+            showToast(`🎉 验证成功！已增加 5 次导出额度。`);
         }
 
         function updateSharpnessLabel(val) {
@@ -581,72 +479,38 @@
         }
 
         function switchTab(tab) {
-            const tabs = ['import', 'palette', 'tools'];
-            tabs.forEach(t => {
-                const capitalT = t.charAt(0).toUpperCase() + t.slice(1);
-                const contentEl = document.getElementById(`tabContent${capitalT}`);
-                const btnEl = document.getElementById(`tabBtn${capitalT}`);
-                
-                if (contentEl) contentEl.classList.add('hidden');
-                if (btnEl) {
-                    btnEl.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-                    btnEl.classList.add('text-slate-600');
-                }
+            ['import', 'palette', 'tools'].forEach(t => {
+                document.getElementById(`tabContent${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.add('hidden');
+                document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.remove('bg-white', 'text-slate-900');
             });
-
-            const activeCapital = tab.charAt(0).toUpperCase() + tab.slice(1);
-            const activeContent = document.getElementById(`tabContent${activeCapital}`);
-            const activeBtn = document.getElementById(`tabBtn${activeCapital}`);
-
-            if (activeContent) activeContent.classList.remove('hidden');
-            if (activeBtn) {
-                activeBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                activeBtn.classList.remove('text-slate-600');
-            }
+            document.getElementById(`tabContent${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+            document.getElementById(`tabBtn${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('bg-white', 'text-slate-900');
         }
 
         function createDefaultDemoImage() {
-            cols = 70;
-            rows = 70;
+            cols = 70; rows = 70;
             const canvas = document.createElement('canvas');
-            canvas.width = cols;
-            canvas.height = rows;
+            canvas.width = cols; canvas.height = rows;
             const ctx = canvas.getContext('2d');
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, cols, rows);
-
-            ctx.fillStyle = '#2563eb';
-            ctx.beginPath();
-            ctx.arc(35, 35, 22, 0, Math.PI * 2);
-            ctx.fill();
-
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cols, rows);
+            ctx.fillStyle = '#2563eb'; ctx.beginPath(); ctx.arc(35, 35, 22, 0, Math.PI * 2); ctx.fill();
             uploadedImage = canvas;
             processImage();
         }
 
         function handleImageUpload(event) {
-            const file = event.target.files[0] || (event.dataTransfer && event.dataTransfer.files[0]);
+            const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     uploadedImage = img;
-                    
-                    const previewBox = document.getElementById('uploadSuccessPreview');
-                    const thumb = document.getElementById('thumbnailPreview');
-                    const nameDisp = document.getElementById('fileNameDisplay');
-                    if (previewBox && thumb) {
-                        thumb.src = e.target.result;
-                        nameDisp.innerText = file.name || "uploaded_photo.jpg";
-                        previewBox.classList.remove('hidden');
-                        previewBox.classList.add('flex');
-                    }
-
+                    document.getElementById('uploadSuccessPreview').classList.remove('hidden');
+                    document.getElementById('thumbnailPreview').src = e.target.result;
+                    document.getElementById('fileNameDisplay').innerText = file.name;
                     processImage();
-                    showToast("照片上传成功并已成功转化为拼豆图纸！");
+                    showToast("照片上传成功！");
                 };
                 img.src = e.target.result;
             };
@@ -655,21 +519,12 @@
 
         function updateGridSizeSelection() {
             const val = document.getElementById('gridSizeSelect').value;
-            const customContainer = document.getElementById('customSizeContainer');
-            
-            if (val === 'custom') {
-                customContainer.classList.remove('hidden');
-            } else {
-                customContainer.classList.add('hidden');
-                cols = parseInt(val);
-                rows = parseInt(val);
-                triggerReprocess();
-            }
+            if (val === 'custom') { document.getElementById('customSizeContainer').classList.remove('hidden'); }
+            else { document.getElementById('customSizeContainer').classList.add('hidden'); cols = parseInt(val); rows = parseInt(val); triggerReprocess(); }
         }
 
         function triggerReprocess() {
-            const val = document.getElementById('gridSizeSelect').value;
-            if (val === 'custom') {
+            if (document.getElementById('gridSizeSelect').value === 'custom') {
                 cols = parseInt(document.getElementById('customWidth').value) || 70;
                 rows = parseInt(document.getElementById('customHeight').value) || 70;
             }
@@ -677,34 +532,42 @@
             processImage();
         }
 
-        function requestConversionWithCheck() {
-            processImage();
-            showToast("图纸已成功重新生成与渲染！");
+        function requestConversionWithCheck() { processImage(); showToast("图纸已成功刷新！"); }
+
+        // RGB转HSV辅助函数（精准提取黄色）
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, v = max, d = max - min;
+            s = max === 0 ? 0 : d / max;
+            if (max === min) { h = 0; }
+            else {
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [h * 360, s, v];
         }
 
-        // --- 核心图像处理（等比自适应留白防裁剪 + 皮肤提纯去噪）---
+        // --- 核心图像与色彩提取重构逻辑 ---
         function processImage() {
             if (!uploadedImage) return;
 
             const srcCanvas = document.createElement('canvas');
             const srcCtx = srcCanvas.getContext('2d');
-            
             const imgW = uploadedImage.width || uploadedImage.naturalWidth;
             const imgH = uploadedImage.height || uploadedImage.naturalHeight;
-            
-            srcCanvas.width = cols;
-            srcCanvas.height = rows;
-            
-            // 1. 先用纯白色填满底层
-            srcCtx.fillStyle = '#ffffff';
-            srcCtx.fillRect(0, 0, cols, rows);
 
-            // 2. Contain Mode: 计算等比例缩放与居中偏移 (不裁剪画面)
+            srcCanvas.width = cols; srcCanvas.height = rows;
+            srcCtx.fillStyle = '#ffffff'; srcCtx.fillRect(0, 0, cols, rows);
+
+            // 等比例居中自适应 Contain 模式
             const scaleFactor = Math.min(cols / imgW, rows / imgH);
-            const dW = imgW * scaleFactor;
-            const dH = imgH * scaleFactor;
-            const dX = (cols - dW) / 2;
-            const dY = (rows - dH) / 2;
+            const dW = imgW * scaleFactor, dH = imgH * scaleFactor;
+            const dX = (cols - dW) / 2, dY = (rows - dH) / 2;
 
             srcCtx.imageSmoothingEnabled = true;
             srcCtx.imageSmoothingQuality = 'high';
@@ -715,63 +578,15 @@
 
             const contrast = parseFloat(document.getElementById('contrastRange').value);
             const saturation = parseFloat(document.getElementById('saturationRange').value);
-            const sharpnessMode = parseInt(document.getElementById('sharpnessRange').value);
             const removeBg = document.getElementById('removeBgToggle').checked;
+            const yellowBoost = document.getElementById('yellowBoostToggle').checked;
             const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value);
 
-            if (sharpnessMode > 0) {
-                data = applyAdvancedBilateralSharpening(data, cols, rows, sharpnessMode);
-            }
-
+            // 智能漫水扣背景
             if (removeBg) {
                 for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i], g = data[i+1], b = data[i+2];
-                    if (r >= bgThreshold && g >= bgThreshold && b >= bgThreshold) {
-                        data[i] = 255;
-                        data[i+1] = 255;
-                        data[i+2] = 255;
-                    }
-                }
-
-                const visited = new Uint8Array(cols * rows);
-                const queue = [];
-
-                for (let c = 0; c < cols; c++) {
-                    queue.push(c);
-                    queue.push((rows - 1) * cols + c);
-                }
-                for (let r = 0; r < rows; r++) {
-                    queue.push(r * cols);
-                    queue.push(r * cols + (cols - 1));
-                }
-
-                while (queue.length > 0) {
-                    const idx1D = queue.pop();
-                    if (visited[idx1D]) continue;
-                    visited[idx1D] = 1;
-
-                    const rIdx = Math.floor(idx1D / cols);
-                    const cIdx = idx1D % cols;
-                    const pxIdx = idx1D * 4;
-
-                    const pr = data[pxIdx], pg = data[pxIdx+1], pb = data[pxIdx+2];
-                    if (pr >= (bgThreshold - 25) && pg >= (bgThreshold - 25) && pb >= (bgThreshold - 25)) {
-                        data[pxIdx] = 255;
-                        data[pxIdx+1] = 255;
-                        data[pxIdx+2] = 255;
-
-                        const neighbors = [
-                            {r: rIdx-1, c: cIdx}, {r: rIdx+1, c: cIdx},
-                            {r: rIdx, c: cIdx-1}, {r: rIdx, c: cIdx+1}
-                        ];
-                        for (let n of neighbors) {
-                            if (n.r >= 0 && n.r < rows && n.c >= 0 && n.c < cols) {
-                                const n1D = n.r * cols + n.c;
-                                if (!visited[n1D]) {
-                                    queue.push(n1D);
-                                }
-                            }
-                        }
+                    if (data[i] >= bgThreshold && data[i+1] >= bgThreshold && data[i+2] >= bgThreshold) {
+                        data[i] = 255; data[i+1] = 255; data[i+2] = 255;
                     }
                 }
             }
@@ -786,23 +601,34 @@
                     let idx = (r * cols + c) * 4;
                     let r_val = data[idx], g_val = data[idx+1], b_val = data[idx+2], a_val = data[idx+3];
 
-                    // 高亮纯白保护：接近亮白的像素直接锁定为纯白
+                    // 纯白高亮保护
                     if (a_val < 50 || (r_val > 242 && g_val > 242 && b_val > 242)) {
                         let whiteMatch = currentPalette.find(p => p.code === "H21" || p.code === "A01" || p.code === "H01" || p.code === "B01") || currentPalette[0];
                         rowArr.push(whiteMatch);
                         continue;
                     }
 
+                    // 提升对比度与饱和度
                     r_val = Math.min(255, Math.max(0, (r_val - 128) * contrast + 128));
                     g_val = Math.min(255, Math.max(0, (g_val - 128) * contrast + 128));
                     b_val = Math.min(255, Math.max(0, (b_val - 128) * contrast + 128));
 
-                    let closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
-                    
-                    // 肤色与浅色高级提纯区保护
-                    if (r_val > 200 && g_val > 170 && b_val > 150) {
-                        let skinMatch = currentPalette.find(p => p.code.includes("E14") || p.code.includes("A85") || p.code.includes("H3"));
-                        if (skinMatch) closest = skinMatch;
+                    // 转化为 HSV 进行特殊颜色通道保护
+                    let [h, s, v] = rgbToHsv(r_val, g_val, b_val);
+
+                    let closest = null;
+
+                    // 核心算法修正：黄色/亮暖色独立通道保护 (解决白雪公主黄衣服识别成浅米色发脏的问题)
+                    if (yellowBoost && (h >= 35 && h <= 65) && v > 0.65 && s > 0.25) {
+                        if (v > 0.85 && s < 0.45) {
+                            closest = currentPalette.find(p => p.code === "H22" || p.code === "F21" || p.code === "A33"); // 奶油黄
+                        } else {
+                            closest = currentPalette.find(p => p.code === "F21" || p.code === "F22" || p.code === "A33"); // 明黄
+                        }
+                    }
+
+                    if (!closest) {
+                        closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
                     }
 
                     rowArr.push(closest);
@@ -812,28 +638,6 @@
 
             redrawCanvas();
             updateColorStatistics();
-        }
-
-        function applyAdvancedBilateralSharpening(data, w, h, strength) {
-            let copy = new Uint8ClampedArray(data);
-            let factor = strength * 0.35;
-            for (let y = 1; y < h - 1; y++) {
-                for (let x = 1; x < w - 1; x++) {
-                    let idx = (y * w + x) * 4;
-                    for (let c = 0; c < 3; c++) {
-                        let center = copy[idx + c];
-                        let blur = (
-                            copy[((y-1)*w + x)*4 + c] +
-                            copy[((y+1)*w + x)*4 + c] +
-                            copy[(y*w + (x-1))*4 + c] +
-                            copy[(y*w + (x+1))*4 + c]
-                        ) / 4;
-                        let newVal = center + (center - blur) * factor;
-                        data[idx + c] = Math.min(255, Math.max(0, newVal));
-                    }
-                }
-            }
-            return data;
         }
 
         function rgbToLab(r, g, b) {
@@ -857,14 +661,10 @@
             let lab = rgbToLab(r, g, b);
             let minDist = Infinity;
             let bestMatch = palette[0];
-
             for (let bead of palette) {
                 let bLab = rgbToLab(bead.rgb[0], bead.rgb[1], bead.rgb[2]);
                 let dist = Math.hypot(lab[0] - bLab[0], lab[1] - bLab[1], lab[2] - bLab[2]);
-                if (dist < minDist) {
-                    minDist = dist;
-                    bestMatch = bead;
-                }
+                if (dist < minDist) { minDist = dist; bestMatch = bead; }
             }
             return bestMatch;
         }
@@ -875,18 +675,15 @@
             const ctx = canvas.getContext('2d');
 
             scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows))));
-            canvas.width = cols * scale;
-            canvas.height = rows * scale;
-
+            canvas.width = cols * scale; canvas.height = rows * scale;
             const showGrid = document.getElementById('showGridLines').checked;
             const showCodes = document.getElementById('showCodesOnCanvas').checked;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
                     const bead = pixelData[r][c];
-                    ctx.fillStyle = `rgb(${bead.rgb[0]}, ${bead.rgb[1]}, ${bead.rgb[2]})`;
+                    ctx.fillStyle = `rgb(${bead.rgb.join(',')})`;
                     ctx.fillRect(c * scale, r * scale, scale, scale);
 
                     if (showGrid) {
@@ -894,12 +691,10 @@
                         ctx.lineWidth = 0.5;
                         ctx.strokeRect(c * scale, r * scale, scale, scale);
                     }
-
                     if (showCodes && scale >= 16) {
                         ctx.fillStyle = (bead.rgb[0]*0.299 + bead.rgb[1]*0.587 + bead.rgb[2]*0.114) > 150 ? '#000' : '#fff';
                         ctx.font = `${Math.max(8, scale * 0.38)}px sans-serif`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                         ctx.fillText(bead.code, (c + 0.5) * scale, (r + 0.5) * scale);
                     }
                 }
@@ -909,35 +704,25 @@
         function updateColorStatistics() {
             colorStats = {};
             let totalBeads = 0;
-
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
                     const bead = pixelData[r][c];
-                    if (!colorStats[bead.code]) {
-                        colorStats[bead.code] = { ...bead, count: 0 };
-                    }
-                    colorStats[bead.code].count++;
-                    totalBeads++;
+                    if (!colorStats[bead.code]) colorStats[bead.code] = { ...bead, count: 0 };
+                    colorStats[bead.code].count++; totalBeads++;
                 }
             }
 
             document.getElementById('totalBeadsBadge').innerText = `总计 ${totalBeads} 颗`;
             const tbody = document.getElementById('colorStatsBody');
             tbody.innerHTML = '';
-
             const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
 
             for (let item of sortedColors) {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 tr.innerHTML = `
-                    <td class="p-2.5">
-                        <div class="w-6 h-6 rounded-md shadow-sm border border-slate-300" style="background-color: rgb(${item.rgb.join(',')})"></div>
-                    </td>
-                    <td class="p-2.5">
-                        <span class="font-bold font-mono text-slate-800">${item.code}</span>
-                        <span class="text-slate-500 ml-1.5">${item.name}</span>
-                    </td>
+                    <td class="p-2.5"><div class="w-6 h-6 rounded-md shadow-sm border border-slate-300" style="background-color: rgb(${item.rgb.join(',')})"></div></td>
+                    <td class="p-2.5"><span class="font-bold font-mono text-slate-800">${item.code}</span> <span class="text-slate-500 ml-1.5">${item.name}</span></td>
                     <td class="p-2.5 text-right font-bold text-slate-900 font-mono">${item.count} 颗</td>
                 `;
                 tbody.appendChild(tr);
@@ -946,12 +731,8 @@
 
         function initQuickPalette() {
             const grid = document.getElementById('quickPaletteGrid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            const paletteKey = document.getElementById('paletteSelect').value;
-            const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
-
+            if (!grid) return; grid.innerHTML = '';
+            const currentPalette = PERLER_PALETTES[document.getElementById('paletteSelect').value] || PERLER_PALETTES.perler;
             for (let bead of currentPalette) {
                 const div = document.createElement('div');
                 div.className = 'w-8 h-8 rounded-lg cursor-pointer border border-slate-300 shadow-sm hover:scale-110 transition';
@@ -971,61 +752,24 @@
 
         function setTool(tool) {
             activeTool = tool;
-            const btnDraw = document.getElementById('toolBtnDraw');
-            const btnErase = document.getElementById('toolBtnErase');
-            if (tool === 'draw') {
-                btnDraw.className = 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-                btnErase.className = 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-            } else {
-                btnErase.className = 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-                btnDraw.className = 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-            }
+            document.getElementById('toolBtnDraw').className = tool === 'draw' ? 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition' : 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
+            document.getElementById('toolBtnErase').className = tool === 'erase' ? 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition' : 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
         }
 
-        function startDrawing(e) {
-            isDrawing = true;
-            handleCanvasInteraction(e);
-        }
-
-        function drawOnCanvas(e) {
-            if (!isDrawing) return;
-            handleCanvasInteraction(e);
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        function handleTouchStart(e) {
-            isDrawing = true;
-            handleCanvasInteraction(e.touches[0]);
-            e.preventDefault();
-        }
-
-        function handleTouchMove(e) {
-            if (!isDrawing) return;
-            handleCanvasInteraction(e.touches[0]);
-            e.preventDefault();
-        }
+        function startDrawing(e) { isDrawing = true; handleCanvasInteraction(e); }
+        function drawOnCanvas(e) { if (isDrawing) handleCanvasInteraction(e); }
+        function stopDrawing() { isDrawing = false; }
+        function handleTouchStart(e) { isDrawing = true; handleCanvasInteraction(e.touches[0]); e.preventDefault(); }
+        function handleTouchMove(e) { if (isDrawing) handleCanvasInteraction(e.touches[0]); e.preventDefault(); }
 
         function handleCanvasInteraction(e) {
             const canvas = document.getElementById('pixelCanvas');
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const c = Math.floor(x / scale);
-            const r = Math.floor(y / scale);
-
+            const c = Math.floor((e.clientX - rect.left) / scale);
+            const r = Math.floor((e.clientY - rect.top) / scale);
             if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                if (activeTool === 'draw') {
-                    pixelData[r][c] = activePaletteColor;
-                } else {
-                    pixelData[r][c] = {code: "BLANK", name: "空白", rgb: [255, 255, 255]};
-                }
-                redrawCanvas();
-                updateColorStatistics();
-
+                pixelData[r][c] = activeTool === 'draw' ? activePaletteColor : {code: "BLANK", name: "空白", rgb: [255, 255, 255]};
+                redrawCanvas(); updateColorStatistics();
                 document.getElementById('inspectorBar').classList.remove('hidden');
                 document.getElementById('inspectorColorBox').style.backgroundColor = `rgb(${pixelData[r][c].rgb.join(',')})`;
                 document.getElementById('inspectorName').innerText = pixelData[r][c].name;
@@ -1034,34 +778,18 @@
             }
         }
 
-        function zoomCanvas(factor) {
-            scale = Math.max(6, Math.min(32, Math.round(scale * factor)));
-            redrawCanvas();
-        }
+        function zoomCanvas(factor) { scale = Math.max(6, Math.min(32, Math.round(scale * factor))); redrawCanvas(); }
+        function resetZoom() { scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows)))); redrawCanvas(); }
 
-        function resetZoom() {
-            scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows))));
-            redrawCanvas();
-        }
-
-        // --- 直接导出带色号坐标与清单的大图纸 PNG ---
+        // 下载带色号坐标排版的大图纸 PNG
         function downloadPatternImage() {
-            if (trialCredits <= 0) {
-                openTokenModal();
-                return;
-            }
+            if (trialCredits <= 0) { openTokenModal(); return; }
             setTrialCredits(trialCredits - 1);
 
             const exportCanvas = document.createElement('canvas');
             const ctx = exportCanvas.getContext('2d');
-
-            const headerHeight = 70;
-            const padding = 50;
-            const printScale = Math.max(18, scale); 
-
-            const gridW = cols * printScale;
-            const gridH = rows * printScale;
-
+            const headerHeight = 70, padding = 50, printScale = Math.max(18, scale);
+            const gridW = cols * printScale, gridH = rows * printScale;
             const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
             const colsInLegend = 4;
             const legendRows = Math.ceil(sortedColors.length / colsInLegend);
@@ -1070,101 +798,57 @@
             exportCanvas.width = Math.max(gridW + padding * 2, 700);
             exportCanvas.height = gridH + headerHeight + footerHeight + padding * 2;
 
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-
-            ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 22px Inter, sans-serif';
-            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 22px Inter, sans-serif'; ctx.textAlign = 'center';
             ctx.fillText(`专业像素拼豆设计图纸 [${cols} x ${rows} 网格]`, exportCanvas.width / 2, padding + 25);
 
-            ctx.fillStyle = '#64748b';
-            ctx.font = '13px Inter, sans-serif';
+            ctx.fillStyle = '#64748b'; ctx.font = '13px Inter, sans-serif';
             ctx.fillText(`总用豆量: ${Object.values(colorStats).reduce((acc, curr) => acc + curr.count, 0)} 颗 | 使用色数: ${sortedColors.length} 种`, exportCanvas.width / 2, padding + 50);
 
             const startX = (exportCanvas.width - gridW) / 2;
             const startY = padding + headerHeight;
-
             const showGrid = document.getElementById('showGridLines').checked;
             const showCodes = document.getElementById('showCodesOnCanvas').checked;
 
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
                     const bead = pixelData[r][c];
-                    const px = startX + c * printScale;
-                    const py = startY + r * printScale;
-
-                    ctx.fillStyle = `rgb(${bead.rgb[0]}, ${bead.rgb[1]}, ${bead.rgb[2]})`;
-                    ctx.fillRect(px, py, printScale, printScale);
-
-                    if (showGrid) {
-                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
-                        ctx.lineWidth = 0.75;
-                        ctx.strokeRect(px, py, printScale, printScale);
-                    }
-
+                    const px = startX + c * printScale, py = startY + r * printScale;
+                    ctx.fillStyle = `rgb(${bead.rgb.join(',')})`; ctx.fillRect(px, py, printScale, printScale);
+                    if (showGrid) { ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)'; ctx.lineWidth = 0.75; ctx.strokeRect(px, py, printScale, printScale); }
                     if (showCodes && printScale >= 14) {
                         ctx.fillStyle = (bead.rgb[0]*0.299 + bead.rgb[1]*0.587 + bead.rgb[2]*0.114) > 150 ? '#000' : '#fff';
                         ctx.font = `${Math.max(9, printScale * 0.35)}px sans-serif`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                         ctx.fillText(bead.code, px + printScale / 2, py + printScale / 2);
                     }
                 }
             }
 
-            ctx.fillStyle = '#475569';
-            ctx.font = '11px monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
+            ctx.fillStyle = '#475569'; ctx.font = '11px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
             for (let c = 0; c < cols; c++) {
-                if (c === 0 || (c + 1) % 5 === 0 || c === cols - 1) {
-                    ctx.fillText(c + 1, startX + (c + 0.5) * printScale, startY - 5);
-                }
+                if (c === 0 || (c + 1) % 5 === 0 || c === cols - 1) ctx.fillText(c + 1, startX + (c + 0.5) * printScale, startY - 5);
             }
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
             for (let r = 0; r < rows; r++) {
-                if (r === 0 || (r + 1) % 5 === 0 || r === rows - 1) {
-                    ctx.fillText(r + 1, startX - 8, startY + (r + 0.5) * printScale);
-                }
+                if (r === 0 || (r + 1) % 5 === 0 || r === rows - 1) ctx.fillText(r + 1, startX - 8, startY + (r + 0.5) * printScale);
             }
 
-            const footerY = startY + gridH + 30;
-            const footerW = exportCanvas.width - padding * 2;
-            
-            ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(padding, footerY, footerW, footerHeight - 20);
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(padding, footerY, footerW, footerHeight - 20);
+            const footerY = startY + gridH + 30, footerW = exportCanvas.width - padding * 2;
+            ctx.fillStyle = '#f8fafc'; ctx.fillRect(padding, footerY, footerW, footerHeight - 20);
+            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1; ctx.strokeRect(padding, footerY, footerW, footerHeight - 20);
 
-            ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 14px Inter, sans-serif';
-            ctx.textAlign = 'left';
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 14px Inter, sans-serif'; ctx.textAlign = 'left';
             ctx.fillText('📋 材料清单与配色色号参考表 (Material List):', padding + 20, footerY + 25);
 
-            let colWidth = footerW / colsInLegend;
-            let startListX = padding + 20;
-            let startListY = footerY + 55;
-
+            let colWidth = footerW / colsInLegend, startListX = padding + 20, startListY = footerY + 55;
             sortedColors.forEach((item, index) => {
-                let colIdx = index % colsInLegend;
-                let rowIdx = Math.floor(index / colsInLegend);
-
-                let curX = startListX + colIdx * colWidth;
-                let curY = startListY + rowIdx * 28;
-
+                let colIdx = index % colsInLegend, rowIdx = Math.floor(index / colsInLegend);
+                let curX = startListX + colIdx * colWidth, curY = startListY + rowIdx * 28;
                 if (curY < footerY + footerHeight - 25) {
-                    ctx.fillStyle = `rgb(${item.rgb.join(',')})`;
-                    ctx.fillRect(curX, curY, 16, 16);
-                    ctx.strokeStyle = '#94a3b8';
-                    ctx.strokeRect(curX, curY, 16, 16);
-
-                    ctx.fillStyle = '#1e293b';
-                    ctx.font = '12px Inter, sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
+                    ctx.fillStyle = `rgb(${item.rgb.join(',')})`; ctx.fillRect(curX, curY, 16, 16);
+                    ctx.strokeStyle = '#94a3b8'; ctx.strokeRect(curX, curY, 16, 16);
+                    ctx.fillStyle = '#1e293b'; ctx.font = '12px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
                     ctx.fillText(`${item.code} (${item.name}): ${item.count}颗`, curX + 24, curY + 1);
                 }
             });
@@ -1178,37 +862,19 @@
 
         function copyColorList() {
             let text = "=== 拼豆颜色采购清单 ===\n";
-            for (let code in colorStats) {
-                let item = colorStats[code];
-                text += `色号 ${item.code} (${item.name}): ${item.count} 颗\n`;
-            }
+            for (let code in colorStats) text += `色号 ${colorStats[code].code} (${colorStats[code].name}): ${colorStats[code].count} 颗\n`;
             document.execCommand('copy');
-            showToast("采购清单已成功复制到剪贴板！");
+            showToast("采购清单已复制！");
         }
 
-        function openHelpModal() {
-            document.getElementById('helpModal').classList.remove('hidden');
-        }
-
-        function closeHelpModal() {
-            document.getElementById('helpModal').classList.add('hidden');
-        }
-
-        function saveProjectState() {
-            showToast("项目状态已成功保存至浏览器缓存！");
-        }
-
-        function loadSavedProject() {
-            return false;
-        }
-
+        function openHelpModal() { document.getElementById('helpModal').classList.remove('hidden'); }
+        function closeHelpModal() { document.getElementById('helpModal').classList.add('hidden'); }
+        function saveProjectState() { showToast("项目已保存至浏览器缓存！"); }
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
         }
     </script>
 </body>
