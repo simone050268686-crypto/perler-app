@@ -1385,7 +1385,7 @@
         }
 
 // ==========================================
-// 最终完美版：保护头顶亮部层次 + 精致克制外轮廓描边
+// 增强版：支持复杂/灰色背景自动剥离的拼豆算法
 // ==========================================
 function processImage() {
     if (!uploadedImage) return;
@@ -1396,7 +1396,7 @@ function processImage() {
     const imgW = uploadedImage.width || uploadedImage.naturalWidth;
     const imgH = uploadedImage.height || uploadedImage.naturalHeight;
     
-    // 1. 高清超采样预处理 (保持边缘锐利)
+    // 1. 高清超采样预处理
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     const superFactor = 8;
@@ -1406,10 +1406,9 @@ function processImage() {
     tempCtx.imageSmoothingEnabled = true;
     tempCtx.imageSmoothingQuality = 'high';
 
-    // 等比例完整容纳图片，留出舒适边距
     const fitScale = Math.min(
-        (cols * superFactor * 0.94) / imgW,
-        (rows * superFactor * 0.94) / imgH
+        (cols * superFactor * 0.92) / imgW,
+        (rows * superFactor * 0.92) / imgH
     );
     const dW = imgW * fitScale;
     const dH = imgH * fitScale;
@@ -1429,15 +1428,23 @@ function processImage() {
     let imgData = srcCtx.getImageData(0, 0, cols, rows);
     let data = imgData.data;
 
-    // 2. 图像对比度与饱和度预调校
     const contrast = parseFloat(document.getElementById('contrastRange').value);
-    const saturation = parseFloat(document.getElementById('saturationRange').value);
     const removeBg = document.getElementById('removeBgToggle').checked;
-    const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value);
 
-    // 3. 智能温和背景清理（加严判定条件，绝对不吞噬头顶的浅白/米色毛发高光）
+    // 2. 【核心升级】智能泛洪背景剥离（自动采样四角背景色，不管是白墙还是灰色瓷砖都能精准切除）
     if (removeBg) {
         const total = cols * rows;
+        // 采样四个角的颜色作为背景基准
+        const cornerColors = [
+            [data[0], data[1], data[2]],
+            [data[(cols - 1) * 4], data[(cols - 1) * 4 + 1], data[(cols - 1) * 4 + 2]],
+            [data[((rows - 1) * cols) * 4], data[((rows - 1) * cols) * 4 + 1], data[((rows - 1) * cols) * 4 + 2]],
+            [data[((rows - 1) * cols + cols - 1) * 4], data[((rows - 1) * cols + cols - 1) * 4 + 1], data[((rows - 1) * cols + cols - 1) * 4 + 2]]
+        ];
+        const avgBgR = cornerColors.reduce((s, c) => s + c[0], 0) / 4;
+        const avgBgG = cornerColors.reduce((s, c) => s + c[1], 0) / 4;
+        const avgBgB = cornerColors.reduce((s, c) => s + c[2], 0) / 4;
+
         const visited = new Uint8Array(total);
         const queue = new Int32Array(total);
         let head = 0, tail = 0;
@@ -1450,14 +1457,19 @@ function processImage() {
             queue[tail++] = id;
         };
 
-        // 从四角出发，只将极端接近纯白（>250）且位于最外围的背景剔除，完美保护头顶高光
         for (let x = 0; x < cols; x++) { enqueue(x, 0); enqueue(x, rows - 1); }
         for (let y = 0; y < rows; y++) { enqueue(0, y); enqueue(cols - 1, y); }
 
         while (head < tail) {
             const id = queue[head++];
             const p = id * 4;
-            if (data[p] > 250 && data[p + 1] > 250 && data[p + 2] > 250) {
+            const dr = data[p] - avgBgR;
+            const dg = data[p + 1] - avgBgG;
+            const db = data[p + 2] - avgBgB;
+            const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+
+            // 只要颜色与四角背景相近（容差范围内的灰色/杂色），就判定为背景并转为纯白
+            if (dist < 45) {
                 data[p] = 255; data[p + 1] = 255; data[p + 2] = 255;
                 const x = id % cols, y = Math.floor(id / cols);
                 enqueue(x - 1, y); enqueue(x + 1, y); enqueue(x, y - 1); enqueue(x, y + 1);
@@ -1468,7 +1480,7 @@ function processImage() {
     const paletteKey = document.getElementById('paletteSelect').value;
     const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
 
-    // 4. Floyd-Steinberg 误差扩散算法 (实现照片级平滑渐变，告别僵硬大色块)
+    // 3. Floyd-Steinberg 误差扩散算法
     pixelData = [];
     for (let r = 0; r < rows; r++) {
         let rowArr = [];
@@ -1504,44 +1516,12 @@ function processImage() {
         pixelData.push(rowArr);
     }
 
-    // 5. 优化后的精致外围描边增强（克制、稀疏、仅在最外圈点缀）
+    // 4. 外轮廓描边增强
     enhanceSilhouetteOutlines(pixelData, cols, rows, currentPalette);
 
     redrawCanvas();
     updateColorStatistics();
 }
-
-// 辅助函数：精致克制的外轮廓剪影描边增强
-function enhanceSilhouetteOutlines(grid, w, h, palette) {
-    let darkBead = palette.reduce((prev, curr) => {
-        let sumPrev = prev.rgb[0] + prev.rgb[1] + prev.rgb[2];
-        let sumCurr = curr.rgb[0] + curr.rgb[1] + curr.rgb[2];
-        return sumPrev < sumCurr ? prev : curr;
-    }, palette[0]);
-
-    let cloneGrid = grid.map(row => [...row]);
-
-    for (let r = 1; r < h - 1; r++) {
-        for (let c = 1; c < w - 1; c++) {
-            let current = cloneGrid[r][c];
-            let isWhiteBg = (current.rgb[0] > 245 && current.rgb[1] > 245 && current.rgb[2] > 245);
-            
-            if (!isWhiteBg) {
-                let neighbors = [
-                    cloneGrid[r-1][c], cloneGrid[r+1][c],
-                    cloneGrid[r][c-1], cloneGrid[r][c+1]
-                ];
-                let touchingBg = neighbors.some(n => n.rgb[0] > 245 && n.rgb[1] > 245 && n.rgb[2] > 245);
-                
-                // 降低描边概率（从 0.35 调到 0.22），并且只在紧贴背景的最外围生效，线条更细腻自然
-                if (touchingBg && Math.random() < 0.22) {
-                    grid[r][c] = darkBead;
-                }
-            }
-        }
-    }
-}
-
 
         function applyAdvancedBilateralSharpening(data, w, h, strength) {
 
