@@ -86,15 +86,25 @@
                 <input type="file" id="imageLoader" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
             </div>
 
-            <!-- 网格尺寸选择 -->
+            <!-- 网格尺寸选择（支持自定义，最大100x100） -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">2. 拼豆底板规格 (网格)</label>
-                <select id="gridSizeSelect" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
-                    <option value="70" selected>70 × 70 标准方格 (锁定)</option>
-                    <option value="50">50 × 50 迷你方格</option>
-                    <option value="30">30 × 30 小巧方格</option>
-                </select>
-                <p class="text-xs text-gray-400 mt-1">✨ 已锁定 70x70 规格，长图自动等比缩放留白不裁剪。</p>
+                <div class="flex items-center space-x-2">
+                    <select id="gridSizeSelect" class="flex-1 border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                        <option value="70" selected>70 × 70 标准方格</option>
+                        <option value="50">50 × 50 迷你方格</option>
+                        <option value="30">30 × 30 小巧方格</option>
+                        <option value="90">90 × 90 大号方格</option>
+                        <option value="100">100 × 100 超大方格</option>
+                        <option value="custom">自定义大小...</option>
+                    </select>
+                </div>
+                <!-- 自定义输入框（默认隐藏） -->
+                <div id="customSizeContainer" class="hidden mt-2 flex items-center space-x-2">
+                    <input type="number" id="customGridSize" min="10" max="100" value="70" class="w-full border border-gray-300 rounded-xl p-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="输入网格大小 (10-100)">
+                    <span class="text-xs text-gray-500">格</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">✨ 支持最高 100×100 网格，长图自动等比缩放留白不裁剪。</p>
             </div>
 
             <!-- 色系选择 -->
@@ -119,14 +129,6 @@
                     <input type="range" id="contrastRange" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full accent-indigo-600">
                 </div>
 
-                <div>
-                    <div class="flex justify-between text-xs text-gray-500 mb-1">
-                        <span>锐化增强</span>
-                        <span id="sharpnessVal">开启</span>
-                    </div>
-                    <input type="range" id="sharpnessRange" min="0" max="2" step="1" value="1" class="w-full accent-indigo-600">
-                </div>
-
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-700">智能背景抠图转纯白</span>
                     <input type="checkbox" id="bgCleanToggle" checked class="w-4 h-4 text-indigo-600 accent-indigo-600 rounded">
@@ -143,8 +145,8 @@
                 <button onclick="processImage()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition shadow-md shadow-indigo-200">
                     生成像素图纸
                 </button>
-                <button onclick="requestExportPDF()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition shadow-md shadow-emerald-200">
-                    导出高清图纸 PDF
+                <button onclick="requestExportPNG()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition shadow-md shadow-emerald-200">
+                    直接下载 PNG 高清图纸
                 </button>
             </div>
         </div>
@@ -199,9 +201,10 @@
                 <p class="text-xs text-gray-500 mt-1">添加作者微信获取专属导出卡密授权码解锁额外次数</p>
             </div>
 
+            <!-- 去掉下划线，改用加粗清晰显示微信号 -->
             <div class="bg-indigo-50/60 border border-indigo-100 rounded-xl p-4 mb-5 text-center">
                 <p class="text-xs text-indigo-600 font-medium mb-1">步骤 1：添加微信获取卡密</p>
-                <p class="text-base font-mono font-bold text-indigo-900">微信号：<span id="wechatIdDisplay" class="text-indigo-600 underline">DD2025_0101_</span></p>
+                <p class="text-base font-mono font-bold text-indigo-900">微信号：<span id="wechatIdDisplay" class="text-indigo-600 font-extrabold not-italic">DD2025_0101_</span></p>
                 <p class="text-[10px] text-gray-400 mt-1">(添加时请备注：拼豆图纸卡密)</p>
             </div>
 
@@ -264,6 +267,31 @@
         let rows = 70;
         let currentPixelData = [];
 
+        // 监听网格大小下拉框
+        document.getElementById('gridSizeSelect').addEventListener('change', function(e) {
+            const val = e.target.value;
+            const customContainer = document.getElementById('customSizeContainer');
+            if(val === 'custom') {
+                customContainer.classList.remove('hidden');
+                cols = parseInt(document.getElementById('customGridSize').value) || 70;
+            } else {
+                customContainer.classList.add('hidden');
+                cols = parseInt(val);
+            }
+            rows = cols;
+            if(uploadedImage) processImage();
+        });
+
+        // 监听自定义网格输入
+        document.getElementById('customGridSize').addEventListener('input', function(e) {
+            let val = parseInt(e.target.value);
+            if(val >= 10 && val <= 100) {
+                cols = val;
+                rows = val;
+                if(uploadedImage) processImage();
+            }
+        });
+
         // 监听图片上传
         document.getElementById('imageLoader').addEventListener('change', function(e) {
             const reader = new FileReader();
@@ -285,16 +313,11 @@
             document.getElementById('contrastVal').innerText = e.target.value;
             if(uploadedImage) processImage();
         });
-        document.getElementById('gridSizeSelect').addEventListener('change', (e) => {
-            cols = parseInt(e.target.value);
-            rows = parseInt(e.target.value);
-            if(uploadedImage) processImage();
-        });
         document.getElementById('brandSelect').addEventListener('change', () => { if(uploadedImage) processImage(); });
         document.getElementById('bgCleanToggle').addEventListener('change', () => { if(uploadedImage) processImage(); });
         document.getElementById('skinRefineToggle').addEventListener('change', () => { if(uploadedImage) processImage(); });
 
-        // 核心处理函数（包含 70x70 留白不裁剪、边缘阻断、白色/肤色提纯）
+        // 核心处理函数（包含动态网格、等比居中留白、防手臂误删、浅色提纯）
         function processImage() {
             if (!uploadedImage) return;
 
@@ -349,13 +372,10 @@
                     let bestBead = palette[0];
 
                     if (a < 50) {
-                        // 透明区域默认为纯白背景
                         bestBead = palette.find(p => p.code === "H21" || p.code === "A-S01" || p.code === "HM-01") || palette[0];
                     } else if (useBgClean && r > 240 && g > 240 && b > 240) {
-                        // 高亮纯白保护
                         bestBead = palette.find(p => p.code === "H21" || p.code === "A-S01" || p.code === "HM-01") || palette[0];
                     } else {
-                        // 欧氏距离匹配色卡
                         let minDist = Infinity;
                         for (let bead of palette) {
                             let dist = Math.hypot(r - bead.rgb[0], g - bead.rgb[1], b - bead.rgb[2]);
@@ -365,7 +385,6 @@
                             }
                         }
 
-                        // 肤色浅色高级提纯保护
                         if (useSkinRefine && minDist < 45) {
                             let skinMatch = palette.find(p => p.code.includes("E14") || p.code.includes("C12") || p.code.includes("H3"));
                             if (skinMatch && (r > 200 && g > 170 && b > 150)) {
@@ -374,7 +393,6 @@
                         }
                     }
 
-                    // 回写像素颜色用于 Canvas 预览
                     data[idx] = bestBead.rgb[0];
                     data[idx+1] = bestBead.rgb[1];
                     data[idx+2] = bestBead.rgb[2];
@@ -399,7 +417,6 @@
             const brand = document.getElementById('brandSelect').value;
             const palette = colorLibraries[brand] || colorLibraries.perler;
 
-            // 按照使用数量从多到少排序
             const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 
             sortedEntries.forEach(([code, count]) => {
@@ -441,12 +458,21 @@
             }
         }
 
-        function requestExportPDF() {
+        // 修改为直接下载 PNG 高清图纸
+        function requestExportPNG() {
             if (freeQuota > 0) {
                 freeQuota--;
                 localStorage.setItem('bead_free_quota', freeQuota);
                 updateQuotaDisplay();
-                alert('✨ 导出成功！图纸正在为您打包下载...');
+                
+                // 执行 PNG 下载
+                const canvas = document.getElementById('pixelCanvas');
+                const link = document.createElement('a');
+                link.download = `bead_pattern_${cols}x${rows}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                alert('✨ 高清 PNG 图纸已成功下载！');
             } else {
                 openTokenModal();
             }
@@ -463,7 +489,6 @@
         // 动态数学卡密校验算法 (随机数 * 7 + 13 的后两位)
         function verifyToken() {
             const inputVal = document.getElementById('tokenInput').value.trim();
-            // 假设卡密格式为 BEAD-随机数-校验码
             const parts = inputVal.split('-');
             if (parts.length === 3 && parts[0] === 'BEAD') {
                 const randomNum = parseInt(parts[1]);
