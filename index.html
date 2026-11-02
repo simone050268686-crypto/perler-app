@@ -1384,10 +1384,8 @@
 
         }
 
-
-
 // ==========================================
-// 终极优化版：专业级纯净色块拼豆处理算法
+// 终极画质版：保护高光层次与专业轮廓的拼豆算法
 // ==========================================
 function processImage() {
     if (!uploadedImage) return;
@@ -1408,10 +1406,10 @@ function processImage() {
     tempCtx.imageSmoothingEnabled = true;
     tempCtx.imageSmoothingQuality = 'high';
 
-    // 等比例完整容纳图片，留出舒适边距
+    // 等比例完整容纳图片，保留完美构图与呼吸边距
     const fitScale = Math.min(
-        (cols * superFactor * 0.94) / imgW,
-        (rows * superFactor * 0.94) / imgH
+        (cols * superFactor * 0.92) / imgW,
+        (rows * superFactor * 0.92) / imgH
     );
     const dW = imgW * fitScale;
     const dH = imgH * fitScale;
@@ -1431,37 +1429,16 @@ function processImage() {
     let imgData = srcCtx.getImageData(0, 0, cols, rows);
     let data = imgData.data;
 
-    // 2. 图像对比度与饱和度调校
     const contrast = parseFloat(document.getElementById('contrastRange').value);
     const removeBg = document.getElementById('removeBgToggle').checked;
-    const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value);
 
-    // 3. 智能边缘保护与背景清理
+    // 2. 智能轻量背景清理（严格限制仅清除外围纯空背景，绝不吞噬内部和头顶的浅色主体）
     if (removeBg) {
-        const borderSamples = [];
-        const addSample = (x, y) => {
-            const k = (y * cols + x) * 4;
-            borderSamples.push([data[k], data[k + 1], data[k + 2]]);
-        };
-        for (let x = 0; x < cols; x++) { addSample(x, 0); addSample(x, rows - 1); }
-        for (let y = 1; y < rows - 1; y++) { addSample(0, y); addSample(cols - 1, y); }
-        
-        const avg = [0, 1, 2].map(ch =>
-            borderSamples.reduce((sum, px) => sum + px[ch], 0) / Math.max(1, borderSamples.length)
-        );
-        const bgDistanceLimit = Math.max(22, (250 - bgThreshold) * 2.2 + 18);
-
         const total = cols * rows;
-        const foreground = new Uint8Array(total);
-        for (let id = 0; id < total; id++) {
-            const p = id * 4;
-            const dr = data[p] - avg[0], dg = data[p + 1] - avg[1], db = data[p + 2] - avg[2];
-            foreground[id] = Math.sqrt(dr * dr + dg * dg + db * db) > bgDistanceLimit ? 1 : 0;
-        }
-
         const visited = new Uint8Array(total);
         const queue = new Int32Array(total);
         let head = 0, tail = 0;
+
         const enqueue = (x, y) => {
             if (x < 0 || x >= cols || y < 0 || y >= rows) return;
             const id = y * cols + x;
@@ -1469,14 +1446,17 @@ function processImage() {
             visited[id] = 1;
             queue[tail++] = id;
         };
+
+        // 从四角出发，只清理非常接近纯白（>248）的外围空背景
         for (let x = 0; x < cols; x++) { enqueue(x, 0); enqueue(x, rows - 1); }
         for (let y = 0; y < rows; y++) { enqueue(0, y); enqueue(cols - 1, y); }
 
         while (head < tail) {
             const id = queue[head++];
             const p = id * 4;
-            if (!foreground[id]) {
-                data[p] = 255; data[p + 1] = 255; data[p + 2] = 255;
+            // 只有当像素极其接近白色时才作为背景吞掉，保护头顶的浅灰、米色阴影
+            if (data[p] > 248 && data[p+1] > 248 && data[p+2] > 248) {
+                data[p] = 255; data[p+1] = 255; data[p+2] = 255;
                 const x = id % cols, y = Math.floor(id / cols);
                 enqueue(x - 1, y); enqueue(x + 1, y); enqueue(x, y - 1); enqueue(x, y + 1);
             }
@@ -1486,7 +1466,7 @@ function processImage() {
     const paletteKey = document.getElementById('paletteSelect').value;
     const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
 
-    // 4. 精准 Lab 色彩空间直接映射（摒弃产生噪点的抖动算法，保证色块纯净）
+    // 3. Lab 空间色彩精准映射（保留亮部细腻色差，拒绝死白）
     pixelData = [];
     for (let r = 0; r < rows; r++) {
         let rowArr = [];
@@ -1504,39 +1484,30 @@ function processImage() {
         pixelData.push(rowArr);
     }
 
-    // 5. 【核心去噪与平滑】3×3 区域模态滤波（消除孤立杂色噪点，让色块成片、干净）
+    // 4. 平滑去噪：使用加权模态滤波，使大面积毛发/皮肤色块自然衔接
     applySpatialModeFilter(pixelData, cols, rows);
 
-    // 6. 主体外轮廓强化
-    enhanceSilhouetteOutlines(pixelData, cols, rows, currentPalette);
+    // 5. 【核心亮点】使用 Sobel 算子进行专业级边缘结构描边，拒绝随机噪点
+    applyProfessionalSobelOutlines(pixelData, cols, rows, currentPalette, data);
 
     redrawCanvas();
     updateColorStatistics();
 }
 
-// 辅助函数 1：空间模态滤波（把零散的单颗杂色融合成周围的大色块，彻底消除马赛克感）
+// 辅助函数 1：空间模态平滑
 function applySpatialModeFilter(grid, w, h) {
     let copy = grid.map(row => [...row]);
     for (let r = 1; r < h - 1; r++) {
         for (let c = 1; c < w - 1; c++) {
             let current = copy[r][c];
-            // 统计 3x3 邻域内的颜色分布
             let counts = {};
-            let selfKey = current.code;
-            let hasBgNeighbor = false;
-
             for (let dr = -1; dr <= 1; dr++) {
                 for (let dc = -1; dc <= 1; dc++) {
-                    let neighbor = copy[r + dr][c + dc];
-                    if (neighbor.code === "BLANK" || (neighbor.rgb[0] > 245 && neighbor.rgb[1] > 245 && neighbor.rgb[2] > 245)) {
-                        hasBgNeighbor = true;
-                    }
-                    counts[neighbor.code] = (counts[neighbor.code] || 0) + 1;
+                    let n = copy[r + dr][c + dc];
+                    counts[n.code] = (counts[n.code] || 0) + 1;
                 }
             }
-
-            // 如果当前像素与其周围大多数颜色不同（即孤立噪点），则将其替换为邻域内出现次数最多的颜色
-            let dominantCode = selfKey;
+            let dominantCode = current.code;
             let maxCount = 0;
             for (let code in counts) {
                 if (counts[code] > maxCount) {
@@ -1544,10 +1515,8 @@ function applySpatialModeFilter(grid, w, h) {
                     dominantCode = code;
                 }
             }
-
-            // 若周围多数属于某种主流色且当前点属于孤立点，进行平滑
-            if (maxCount >= 5 && dominantCode !== selfKey && !hasBgNeighbor) {
-                // 在当前调色板中找到对应 bead 对象
+            // 消除孤立杂色，使色块成片
+            if (maxCount >= 6 && dominantCode !== current.code) {
                 for (let bead of PERLER_PALETTES[document.getElementById('paletteSelect').value] || PERLER_PALETTES.perler) {
                     if (bead.code === dominantCode) {
                         grid[r][c] = bead;
@@ -1559,34 +1528,51 @@ function applySpatialModeFilter(grid, w, h) {
     }
 }
 
-// 辅助函数 2：智能外轮廓描边增强
-function enhanceSilhouetteOutlines(grid, w, h, palette) {
+// 辅助函数 2：利用 Sobel 算子实现真正的专业级结构描边
+function applyProfessionalSobelOutlines(grid, w, h, palette, rawData) {
+    // 寻找调色板中最深色（黑色或深炭灰）作为描边色
     let darkBead = palette.reduce((prev, curr) => {
         let sumPrev = prev.rgb[0] + prev.rgb[1] + prev.rgb[2];
         let sumCurr = curr.rgb[0] + curr.rgb[1] + curr.rgb[2];
         return sumPrev < sumCurr ? prev : curr;
     }, palette[0]);
 
-    let cloneGrid = grid.map(row => [...row]);
+    // 计算灰度矩阵用于边缘检测
+    let gray = new Float32Array(w * h);
+    for (let i = 0; i < w * h; i++) {
+        let p = i * 4;
+        gray[i] = rawData[p] * 0.299 + rawData[p+1] * 0.587 + rawData[p+2] * 0.114;
+    }
 
+    // Sobel 算子提取清晰轮廓
     for (let r = 1; r < h - 1; r++) {
         for (let c = 1; c < w - 1; c++) {
-            let current = cloneGrid[r][c];
-            let isWhiteBg = (current.rgb[0] > 245 && current.rgb[1] > 245 && current.rgb[2] > 245);
-            
-            if (!isWhiteBg) {
-                let neighbors = [
-                    cloneGrid[r-1][c], cloneGrid[r+1][c],
-                    cloneGrid[r][c-1], cloneGrid[r][c+1]
-                ];
-                let touchingBg = neighbors.some(n => n.rgb[0] > 245 && n.rgb[1] > 245 && n.rgb[2] > 245);
-                if (touchingBg && Math.random() < 0.3) {
-                    grid[r][c] = darkBead;
-                }
+            let idx = r * w + c;
+            // 避开纯白背景
+            let currentBead = grid[r][c];
+            let isBg = (currentBead.rgb[0] > 245 && currentBead.rgb[1] > 245 && currentBead.rgb[2] > 245);
+            if (isBg) continue;
+
+            let gx = 
+                -1 * gray[(r-1)*w + (c-1)] + 1 * gray[(r-1)*w + (c+1)] +
+                -2 * gray[r*w + (c-1)]     + 2 * gray[r*w + (c+1)] +
+                -1 * gray[(r+1)*w + (c-1)] + 1 * gray[(r+1)*w + (c+1)];
+
+            let gy = 
+                -1 * gray[(r-1)*w + (c-1)] - 2 * gray[(r-1)*w + c] - 1 * gray[(r-1)*w + (c+1)] +
+                 1 * gray[(r+1)*w + (c-1)] + 2 * gray[(r+1)*w + c] + 1 * gray[(r+1)*w + (c+1)];
+
+            let magnitude = Math.sqrt(gx * gx + gy * gy);
+
+            // 梯度较大处（即主体轮廓与五官交界线）自动赋予深色描边，增强立体漫画感
+            if (magnitude > 45) {
+                grid[r][c] = darkBead;
             }
         }
     }
 }
+
+
 
 
 
