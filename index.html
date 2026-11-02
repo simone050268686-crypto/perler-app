@@ -1386,6 +1386,9 @@
 
 
 
+// ==========================================
+// 终极优化版：专业级纯净色块拼豆处理算法
+// ==========================================
 function processImage() {
     if (!uploadedImage) return;
 
@@ -1395,7 +1398,7 @@ function processImage() {
     const imgW = uploadedImage.width || uploadedImage.naturalWidth;
     const imgH = uploadedImage.height || uploadedImage.naturalHeight;
     
-    // 1. 高清超采样预处理 (保持边缘锐利)
+    // 1. 高清超采样预处理
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     const superFactor = 8;
@@ -1428,13 +1431,12 @@ function processImage() {
     let imgData = srcCtx.getImageData(0, 0, cols, rows);
     let data = imgData.data;
 
-    // 2. 图像对比度与饱和度预调校
+    // 2. 图像对比度与饱和度调校
     const contrast = parseFloat(document.getElementById('contrastRange').value);
-    const saturation = parseFloat(document.getElementById('saturationRange').value);
     const removeBg = document.getElementById('removeBgToggle').checked;
     const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value);
 
-    // 3. 智能边缘保护与背景清理 (防止背景腐蚀白色主体毛发或衣服)
+    // 3. 智能边缘保护与背景清理
     if (removeBg) {
         const borderSamples = [];
         const addSample = (x, y) => {
@@ -1457,7 +1459,6 @@ function processImage() {
             foreground[id] = Math.sqrt(dr * dr + dg * dg + db * db) > bgDistanceLimit ? 1 : 0;
         }
 
-        // 洪泛法清除外围杂色背景，保留内部白色细节
         const visited = new Uint8Array(total);
         const queue = new Int32Array(total);
         let head = 0, tail = 0;
@@ -1485,8 +1486,7 @@ function processImage() {
     const paletteKey = document.getElementById('paletteSelect').value;
     const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
 
-    // 4. 【核心升级】引入 Floyd-Steinberg 误差扩散算法 (实现照片级渐变)
-    // 将原先的单点直接映射升级为带有误差传导的量化循环
+    // 4. 精准 Lab 色彩空间直接映射（摒弃产生噪点的抖动算法，保证色块纯净）
     pixelData = [];
     for (let r = 0; r < rows; r++) {
         let rowArr = [];
@@ -1494,48 +1494,73 @@ function processImage() {
             let idx = (r * cols + c) * 4;
             let r_val = data[idx], g_val = data[idx+1], b_val = data[idx+2];
 
-            // Gamma 与对比度调整
             r_val = Math.min(255, Math.max(0, (r_val - 128) * contrast + 128));
             g_val = Math.min(255, Math.max(0, (g_val - 128) * contrast + 128));
             b_val = Math.min(255, Math.max(0, (b_val - 128) * contrast + 128));
 
-            // 在 Lab 空间寻找最佳匹配色
             let closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
             rowArr.push(closest);
-
-            // 计算量化误差 (Error Calculation)
-            let errR = r_val - closest.rgb[0];
-            let errG = g_val - closest.rgb[1];
-            let errB = b_val - closest.rgb[2];
-
-            // 将误差按 Floyd-Steinberg 权重扩散到右侧及下方的相邻像素
-            const distributeError = (nc, nr, weight) => {
-                if (nc >= 0 && nc < cols && nr >= 0 && nr < rows) {
-                    let nIdx = (nr * cols + nc) * 4;
-                    data[nIdx] = Math.min(255, Math.max(0, data[nIdx] + errR * weight));
-                    data[nIdx+1] = Math.min(255, Math.max(0, data[nIdx+1] + errG * weight));
-                    data[nIdx+2] = Math.min(255, Math.max(0, data[nIdx+2] + errB * weight));
-                }
-            };
-
-            distributeError(c + 1, r,     7 / 16);
-            distributeError(c - 1, r + 1, 3 / 16);
-            distributeError(c,     r + 1, 5 / 16);
-            distributeError(c + 1, r + 1, 1 / 16);
         }
         pixelData.push(rowArr);
     }
 
-    // 5. 自动外轮廓描边增强：检测主体边缘并补上深色/黑色拼豆，使轮廓极具立体感
+    // 5. 【核心去噪与平滑】3×3 区域模态滤波（消除孤立杂色噪点，让色块成片、干净）
+    applySpatialModeFilter(pixelData, cols, rows);
+
+    // 6. 主体外轮廓强化
     enhanceSilhouetteOutlines(pixelData, cols, rows, currentPalette);
 
     redrawCanvas();
     updateColorStatistics();
 }
 
-// 辅助函数：智能边缘剪影描边增强
+// 辅助函数 1：空间模态滤波（把零散的单颗杂色融合成周围的大色块，彻底消除马赛克感）
+function applySpatialModeFilter(grid, w, h) {
+    let copy = grid.map(row => [...row]);
+    for (let r = 1; r < h - 1; r++) {
+        for (let c = 1; c < w - 1; c++) {
+            let current = copy[r][c];
+            // 统计 3x3 邻域内的颜色分布
+            let counts = {};
+            let selfKey = current.code;
+            let hasBgNeighbor = false;
+
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    let neighbor = copy[r + dr][c + dc];
+                    if (neighbor.code === "BLANK" || (neighbor.rgb[0] > 245 && neighbor.rgb[1] > 245 && neighbor.rgb[2] > 245)) {
+                        hasBgNeighbor = true;
+                    }
+                    counts[neighbor.code] = (counts[neighbor.code] || 0) + 1;
+                }
+            }
+
+            // 如果当前像素与其周围大多数颜色不同（即孤立噪点），则将其替换为邻域内出现次数最多的颜色
+            let dominantCode = selfKey;
+            let maxCount = 0;
+            for (let code in counts) {
+                if (counts[code] > maxCount) {
+                    maxCount = counts[code];
+                    dominantCode = code;
+                }
+            }
+
+            // 若周围多数属于某种主流色且当前点属于孤立点，进行平滑
+            if (maxCount >= 5 && dominantCode !== selfKey && !hasBgNeighbor) {
+                // 在当前调色板中找到对应 bead 对象
+                for (let bead of PERLER_PALETTES[document.getElementById('paletteSelect').value] || PERLER_PALETTES.perler) {
+                    if (bead.code === dominantCode) {
+                        grid[r][c] = bead;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 辅助函数 2：智能外轮廓描边增强
 function enhanceSilhouetteOutlines(grid, w, h, palette) {
-    // 寻找最深色（通常是黑色或深炭灰）作为描边色
     let darkBead = palette.reduce((prev, curr) => {
         let sumPrev = prev.rgb[0] + prev.rgb[1] + prev.rgb[2];
         let sumCurr = curr.rgb[0] + curr.rgb[1] + curr.rgb[2];
@@ -1550,13 +1575,12 @@ function enhanceSilhouetteOutlines(grid, w, h, palette) {
             let isWhiteBg = (current.rgb[0] > 245 && current.rgb[1] > 245 && current.rgb[2] > 245);
             
             if (!isWhiteBg) {
-                // 检查上下左右是否有纯白背景，如果是，说明处于边缘
                 let neighbors = [
                     cloneGrid[r-1][c], cloneGrid[r+1][c],
                     cloneGrid[r][c-1], cloneGrid[r][c+1]
                 ];
                 let touchingBg = neighbors.some(n => n.rgb[0] > 245 && n.rgb[1] > 245 && n.rgb[2] > 245);
-                if (touchingBg && Math.random() < 0.35) { // 适度在边缘点缀深色轮廓
+                if (touchingBg && Math.random() < 0.3) {
                     grid[r][c] = darkBead;
                 }
             }
