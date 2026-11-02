@@ -31,6 +31,13 @@
                 </div>
             </div>
             <div class="flex items-center space-x-2">
+                <div class="flex items-center bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg shadow-xs">
+                    <span class="text-xs font-semibold text-amber-800 flex items-center space-x-1">
+                        <span>⚡ 剩余导出次数:</span>
+                        <span id="quotaDisplay" class="font-bold text-amber-600 font-mono text-sm ml-1">1</span>
+                        <span>次</span>
+                    </span>
+                </div>
                 <button onclick="saveProjectState()" class="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition shadow-sm">
                     💾 保存项目
                 </button>
@@ -235,11 +242,11 @@
             <div class="mt-6 pt-4 border-t border-slate-100 space-y-3">
                 <button onclick="requestConversionWithCheck()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-200 transition flex items-center justify-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    <span>生成并解锁 70x70 图纸</span>
+                    <span>重新生成图纸</span>
                 </button>
-                <button onclick="downloadPatternImage()" id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2 opacity-50 cursor-not-allowed" disabled>
+                <button onclick="downloadPatternImage()" id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span>导出高清拼豆图纸 (需付款解锁)</span>
+                    <span id="downloadBtnText">导出高清拼豆图纸</span>
                 </button>
             </div>
         </aside>
@@ -333,7 +340,7 @@
             <h3 class="text-lg font-bold text-slate-900">📖 拼豆设计大师使用指南</h3>
             <div class="space-y-3 text-sm text-slate-600">
                 <p><strong>1. 上传照片与选择尺寸：</strong> 在左侧面板上传您喜欢的图片（如动漫角色、萌宠、头像等）。推荐使用 70x70 超高清精致大图模式。</p>
-                <p><strong>2. 付款解锁：</strong> 本专业图纸转换器需完成支付或激活后方可生成完整无码图纸及导出高清清单。</p>
+                <p><strong>2. 导出次数：</strong> 上传照片、预览和编辑图纸均可免费使用；导出高清图纸需消耗次数，新用户赠送 1 次免费导出，用完后可在导出弹窗充值。</p>
                 <p><strong>3. 背景一键清理：</strong> 开启“将背景转换为纯白色”，系统会自动智能抠图并清理周围杂色背景。</p>
                 <p><strong>4. 手动精修微调：</strong> 切换至“编辑工具”标签，选择画笔颜色，在画布上点击或拖拽即可涂抹修改任意像素点。</p>
             </div>
@@ -350,8 +357,8 @@
                 <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900">真实收银台支付接口</h3>
-                <p class="text-xs text-slate-500">扫码支付 ￥9.9 元解锁 70x70 极清拼豆图纸与导出特权</p>
+                <h3 class="text-lg font-bold text-slate-900">导出次数已用完，请充值</h3>
+                <p class="text-xs text-slate-500">扫码支付 ￥9.9 元解锁 <span class="text-indigo-600 font-bold">5 次</span>高清图纸导出特权</p>
             </div>
 
             <!-- Payment Method Tabs -->
@@ -384,7 +391,7 @@
                 </div>
                 <div>
                     <p class="text-xs font-bold text-slate-800" id="payMethodTitle">请使用微信“扫一扫”完成支付</p>
-                    <p class="text-lg font-black text-indigo-600 mt-0.5">￥ 9.90</p>
+                    <p class="text-lg font-black text-indigo-600 mt-0.5">￥ 9.90 / 5次</p>
                 </div>
             </div>
 
@@ -477,7 +484,7 @@
 
         // State Variables
         let uploadedImage = null;
-        let pixelData = []; // 2D array of bead objects
+        let pixelData = [];
         let colorStats = {};
         let cols = 70;
         let rows = 70;
@@ -485,10 +492,42 @@
         let activeTool = 'draw';
         let activePaletteColor = PERLER_PALETTES.perler[0];
         let isDrawing = false;
-        let isPaidUser = false; // 付款状态标记
         let currentPayChannel = 'wechat';
+        let trialCredits = getTrialCredits();
+
+        function getTrialCredits() {
+            let q = localStorage.getItem('bead_trial_quota');
+            if (q === null) {
+                q = 1;
+                localStorage.setItem('bead_trial_quota', q);
+            }
+            return parseInt(q, 10);
+        }
+
+        function setTrialCredits(v) {
+            trialCredits = v;
+            localStorage.setItem('bead_trial_quota', v);
+            document.getElementById('quotaDisplay').innerText = v;
+            updateDownloadBtnState();
+        }
+
+        function updateDownloadBtnState() {
+            const dlBtn = document.getElementById('downloadBtn');
+            const btnText = document.getElementById('downloadBtnText');
+            if (trialCredits > 0) {
+                dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                dlBtn.removeAttribute('disabled');
+                btnText.innerText = `导出高清拼豆图纸 (剩余 ${trialCredits} 次)`;
+            } else {
+                dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                dlBtn.removeAttribute('disabled');
+                btnText.innerText = '导出高清图纸 (次数已用完，点击充值)';
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
+            setTrialCredits(getTrialCredits());
+
             const dropZone = document.getElementById('uploadDropZone');
             if (dropZone) {
                 dropZone.addEventListener('dragover', (e) => {
@@ -536,15 +575,9 @@
 
             setTimeout(() => {
                 if (overlay) overlay.classList.add('opacity-0');
-                isPaidUser = true;
+                setTrialCredits(trialCredits + 5);
                 closePaymentModal();
-                showToast("支付网关回调成功！已为您解锁 70x70 高清图纸与导出特权。");
-                
-                const dlBtn = document.getElementById('downloadBtn');
-                dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                dlBtn.removeAttribute('disabled');
-
-                processImage();
+                showToast("支付成功！已自动充值 5 次导出额度。");
             }, 1200);
         }
 
@@ -647,19 +680,10 @@
                 rows = parseInt(document.getElementById('customHeight').value) || 70;
             }
             document.getElementById('dimensionBadge').innerText = `${cols} x ${rows}`;
-            
-            if (!isPaidUser) {
-                showPaymentModal();
-                return;
-            }
             processImage();
         }
 
         function requestConversionWithCheck() {
-            if (!isPaidUser) {
-                showPaymentModal();
-                return;
-            }
             processImage();
             showToast("图纸已成功重新生成与渲染！");
         }
@@ -672,25 +696,8 @@
             document.getElementById('paymentModal').classList.add('hidden');
         }
 
-        function simulatePaymentSuccess() {
-            isPaidUser = true;
-            closePaymentModal();
-            showToast("支付成功！已为您解锁全部高级转换与高清导出功能。");
-            
-            const dlBtn = document.getElementById('downloadBtn');
-            dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            dlBtn.removeAttribute('disabled');
-
-            processImage();
-        }
-
         function processImage() {
             if (!uploadedImage) return;
-
-            if (!isPaidUser) {
-                showPaymentModal();
-                return;
-            }
 
             const srcCanvas = document.createElement('canvas');
             const srcCtx = srcCanvas.getContext('2d');
@@ -1052,10 +1059,11 @@
         }
 
         function downloadPatternImage() {
-            if (!isPaidUser) {
+            if (trialCredits <= 0) {
                 showPaymentModal();
                 return;
             }
+            setTrialCredits(trialCredits - 1);
 
             const originalCanvas = document.getElementById('pixelCanvas');
             const exportCanvas = document.createElement('canvas');
@@ -1068,7 +1076,6 @@
             const gridW = cols * printScale;
             const gridH = rows * printScale;
 
-            // 计算底部材料清单区域所需的高度（按每行可放多列动态计算）
             const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
             const colsInLegend = 4;
             const legendRows = Math.ceil(sortedColors.length / colsInLegend);
@@ -1077,11 +1084,9 @@
             exportCanvas.width = Math.max(gridW + padding * 2, 700);
             exportCanvas.height = gridH + headerHeight + footerHeight + padding * 2;
 
-            // 绘制纯白底色
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-            // 绘制顶部标题与尺寸信息
             ctx.fillStyle = '#0f172a';
             ctx.font = 'bold 22px Inter, sans-serif';
             ctx.textAlign = 'center';
@@ -1094,7 +1099,6 @@
             const startX = (exportCanvas.width - gridW) / 2;
             const startY = padding + headerHeight;
 
-            // 绘制网格线、像素与格子内色号
             const showGrid = document.getElementById('showGridLines').checked;
             const showCodes = document.getElementById('showCodesOnCanvas').checked;
 
@@ -1123,7 +1127,6 @@
                 }
             }
 
-            // 绘制四周坐标刻度 (每隔5格加粗标记)
             ctx.fillStyle = '#475569';
             ctx.font = '11px monospace';
             ctx.textAlign = 'center';
@@ -1141,7 +1144,6 @@
                 }
             }
 
-            // 绘制底部材料清单参考面板 (完整展示所有颜色)
             const footerY = startY + gridH + 30;
             const footerW = exportCanvas.width - padding * 2;
             
@@ -1168,13 +1170,11 @@
                 let curY = startListY + rowIdx * 28;
 
                 if (curY < footerY + footerHeight - 25) {
-                    // 颜色小方块
                     ctx.fillStyle = `rgb(${item.rgb.join(',')})`;
                     ctx.fillRect(curX, curY, 16, 16);
                     ctx.strokeStyle = '#94a3b8';
                     ctx.strokeRect(curX, curY, 16, 16);
 
-                    // 文字说明
                     ctx.fillStyle = '#1e293b';
                     ctx.font = '12px Inter, sans-serif';
                     ctx.textAlign = 'left';
@@ -1187,7 +1187,7 @@
             link.download = `perler_bead_pattern_${cols}x${rows}_complete.png`;
             link.href = exportCanvas.toDataURL('image/png');
             link.click();
-            showToast("已成功导出包含完整材料清单与坐标网格的高清图纸！");
+            showToast(`已成功导出高清图纸！本次消耗 1 次，剩余 ${trialCredits} 次。`);
         }
 
         function copyColorList() {
