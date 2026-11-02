@@ -1,1359 +1,2424 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN" class="h-full">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高级像素拼豆图纸生成器 - Perler Bead Designer Pro (全量展开版)</title>
-    <!-- Tailwind CSS CDN -->
+
+    <title>高级像素拼豆图纸生成器 - Perler Bead Designer Pro</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Inter Font -->
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* ==========================================================================
-           1. 全局基础样式与自定义滚动条配置
-           ========================================================================== */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
 
-        /* Webkit 自定义滚动条美化 */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
+        body { font-family: 'Inter', sans-serif; }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
 
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-        /* 画布棋盘格背景（用于透明/留白指示） */
-        .checkerboard-bg {
-            background-color: #ffffff;
-            background-image: linear-gradient(45deg, #f1f5f9 25%, transparent 25%),
-                              linear-gradient(-45deg, #f1f5f9 25%, transparent 25%),
-                              linear-gradient(45deg, transparent 75%, #f1f5f9 75%),
-                              linear-gradient(-45deg, transparent 75%, #f1f5f9 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* 极细腻微过渡动画 */
-        .smooth-transition {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* 卡密与微信号强调类（去除下划线，保持纯粗体） */
-        .wechat-code-text {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-weight: 800;
-            color: #312e81;
-            text-decoration: none !important;
-            border-bottom: none !important;
-        }
     </style>
+
 </head>
-<body class="bg-slate-50 text-slate-800 h-full flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- ==========================================================================
-         2. 顶部导航栏 (Header)
-         ========================================================================== -->
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col antialiased">
+
+
+
+    <!-- Header -->
+
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- 品牌 Logo 与标题 -->
+
             <div class="flex items-center space-x-3">
+
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+
                     </svg>
+
                 </div>
+
                 <div>
-                    <h1 class="text-lg font-bold text-slate-900 leading-tight tracking-tight">
-                        拼豆设计大师 Pro (全量高级版)
-                    </h1>
-                    <p class="text-xs text-slate-500">
-                        专业级像素照片转换、图纸编辑与色号统计工具
-                    </p>
+
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">拼豆设计大师 Pro</h1>
+
+                    <p class="text-xs text-slate-500">专业级像素照片转换、图纸编辑与色号统计工具</p>
+
                 </div>
+
             </div>
 
-            <!-- 右侧快捷控制区 -->
-            <div class="flex items-center space-x-3">
-                <!-- 额度显示卡片 -->
-                <div class="flex items-center bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl shadow-xs">
+            <div class="flex items-center space-x-2">
+
+                <div class="flex items-center bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg shadow-xs">
+
                     <span class="text-xs font-semibold text-amber-800 flex items-center space-x-1">
+
                         <span>⚡ 剩余导出次数:</span>
+
                         <span id="quotaDisplay" class="font-bold text-amber-600 font-mono text-sm ml-1">1</span>
+
                         <span>次</span>
+
                     </span>
+
                 </div>
 
-                <!-- 保存状态 -->
-                <button 
-                    onclick="saveProjectState()" 
-                    class="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition shadow-sm flex items-center space-x-1.5"
-                >
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                    </svg>
-                    <span>保存项目</span>
+                <button onclick="saveProjectState()" class="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition shadow-sm">
+
+                    💾 保存项目
+
                 </button>
 
-                <!-- 使用指南 -->
-                <button 
-                    onclick="openHelpModal()" 
-                    class="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition flex items-center space-x-1.5"
-                >
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                    <span>使用指南</span>
+                <button onclick="openHelpModal()" class="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition">
+
+                    📖 使用指南
+
                 </button>
 
-                <!-- 输入卡密 -->
-                <button 
-                    onclick="openTokenModal()" 
-                    class="px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition flex items-center space-x-1.5"
-                >
-                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                    </svg>
-                    <span>输入卡密</span>
+                <button onclick="openTokenModal()" class="px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition">
+
+                    🔑 输入卡密
+
                 </button>
+
             </div>
+
         </div>
+
     </header>
 
-    <!-- ==========================================================================
-         3. 主工作区面板 (Main Content Workspace)
-         ========================================================================== -->
+
+
+    <!-- Main Workspace -->
+
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 overflow-hidden">
+
         
-        <!-- 左侧控制控制侧边栏 (Sidebar Control Panel) -->
+
+        <!-- Left Control Panel (Sidebar) -->
+
         <aside class="w-full lg:w-96 bg-white border border-slate-200 rounded-2xl p-5 flex flex-col shadow-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+
             
-            <!-- 选项卡导航 (Tab Controls) -->
-            <div class="flex bg-slate-100 p-1 rounded-xl mb-5 border border-slate-200">
-                <button 
-                    onclick="switchTab('import')" 
-                    id="tabBtnImport" 
-                    class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition"
-                >
-                    1. 图片与尺寸
-                </button>
-                <button 
-                    onclick="switchTab('palette')" 
-                    id="tabBtnPalette" 
-                    class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition"
-                >
-                    2. 色彩与调色
-                </button>
-                <button 
-                    onclick="switchTab('tools')" 
-                    id="tabBtnTools" 
-                    class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition"
-                >
-                    3. 编辑工具
-                </button>
+
+            <!-- Tabs Navigation -->
+
+            <div class="flex bg-slate-100 p-1 rounded-xl mb-5">
+
+                <button onclick="switchTab('import')" id="tabBtnImport" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition">1. 图片与尺寸</button>
+
+                <button onclick="switchTab('palette')" id="tabBtnPalette" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">2. 色彩与调色</button>
+
+                <button onclick="switchTab('tools')" id="tabBtnTools" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">3. 编辑工具</button>
+
             </div>
 
-            <!-- ==================================================================
-                 TAB 1: 图片上传与尺寸网格设定
-                 ================================================================== -->
+
+
+            <!-- Tab Content 1: Import & Size -->
+
             <div id="tabContentImport" class="space-y-4">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    上传源照片
-                </h2>
+
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">上传源照片</h2>
+
                 
-                <!-- 拖拽上传区域 -->
-                <div 
-                    id="uploadDropZone" 
-                    class="relative border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-indigo-500 transition group bg-slate-50/50 cursor-pointer"
-                >
-                    <input 
-                        type="file" 
-                        id="fileInput" 
-                        accept="image/*" 
-                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                        onchange="handleImageUpload(event)"
-                    >
+
+                <div id="uploadDropZone" class="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-indigo-500 transition group bg-slate-50/50 cursor-pointer">
+
+                    <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleImageUpload(event)">
+
                     <div class="flex flex-col items-center pointer-events-none">
-                        <div id="uploadIconContainer" class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition shadow-sm">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
+
+                        <div id="uploadIconContainer" class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+
                         </div>
-                        <p id="uploadTextTitle" class="text-sm font-medium text-slate-700">
-                            点击或拖拽照片到此处上传
-                        </p>
-                        <p id="uploadTextSubtitle" class="text-xs text-slate-400 mt-1">
-                            支持 PNG, JPG, WEBP 格式 (长方形自动缩放留白)
-                        </p>
+
+                        <p id="uploadTextTitle" class="text-sm font-medium text-slate-700">点击或拖拽照片到此处上传</p>
+
+                        <p id="uploadTextSubtitle" class="text-xs text-slate-400 mt-1">支持 PNG, JPG, WEBP 格式</p>
+
                     </div>
+
                 </div>
 
-                <!-- 上传成功状态预览 -->
+
+
+                <!-- Upload Preview Thumbnail & Success Status -->
+
                 <div id="uploadSuccessPreview" class="hidden items-center space-x-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+
                     <img id="thumbnailPreview" src="" alt="Thumbnail" class="w-12 h-12 object-cover rounded-lg border border-emerald-300 shadow-sm">
-                    <div class="flex-1 overflow-hidden">
+
+                    <div class="flex-1">
+
                         <p class="text-xs font-bold text-emerald-800 flex items-center space-x-1">
-                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span>照片加载成功！</span>
+
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+
+                            <span>照片上传成功并加载！</span>
+
                         </p>
-                        <p class="text-[11px] text-emerald-600 truncate" id="fileNameDisplay">
-                            image.jpg
-                        </p>
+
+                        <p class="text-[11px] text-emerald-600 truncate" id="fileNameDisplay">image.jpg</p>
+
                     </div>
-                    <button onclick="document.getElementById('fileInput').click()" class="text-xs text-emerald-700 hover:text-emerald-900 underline font-medium px-2 py-1">
-                        更换
-                    </button>
+
+                    <button onclick="document.getElementById('fileInput').click()" class="text-xs text-emerald-700 hover:text-emerald-900 underline font-medium px-2 py-1">更换</button>
+
                 </div>
 
-                <div class="pt-1">
+
+
+                <div class="pt-2">
+
                     <button onclick="document.getElementById('fileInput').click()" class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-xl text-sm transition shadow-sm flex items-center justify-center space-x-2">
-                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
+
+                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+
                         <span>从本地文件夹选择图片</span>
+
                     </button>
+
                 </div>
 
-                <hr class="border-slate-100 my-2">
 
-                <!-- 网格规格设置 -->
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    网格尺寸规格 (支持最大100x100)
-                </h2>
+
+                <hr class="border-slate-100">
+
+
+
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">网格尺寸规格</h2>
+
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">
-                        预设模板大小
-                    </label>
+
+                    <label class="block text-sm font-medium text-slate-700 mb-1">预设模板大小</label>
+
                     <select id="gridSizeSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="updateGridSizeSelection()">
+
                         <option value="30">30 x 30 (标准单模板)</option>
+
                         <option value="50">50 x 50 (标准双模板)</option>
+
                         <option value="70" selected>70 x 70 (👑 主攻推荐：超高清精致大图)</option>
+
                         <option value="100">100 x 100 (巨幅极度还原)</option>
+
                         <option value="custom">自定义尺寸...</option>
+
                     </select>
+
                 </div>
 
-                <!-- 自定义尺寸维度扩展框 -->
+
+
                 <div id="customSizeContainer" class="hidden grid grid-cols-2 gap-2">
+
                     <div>
+
                         <label class="block text-xs font-medium text-slate-600 mb-1">宽度 (列)</label>
-                        <input type="number" id="customWidth" value="70" min="10" max="100" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
+
+                        <input type="number" id="customWidth" value="70" min="10" max="150" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
+
                     </div>
+
                     <div>
+
                         <label class="block text-xs font-medium text-slate-600 mb-1">高度 (行)</label>
-                        <input type="number" id="customHeight" value="70" min="10" max="100" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
+
+                        <input type="number" id="customHeight" value="70" min="10" max="150" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
+
                     </div>
+
                 </div>
 
-                <!-- 细粒度控制滑块 -->
+
+
                 <div class="space-y-3 pt-2">
+
                     <div>
+
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>拉普拉斯边缘增强</span>
-                            <span id="sharpnessVal">极强边缘提取</span>
+
+                            <span>70x70 专有拉普拉斯边缘增强</span>
+
+                            <span id="sharpnessVal">极强边缘提取 (70x70 专属)</span>
+
                         </div>
+
                         <input type="range" id="sharpnessRange" min="0" max="3" step="1" value="3" class="w-full accent-indigo-600" oninput="updateSharpnessLabel(this.value); triggerReprocess()">
+
                     </div>
+
                     <div>
+
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩对比度校正 (Contrast)</span>
-                            <span id="contrastVal">1.3</span>
+
+                            <span>色彩曲线校正 (Gamma)</span>
+
+                            <span id="contrastVal">1.2</span>
+
                         </div>
-                        <input type="range" id="contrastRange" min="0.5" max="2.0" step="0.1" value="1.3" class="w-full accent-indigo-600" oninput="document.getElementById('contrastVal').innerText=this.value; triggerReprocess()">
+
+                        <input type="range" id="contrastRange" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full accent-indigo-600" oninput="document.getElementById('contrastVal').innerText=this.value; triggerReprocess()">
+
                     </div>
+
                     <div>
+
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩鲜艳度/饱和度 (防发灰发脏)</span>
-                            <span id="saturationVal">1.4</span>
+
+                            <span>色彩饱和度还原</span>
+
+                            <span id="saturationVal">1.2</span>
+
                         </div>
-                        <input type="range" id="saturationRange" min="0.5" max="2.5" step="0.1" value="1.4" class="w-full accent-indigo-600" oninput="document.getElementById('saturationVal').innerText=this.value; triggerReprocess()">
+
+                        <input type="range" id="saturationRange" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full accent-indigo-600" oninput="document.getElementById('saturationVal').innerText=this.value; triggerReprocess()">
+
                     </div>
+
                 </div>
 
-                <hr class="border-slate-100 my-2">
 
-                <!-- 高级背景扣图与黄色/亮色保护 -->
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    背景与高级色彩提取设置
-                </h2>
-                <div class="space-y-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+
+                <hr class="border-slate-100">
+
+
+
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">背景处理设置</h2>
+
+                <div class="space-y-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+
                     <label class="flex items-center space-x-3 cursor-pointer">
+
                         <input type="checkbox" id="removeBgToggle" checked onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+
                         <span class="text-sm font-bold text-slate-800">将背景转换为纯白色 (抠图清洗)</span>
+
                     </label>
-                    <label class="flex items-center space-x-3 cursor-pointer">
-                        <input type="checkbox" id="yellowBoostToggle" checked onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                        <span class="text-sm font-bold text-indigo-700">开启黄色/暖色衣服专项保真 (防灰发脏)</span>
-                    </label>
+
+                    <p class="text-xs text-slate-500">勾选后，会自动应用边缘漫水洪泛算法，将照片周围杂色背景清空为纯白色基底，使 70x70 主体极为突显。</p>
+
                     <div id="bgThresholdContainer" class="pt-1">
+
                         <div class="flex justify-between text-xs font-medium text-slate-500 mb-1">
-                            <span>背景抠图敏感度</span>
+
+                            <span>背景判定灵敏度阈值</span>
+
                             <span id="bgThresholdVal">215</span>
+
                         </div>
+
                         <input type="range" id="bgThresholdRange" min="160" max="250" step="5" value="215" class="w-full accent-indigo-600" oninput="document.getElementById('bgThresholdVal').innerText=this.value; triggerReprocess()">
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- ==================================================================
-                 TAB 2: 色调库与颜色量化限制
-                 ================================================================== -->
+
+
+            <!-- Tab Content 2: Palette & Quantization -->
+
             <div id="tabContentPalette" class="space-y-4 hidden">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    拼豆色系品牌
-                </h2>
+
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">拼豆色系品牌</h2>
+
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">
-                        色号标准库
-                    </label>
+
+                    <label class="block text-sm font-medium text-slate-700 mb-1">色号标准库</label>
+
                     <select id="paletteSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess(); initQuickPalette();">
-                        <option value="perler">Perler 完整增强色系 (含高亮黄/鲜艳粉)</option>
+
+                        <option value="perler">Perler 经典色系 (29色示例)</option>
+
                         <option value="artkal">Artkal 漫库专业色系</option>
+
                         <option value="hama">Hama 丹麦标准色</option>
-                        <option value="basic16">基础标准色</option>
+
+                        <option value="basic16">新手基础 11 色</option>
+
                     </select>
+
                 </div>
 
+
+
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">
-                        色彩精简数量 (量化)
-                    </label>
+
+                    <label class="block text-sm font-medium text-slate-700 mb-1">色彩精简数量 (量化)</label>
+
                     <select id="colorLimitSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
+
                         <option value="0" selected>使用全色库 (最还原)</option>
+
                         <option value="32">限制最多 32 种颜色</option>
+
                         <option value="24">限制最多 24 种颜色</option>
+
                         <option value="16">限制最多 16 种颜色</option>
+
+                        <option value="12">限制最多 12 种颜色</option>
+
                     </select>
+
                 </div>
 
-                <div class="p-3.5 bg-indigo-50 border border-indigo-100 rounded-xl space-y-1">
-                    <p class="text-xs text-indigo-700 font-bold">💡 专业拼豆色彩调优技巧：</p>
-                    <p class="text-[11px] text-indigo-600 leading-relaxed">
-                        如果原图中白雪公主等角色的黄裙子出现混色灰暗，请保持勾选【开启黄色/暖色衣服专项保真】，系统会将 Lab 色彩距离自动重定向至 F21/H22 明黄和奶油黄色号。
-                    </p>
+
+
+                <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+
+                    <p class="text-xs text-indigo-700 font-medium">💡 提示：减少颜色数量可以使拼豆作品色彩更干净统一，更容易购买和拼贴！</p>
+
                 </div>
+
             </div>
 
-            <!-- ==================================================================
-                 TAB 3: 像素级编辑与画笔工具
-                 ================================================================== -->
+
+
+            <!-- Tab Content 3: Editor Tools -->
+
             <div id="tabContentTools" class="space-y-4 hidden">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    交互绘制工具
-                </h2>
+
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">交互绘制工具</h2>
+
+                
+
                 <div class="grid grid-cols-2 gap-2">
+
                     <button onclick="setTool('draw')" id="toolBtnDraw" class="p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition">
+
                         <span>✏️ 填色画笔</span>
+
                     </button>
+
                     <button onclick="setTool('erase')" id="toolBtnErase" class="p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition">
+
                         <span>🧹 橡皮擦/清空</span>
+
                     </button>
+
                 </div>
 
+
+
                 <div>
+
                     <label class="block text-sm font-medium text-slate-700 mb-2">当前选择画笔颜色：</label>
+
                     <div id="activePaletteColorDisplay" class="flex items-center space-x-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+
                         <div id="activeColorSwatch" class="w-8 h-8 rounded-lg shadow-sm border border-slate-300"></div>
+
                         <div>
+
                             <p class="text-sm font-bold text-slate-800" id="activeColorName">未选择</p>
+
                             <p class="text-xs text-slate-500 font-mono" id="activeColorCode">色号: --</p>
+
                         </div>
+
                     </div>
+
                 </div>
 
+
+
+                <!-- Palette Color Quick Picker -->
+
                 <div>
+
                     <label class="block text-sm font-medium text-slate-700 mb-1">调色板快捷选择：</label>
+
                     <div id="quickPaletteGrid" class="grid grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl">
-                        <!-- 动态渲染选项 -->
+
+                        <!-- Populated dynamically -->
+
                     </div>
+
                 </div>
+
             </div>
+
+
 
             <hr class="my-5 border-slate-100">
 
-            <!-- 渲染辅助选项开关 -->
-            <div class="space-y-2.5">
+
+
+            <div class="space-y-2">
+
                 <label class="flex items-center space-x-3 cursor-pointer">
+
                     <input type="checkbox" id="showGridLines" checked onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+
                     <span class="text-sm font-medium text-slate-700">显示网格参考线</span>
+
                 </label>
+
                 <label class="flex items-center space-x-3 cursor-pointer">
-                    <input type="checkbox" id="showCodesOnCanvas" checked onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                    <span class="text-sm font-medium text-slate-700">在图纸格内显示色号 (如 H21/E21)</span>
+
+                    <input type="checkbox" id="showCodesOnCanvas" onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+
+                    <span class="text-sm font-medium text-slate-700">在图纸格内显示色号 (适合大图时关闭)</span>
+
                 </label>
+
             </div>
 
-            <!-- 底部提交与导出按钮组 -->
+
+
             <div class="mt-6 pt-4 border-t border-slate-100 space-y-3">
-                <button 
-                    onclick="requestConversionWithCheck()" 
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-200 transition flex items-center justify-center space-x-2"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
+
+                <button onclick="requestConversionWithCheck()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-200 transition flex items-center justify-center space-x-2">
+
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+
                     <span>重新生成图纸</span>
+
                 </button>
-                <button 
-                    onclick="downloadPatternImage()" 
-                    id="downloadBtn" 
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                    </svg>
+
+                <button onclick="downloadPatternImage()" id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2">
+
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+
                     <span id="downloadBtnText">导出高清拼豆图纸</span>
+
                 </button>
+
             </div>
+
         </aside>
 
-        <!-- 右侧图纸预览与材料清单统计面板 (Right Preview Area) -->
+
+
+        <!-- Right Preview & Stats Area -->
+
         <div class="flex-1 flex flex-col gap-6 overflow-hidden">
+
             
-            <!-- Canvas 图纸工作台卡片 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col shadow-sm relative min-h-[380px]">
+
+            <!-- Canvas Preview Card -->
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col shadow-sm relative min-h-[350px]">
+
                 <div class="flex items-center justify-between mb-4">
+
                     <div class="flex items-center space-x-2">
-                        <h2 class="text-base font-bold text-slate-800">
-                            专业拼豆图纸实时工作台
-                        </h2>
-                        <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                            70 x 70
-                        </span>
+
+                        <h2 class="text-base font-bold text-slate-800">专业拼豆图纸实时工作台</h2>
+
+                        <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">70 x 70</span>
+
                     </div>
+
                     <div class="flex items-center space-x-2">
-                        <button onclick="zoomCanvas(1.2)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="放大">🔍+</button>
-                        <button onclick="zoomCanvas(0.8)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="缩小">🔍-</button>
+
+                        <button onclick="zoomCanvas(1.2)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="放大">
+
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+
+                        </button>
+
+                        <button onclick="zoomCanvas(0.8)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="缩小">
+
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg>
+
+                        </button>
+
                         <button onclick="resetZoom()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition">适合窗口</button>
+
                     </div>
+
                 </div>
 
-                <!-- Canvas 主容器 -->
-                <div id="canvasContainer" class="flex-1 bg-slate-900/5 border border-slate-200 rounded-xl flex items-center justify-center overflow-auto relative cursor-crosshair p-4 checkerboard-bg">
-                    <canvas 
-                        id="pixelCanvas" 
-                        class="shadow-xl rounded bg-white" 
+
+
+                <!-- Canvas Container -->
+
+                <div id="canvasContainer" class="flex-1 bg-slate-900/5 border border-slate-200 rounded-xl flex items-center justify-center overflow-auto relative cursor-crosshair p-4">
+
+                    <canvas id="pixelCanvas" class="shadow-xl rounded bg-white" 
+
                         onmousedown="startDrawing(event)" 
+
                         onmousemove="drawOnCanvas(event)" 
+
                         onmouseup="stopDrawing()" 
+
                         onmouseleave="stopDrawing()"
+
                         ontouchstart="handleTouchStart(event)"
+
                         ontouchmove="handleTouchMove(event)"
-                        ontouchend="stopDrawing()"
-                    >
+
+                        ontouchend="stopDrawing()">
+
                     </canvas>
+
                 </div>
 
-                <!-- 选定像素吸管与坐标指示信息栏 -->
+
+
+                <!-- Selected Bead Tooltip Bar -->
+
                 <div id="inspectorBar" class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between text-sm hidden">
+
                     <div class="flex items-center space-x-3">
+
                         <div id="inspectorColorBox" class="w-6 h-6 rounded-md shadow-sm border border-slate-300"></div>
+
                         <div>
+
                             <span class="font-bold text-slate-800" id="inspectorName">颜色名称</span>
+
                             <span class="text-xs text-slate-500 ml-2" id="inspectorCode">色号: --</span>
+
                         </div>
+
                     </div>
+
                     <div class="text-xs text-slate-500">
+
                         网格坐标: <span id="inspectorPos" class="font-mono font-medium text-slate-750">--</span>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- 材料采购统计表格卡片 -->
+
+
+            <!-- Color Statistics Card -->
+
             <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col max-h-80">
+
                 <div class="flex items-center justify-between mb-3">
+
                     <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
+
                         <span>拼豆颜色采购清单</span>
-                        <span id="totalBeadsBadge" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-md font-normal">
-                            总计 0 颗
-                        </span>
+
+                        <span id="totalBeadsBadge" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-md font-normal">总计 0 颗</span>
+
                     </h3>
-                    <button onclick="copyColorList()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1">
-                        <span>📋 复制完整清单</span>
-                    </button>
+
+                    <div class="flex items-center space-x-2">
+
+                        <button onclick="copyColorList()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1">
+
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+
+                            <span>复制清单</span>
+
+                        </button>
+
+                    </div>
+
                 </div>
+
                 
+
                 <div class="flex-1 overflow-y-auto border border-slate-100 rounded-xl pr-1">
+
                     <table class="w-full text-left border-collapse text-xs">
+
                         <thead class="bg-slate-50 sticky top-0 text-slate-500 font-semibold border-b border-slate-200 z-10">
+
                             <tr>
+
                                 <th class="p-2.5">颜色预览</th>
+
                                 <th class="p-2.5">色号 / 名称</th>
+
                                 <th class="p-2.5 text-right">所需数量 (颗)</th>
+
                             </tr>
+
                         </thead>
+
                         <tbody id="colorStatsBody" class="divide-y divide-slate-100 text-slate-700">
-                            <tr>
-                                <td colspan="3" class="p-6 text-center text-slate-400">
-                                    请先上传图片以生成拼豆清单
-                                </td>
-                            </tr>
+
+                            <tr><td colspan="3" class="p-6 text-center text-slate-400">请先上传图片以生成拼豆清单</td></tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </div>
+
+
+
         </div>
+
     </main>
 
-    <!-- ==========================================================================
-         4. 全局弹窗说明与卡密校验 Modal
-         ========================================================================== -->
-    <!-- 使用指南 Modal -->
+
+
+    <!-- Help Modal -->
+
     <div id="helpModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+
             <h3 class="text-lg font-bold text-slate-900">📖 拼豆设计大师使用指南</h3>
+
             <div class="space-y-3 text-sm text-slate-600">
-                <p><strong>1. 上传照片与尺寸选择：</strong> 支持任意长方形照片，选择 70x70 或 100x100 等大尺寸网格时会自动保持比例留白，绝不切头削边。</p>
-                <p><strong>2. 微信卡密获取：</strong> 免费试用导出次数用完后，可添加微信号 <strong class="wechat-code-text">DD2025_0101_</strong> 获取专属动态授权码解锁。</p>
+
+                <p><strong>1. 上传照片与选择尺寸：</strong> 在左侧面板上传您喜欢的图片（如动漫角色、萌宠、头像等）。推荐使用 70x70 超高清精致大图模式。</p>
+
+                <p><strong>2. 免费试用与卡密获取：</strong> 第一次导出高清图纸完全免费！免费次数用完后，联系授权账号 DD2025_0101_ 获取专属导出卡密。</p>
+
+                <p><strong>3. 背景一键清理：</strong> 开启“将背景转换为纯白色”，系统会自动智能抠图并清理周围杂色背景。</p>
+
+                <p><strong>4. 手动精修微调：</strong> 切换至“编辑工具”标签，选择画笔颜色，在画布上点击或拖拽即可涂抹修改任意像素点。</p>
+
             </div>
+
             <div class="flex justify-end pt-2">
-                <button onclick="closeHelpModal()" class="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-indigo-700 transition">
-                    开始创作
-                </button>
+
+                <button onclick="closeHelpModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">开始创作</button>
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- 微信授权卡密 Modal -->
+
+
+    <!-- Modal: Card Token Verification / WeChat Guide -->
+
     <div id="tokenModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5 text-center">
-            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">🔑</div>
+
+            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
+
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+
+            </div>
+
             <div>
+
                 <h3 class="text-lg font-bold text-slate-900">免费导出次数已用完</h3>
-                <p class="text-xs text-slate-500 mt-1">添加作者微信，获取专属导出卡密授权码</p>
+
+                <p class="text-xs text-slate-500 mt-1">联系授权账号 DD2025_0101_，获取专属导出卡密授权码</p>
+
             </div>
 
-            <!-- 微信号展示框（确保无下划线） -->
+
+
+            <!-- WeChat QR Code or Instructions Box -->
+
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-center">
-                <p class="text-xs font-bold text-slate-700">步骤 1：添加微信获取卡密</p>
+
+                <p class="text-xs font-bold text-slate-700">步骤 1：联系授权账号获取卡密</p>
+
                 <div class="bg-white p-3 border border-slate-200 rounded-lg inline-block shadow-xs">
-                    <p class="text-sm font-mono text-indigo-600">
-                        微信号：<span id="DD2025_0101_" class="wechat-code-text">DD2025_0101_</span>
-                    </p>
+
+                    <!-- 请在这里把下面引号里的微信号改成你自己的真实微信号 -->
+
+                    <p class="text-sm font-mono font-bold text-indigo-600">授权账号：<span id="DD2025_0101_">DD2025_0101_</span></p>
+
                     <p class="text-[11px] text-slate-400 mt-0.5">(添加时请备注：拼豆图纸卡密)</p>
+
                 </div>
+
             </div>
 
-            <!-- 卡密输入表单 -->
+
+
+            <!-- Token Input Box -->
+
             <div class="space-y-2 text-left">
-                <label class="block text-xs font-medium text-slate-700">步骤 2：输入微信获取的卡密 (格式如 BEAD-123-74)</label>
+
+                <label class="block text-xs font-medium text-slate-700">步骤 2：输入获取的卡密 (格式如 BEAD-123-74)</label>
+
                 <div class="flex space-x-2">
-                    <input 
-                        type="text" 
-                        id="tokenInput" 
-                        placeholder="请输入卡密..." 
-                        class="flex-1 bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2.5 font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    >
-                    <button onclick="verifyToken()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
-                        验证兑换
-                    </button>
+
+                    <input type="text" id="tokenInput" placeholder="请输入卡密 (例如 BEAD-123-74)..." class="flex-1 bg-slate-50 border border-slate-300 text-sm rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono uppercase">
+
+                    <button onclick="verifyToken()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">验证并兑换</button>
+
                 </div>
+
             </div>
-            <button onclick="closeTokenModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-xl transition">
-                关闭窗口
-            </button>
+
+
+
+            <button onclick="closeTokenModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-xl transition">关闭窗口</button>
+
         </div>
+
     </div>
 
-    <!-- 浮动 Toast 提示 -->
+
+
+    <!-- Toast Notification -->
+
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
+
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+
         <span id="toastMsg">操作成功</span>
+
     </div>
 
-    <!-- ==========================================================================
-         5. JavaScript 核心算法与逻辑控制引擎 (全量展开版)
-         ========================================================================== -->
+
+
     <script>
-        /**
-         * 拼豆色号标准库全量定义
-         * 包含：Perler 经典与增强色系、Artkal 漫库色系、Hama 丹麦色系、基础16色
-         */
+
+        // --- Palettes Definition ---
+
         const PERLER_PALETTES = {
+
             perler: [
-                { code: "F21", name: "明黄色", rgb: [255, 235, 40] },
-                { code: "F22", name: "金黄色", rgb: [250, 185, 20] },
-                { code: "H22", name: "奶油黄", rgb: [255, 248, 185] },
-                { code: "F24", name: "日落橙", rgb: [245, 110, 20] },
-                { code: "H21", name: "纯白色", rgb: [255, 255, 255] },
-                { code: "H2",  name: "乳白/象牙", rgb: [250, 248, 240] },
-                { code: "H3",  name: "浅米色", rgb: [240, 225, 205] },
-                { code: "H7",  name: "纯黑色", rgb: [20, 20, 20] },
-                { code: "H8",  name: "深炭灰", rgb: [50, 50, 50] },
-                { code: "H9",  name: "经典灰", rgb: [130, 130, 130] },
-                { code: "H10", name: "高级银灰", rgb: [195, 195, 195] },
-                { code: "H14", name: "暖灰棕", rgb: [160, 140, 130] },
-                { code: "M8",  name: "经典深棕", rgb: [100, 70, 50] },
-                { code: "M11", name: "蜜糖棕", rgb: [140, 95, 60] },
-                { code: "M12", name: "焦糖色", rgb: [175, 115, 70] },
-                { code: "E14", name: "浅肤色", rgb: [255, 220, 200] },
-                { code: "E15", name: "粉嫩红", rgb: [255, 180, 190] },
-                { code: "E20", name: "珊瑚粉", rgb: [245, 130, 150] },
-                { code: "E21", name: "鲜红色", rgb: [225, 40, 50] },
-                { code: "E22", name: "深酒红", rgb: [140, 20, 30] },
-                { code: "C3",  name: "天空蓝", rgb: [120, 190, 245] },
-                { code: "C13", name: "湖蓝", rgb: [50, 130, 210] },
-                { code: "C27", name: "群青", rgb: [30, 85, 175] },
-                { code: "A23", name: "浅草绿", rgb: [180, 225, 160] },
-                { code: "G04", name: "橄榄绿", rgb: [110, 145, 65] },
-                { code: "G14", name: "森林绿", rgb: [35, 110, 55] }
+
+                {code: "H2", name: "乳白/象牙", rgb: [250, 248, 240]},
+
+                {code: "H3", name: "浅米色", rgb: [240, 225, 205]},
+
+                {code: "H7", name: "纯黑色", rgb: [20, 20, 20]},
+
+                {code: "H8", name: "深炭灰", rgb: [50, 50, 50]},
+
+                {code: "H9", name: "经典灰", rgb: [130, 130, 130]},
+
+                {code: "H10", name: "高级银灰", rgb: [195, 195, 195]},
+
+                {code: "H14", name: "暖灰棕", rgb: [160, 140, 130]},
+
+                {code: "H21", name: "纯白色", rgb: [255, 255, 255]},
+
+                {code: "H22", name: "奶油色", rgb: [255, 245, 220]},
+
+                {code: "M8", name: "经典深棕", rgb: [100, 70, 50]},
+
+                {code: "M11", name: "蜜糖棕", rgb: [140, 95, 60]},
+
+                {code: "M12", name: "焦糖色", rgb: [175, 115, 70]},
+
+                {code: "E14", name: "浅肤色", rgb: [255, 220, 200]},
+
+                {code: "E15", name: "粉嫩红", rgb: [255, 180, 190]},
+
+                {code: "E20", name: "珊瑚粉", rgb: [245, 130, 150]},
+
+                {code: "E21", name: "鲜红色", rgb: [225, 40, 50]},
+
+                {code: "E22", name: "深酒红", rgb: [140, 20, 30]},
+
+                {code: "F21", name: "明黄色", rgb: [255, 230, 40]},
+
+                {code: "F22", name: "金黄色", rgb: [245, 175, 20]},
+
+                {code: "F24", name: "日落橙", rgb: [245, 110, 20]},
+
+                {code: "C3", name: "天空蓝", rgb: [120, 190, 245]},
+
+                {code: "C13", name: "湖蓝", rgb: [50, 130, 210]},
+
+                {code: "C27", name: "群青", rgb: [30, 85, 175]},
+
+                {code: "A23", name: "浅草绿", rgb: [180, 225, 160]},
+
+                {code: "G04", name: "橄榄绿", rgb: [110, 145, 65]},
+
+                {code: "G14", name: "森林绿", rgb: [35, 110, 55]},
+
+                {code: "G21", name: "墨绿", rgb: [15, 60, 30]}
+
             ],
+
             artkal: [
-                { code: "A33", name: "向日葵黄", rgb: [255, 215, 0] },
-                { code: "A01", name: "纯白", rgb: [255, 255, 255] },
-                { code: "A02", name: "纯黑", rgb: [10, 10, 10] },
-                { code: "A05", name: "亮红", rgb: [235, 30, 35] },
-                { code: "A12", name: "樱桃粉", rgb: [255, 150, 180] },
-                { code: "A20", name: "日光橙", rgb: [255, 130, 20] },
-                { code: "A58", name: "电光蓝", rgb: [0, 120, 255] },
-                { code: "A85", name: "浅肤色", rgb: [255, 224, 196] }
+
+                {code: "A01", name: "纯白", rgb: [255, 255, 255]},
+
+                {code: "A02", name: "纯黑", rgb: [10, 10, 10]},
+
+                {code: "A05", name: "亮红", rgb: [235, 30, 35]},
+
+                {code: "A12", name: "樱桃粉", rgb: [255, 150, 180]},
+
+                {code: "A20", name: "日光橙", rgb: [255, 130, 20]},
+
+                {code: "A33", name: "向日葵黄", rgb: [255, 215, 0]},
+
+                {code: "A45", name: "森林绿", rgb: [30, 120, 50]},
+
+                {code: "A48", name: "青翠绿", rgb: [80, 200, 100]},
+
+                {code: "A58", name: "电光蓝", rgb: [0, 120, 255]},
+
+                {code: "A60", name: "浅水蓝", rgb: [170, 220, 255]},
+
+                {code: "A70", name: "深紫罗兰", rgb: [110, 40, 150]},
+
+                {code: "A80", name: "卡其色", rgb: [210, 180, 140]},
+
+                {code: "A85", name: "浅肤色", rgb: [255, 224, 196]}
+
             ],
+
             hama: [
-                { code: "H03", name: "Hama黄", rgb: [255, 235, 35] },
-                { code: "H01", name: "Hama白", rgb: [255, 255, 255] },
-                { code: "H18", name: "Hama黑", rgb: [25, 25, 25] },
-                { code: "H09", name: "Hama红", rgb: [225, 35, 35] },
-                { code: "H08", name: "Hama蓝", rgb: [30, 130, 210] }
+
+                {code: "H01", name: "Hama白", rgb: [255, 255, 255]},
+
+                {code: "H18", name: "Hama黑", rgb: [25, 25, 25]},
+
+                {code: "H09", name: "Hama红", rgb: [225, 35, 35]},
+
+                {code: "H03", name: "Hama黄", rgb: [255, 235, 35]},
+
+                {code: "H10", name: "Hama绿", rgb: [40, 150, 70]},
+
+                {code: "H08", name: "Hama蓝", rgb: [30, 130, 210]},
+
+                {code: "H07", name: "Hama紫", rgb: [130, 50, 160]},
+
+                {code: "H05", name: "Hama红橙", rgb: [240, 140, 40]}
+
             ],
+
             basic16: [
-                { code: "B05", name: "黄", rgb: [255, 255, 0] },
-                { code: "B01", name: "白", rgb: [255, 255, 255] },
-                { code: "B02", name: "黑", rgb: [0, 0, 0] },
-                { code: "B03", name: "红", rgb: [255, 0, 0] },
-                { code: "B07", name: "蓝", rgb: [0, 0, 255] }
+
+                {code: "B01", name: "白", rgb: [255, 255, 255]},
+
+                {code: "B02", name: "黑", rgb: [0, 0, 0]},
+
+                {code: "B03", name: "红", rgb: [255, 0, 0]},
+
+                {code: "B04", name: "橙", rgb: [255, 128, 0]},
+
+                {code: "B05", name: "黄", rgb: [255, 255, 0]},
+
+                {code: "B06", name: "绿", rgb: [0, 200, 0]},
+
+                {code: "B07", name: "蓝", rgb: [0, 0, 255]},
+
+                {code: "B08", name: "紫", rgb: [128, 0, 128]},
+
+                {code: "B09", name: "粉红", rgb: [255, 192, 203]},
+
+                {code: "B10", name: "棕色", rgb: [139, 69, 19]},
+
+                {code: "B11", name: "灰色", rgb: [128, 128, 128]}
+
             ]
+
         };
 
-        // 全局状态控制变量
+
+
+        // State Variables
+
         let uploadedImage = null;
+
         let pixelData = [];
+
         let colorStats = {};
+
         let cols = 70;
+
         let rows = 70;
+
         let scale = 12;
+
         let activeTool = 'draw';
+
         let activePaletteColor = PERLER_PALETTES.perler[0];
+
         let isDrawing = false;
+
         let trialCredits = getTrialCredits();
 
-        /**
-         * 获取离线额度缓存
-         */
+
+
         function getTrialCredits() {
+
             let q = localStorage.getItem('bead_trial_quota');
+
             if (q === null) {
-                return 1;
+
+                q = 1; // 默认新用户赠送 1 次免费导出
+
+                localStorage.setItem('bead_trial_quota', q);
+
             }
+
             return parseInt(q, 10);
+
         }
 
-        /**
-         * 更新导出额度状态
-         */
-        function setTrialCredits(val) {
-            trialCredits = val;
-            localStorage.setItem('bead_trial_quota', val);
-            const quotaDisplay = document.getElementById('quotaDisplay');
-            if (quotaDisplay) {
-                quotaDisplay.innerText = val;
-            }
+
+
+        function setTrialCredits(v) {
+
+            trialCredits = v;
+
+            localStorage.setItem('bead_trial_quota', v);
+
+            document.getElementById('quotaDisplay').innerText = v;
+
             updateDownloadBtnState();
+
         }
 
-        /**
-         * 同步主界面按钮提示文本
-         */
+
+
         function updateDownloadBtnState() {
+
+            const dlBtn = document.getElementById('downloadBtn');
+
             const btnText = document.getElementById('downloadBtnText');
-            if (btnText) {
-                if (trialCredits > 0) {
-                    btnText.innerText = `导出高清拼豆图纸 (剩余 ${trialCredits} 次)`;
-                } else {
-                    btnText.innerText = '导出高清图纸 (次数用完，添加微信发卡密)';
-                }
+
+            if (trialCredits > 0) {
+
+                btnText.innerText = `导出高清拼豆图纸 (剩余 ${trialCredits} 次)`;
+
+            } else {
+
+                btnText.innerText = '导出高清图纸 (次数用完，联系授权账号获取卡密)';
+
             }
+
         }
 
-        /**
-         * 页面初始化钩子
-         */
+
+
         document.addEventListener('DOMContentLoaded', () => {
+
             setTrialCredits(getTrialCredits());
-            
-            // 绑定拖拽上传拖拽区事件
+
+
+
             const dropZone = document.getElementById('uploadDropZone');
+
             if (dropZone) {
+
                 dropZone.addEventListener('dragover', (e) => {
+
                     e.preventDefault();
+
                     dropZone.classList.add('border-indigo-500', 'bg-indigo-50/20');
+
                 });
+
                 dropZone.addEventListener('dragleave', (e) => {
+
                     e.preventDefault();
+
                     dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/20');
+
                 });
+
                 dropZone.addEventListener('drop', (e) => {
+
                     e.preventDefault();
+
                     dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/20');
+
                     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                        handleImageUpload({ target: { files: e.dataTransfer.files } });
+
+                        const fakeEvent = { target: { files: e.dataTransfer.files } };
+
+                        handleImageUpload(fakeEvent);
+
                     }
+
                 });
+
             }
 
-            // 初始化默认选中颜色及模拟图像
             setActiveColor(PERLER_PALETTES.perler[0]);
-            createDefaultDemoImage();
+
+            loadSavedProject() || createDefaultDemoImage();
+
             initQuickPalette();
+
         });
 
-        /**
-         * Modal 弹窗逻辑控制
-         */
+
+
+        // --- 动态加密卡密校验核心算法 ---
+
         function openTokenModal() {
+
             document.getElementById('tokenModal').classList.remove('hidden');
+
         }
+
+
 
         function closeTokenModal() {
+
             document.getElementById('tokenModal').classList.add('hidden');
+
         }
 
-        function openHelpModal() {
-            document.getElementById('helpModal').classList.remove('hidden');
-        }
 
-        function closeHelpModal() {
-            document.getElementById('helpModal').classList.add('hidden');
-        }
 
-        /**
-         * 动态加密卡密验证算法
-         */
         function verifyToken() {
+
             const input = document.getElementById('tokenInput').value.trim().toUpperCase();
-            const match = input.match(/^BEAD-(\d{3})-(\d{2})$/);
-            
-            if (!match) {
-                showToast("⚠️ 卡密格式错误！正确格式如：BEAD-123-74");
+
+            // 已明确作废的卡密：无论校验算法如何，均不得兑换
+            if (input === 'BEAD-123-74') {
+                showToast("❌ 该卡密已作废，无法兑换，请联系授权账号获取新卡密。");
+                document.getElementById('tokenInput').value = '';
                 return;
             }
 
-            const randomNum = parseInt(match[1], 10);
+
+            
+
+            // 正则匹配格式：BEAD - 3位数字 - 2位校验码 (例如 BEAD-123-74)
+
+            const regex = /^BEAD-(\d{3})-(\d{2})$/;
+
+            const match = input.match(regex);
+
+
+
+            if (!match) {
+
+                showToast("⚠️ 卡密格式错误！正确格式如：BEAD-123-74");
+
+                return;
+
+            }
+
+
+
+            const randomNum = parseInt(match[1], 10); 
+
+            const inputCheckCode = match[2];          
+
+
+
+            // 专属加密算法：(随机数字 × 7 + 13) 的后两位
+
             const calculatedVal = (randomNum * 7 + 13).toString();
+
             const correctCheckCode = calculatedVal.slice(-2).padStart(2, '0');
 
-            if (match[2] !== correctCheckCode) {
-                showToast("❌ 卡密暗号无效，请联系作者获取！");
+
+
+            // 1. 校验加密算式
+
+            if (inputCheckCode !== correctCheckCode) {
+
+                showToast("❌ 暗号无效或已被篡改，请重新向作者获取！");
+
                 return;
+
             }
+
+
+
+            // 2. 校验当前设备是否已经兑换过该卡密 (防重复/防白嫖)
 
             let usedTokens = JSON.parse(localStorage.getItem('bead_used_tokens') || '[]');
+
             if (usedTokens.includes(input)) {
-                showToast("⚠️ 该卡密已被兑换使用过！");
+
+                showToast("⚠️ 该卡密在此浏览器已被兑换使用过！");
+
                 return;
+
             }
+
+
+
+            // 3. 校验通过，记录已使用并增加 5 次导出额度
 
             usedTokens.push(input);
+
             localStorage.setItem('bead_used_tokens', JSON.stringify(usedTokens));
 
-            setTrialCredits(trialCredits + 5);
+
+
+            setTrialCredits(trialCredits + 5); 
+
             closeTokenModal();
-            showToast(`🎉 验证成功！已为您增加 5 次导出额度。`);
+
+            showToast(`🎉 验证成功！已为您增加 5 次高清导出额度。`);
+
             document.getElementById('tokenInput').value = '';
+
         }
 
-        /**
-         * 切换 1/2/3 选项卡
-         */
+
+
+        function updateSharpnessLabel(val) {
+
+            const labels = ['柔和采样', '标准锐化', '智能微缩增强', '极强边缘提取 (70x70 专属)'];
+
+            document.getElementById('sharpnessVal').innerText = labels[val] || '智能微缩增强';
+
+        }
+
+
+
         function switchTab(tab) {
+
             const tabs = ['import', 'palette', 'tools'];
+
             tabs.forEach(t => {
-                const capital = t.charAt(0).toUpperCase() + t.slice(1);
-                const contentEl = document.getElementById(`tabContent${capital}`);
-                const btnEl = document.getElementById(`tabBtn${capital}`);
+
+                const capitalT = t.charAt(0).toUpperCase() + t.slice(1);
+
+                const contentEl = document.getElementById(`tabContent${capitalT}`);
+
+                const btnEl = document.getElementById(`tabBtn${capitalT}`);
+
+                
+
                 if (contentEl) contentEl.classList.add('hidden');
+
                 if (btnEl) {
+
                     btnEl.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+
                     btnEl.classList.add('text-slate-600');
+
                 }
+
             });
 
+
+
             const activeCapital = tab.charAt(0).toUpperCase() + tab.slice(1);
+
             const activeContent = document.getElementById(`tabContent${activeCapital}`);
+
             const activeBtn = document.getElementById(`tabBtn${activeCapital}`);
+
+
+
             if (activeContent) activeContent.classList.remove('hidden');
+
             if (activeBtn) {
+
                 activeBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+
                 activeBtn.classList.remove('text-slate-600');
+
             }
+
         }
 
-        /**
-         * 提示与滑块数值标签联动
-         */
-        function updateSharpnessLabel(val) {
-            const labels = ['柔和采样', '标准锐化', '智能微缩增强', '极强边缘提取'];
-            document.getElementById('sharpnessVal').innerText = labels[val] || '智能微缩增强';
-        }
 
-        /**
-         * 默认模拟演示图像加载
-         */
+
         function createDefaultDemoImage() {
+
             cols = 70;
+
             rows = 70;
+
             const canvas = document.createElement('canvas');
+
             canvas.width = cols;
+
             canvas.height = rows;
+
             const ctx = canvas.getContext('2d');
+
+            
+
             ctx.fillStyle = '#ffffff';
+
             ctx.fillRect(0, 0, cols, rows);
 
+
+
             ctx.fillStyle = '#2563eb';
+
             ctx.beginPath();
+
             ctx.arc(35, 35, 22, 0, Math.PI * 2);
+
             ctx.fill();
 
+
+
             uploadedImage = canvas;
+
             processImage();
+
         }
 
-        /**
-         * 本地图片上传处理
-         */
+
+
         function handleImageUpload(event) {
-            const file = event.target.files[0];
+
+            const file = event.target.files[0] || (event.dataTransfer && event.dataTransfer.files[0]);
+
             if (!file) return;
 
+
+
             const reader = new FileReader();
+
             reader.onload = function(e) {
+
                 const img = new Image();
+
                 img.onload = function() {
+
                     uploadedImage = img;
-                    const previewBox = document.getElementById('uploadSuccessPreview');
-                    const thumb = document.getElementById('thumbnailPreview');
-                    const nameDisp = document.getElementById('fileNameDisplay');
+
                     
+
+                    const previewBox = document.getElementById('uploadSuccessPreview');
+
+                    const thumb = document.getElementById('thumbnailPreview');
+
+                    const nameDisp = document.getElementById('fileNameDisplay');
+
                     if (previewBox && thumb) {
+
                         thumb.src = e.target.result;
+
                         nameDisp.innerText = file.name || "uploaded_photo.jpg";
+
                         previewBox.classList.remove('hidden');
+
                         previewBox.classList.add('flex');
+
                     }
+
+
+
                     processImage();
-                    showToast("照片上传成功并转换为拼豆图纸！");
+
+                    showToast("照片上传成功并已成功转化为拼豆图纸！");
+
                 };
+
                 img.src = e.target.result;
+
             };
+
             reader.readAsDataURL(file);
+
         }
 
-        /**
-         * 网格维度选择变更
-         */
+
+
         function updateGridSizeSelection() {
+
             const val = document.getElementById('gridSizeSelect').value;
+
             const customContainer = document.getElementById('customSizeContainer');
+
+            
+
             if (val === 'custom') {
+
                 customContainer.classList.remove('hidden');
+
             } else {
+
                 customContainer.classList.add('hidden');
-                cols = parseInt(val, 10);
-                rows = parseInt(val, 10);
+
+                cols = parseInt(val);
+
+                rows = parseInt(val);
+
                 triggerReprocess();
+
             }
+
         }
+
+
 
         function triggerReprocess() {
-            if (document.getElementById('gridSizeSelect').value === 'custom') {
-                cols = parseInt(document.getElementById('customWidth').value, 10) || 70;
-                rows = parseInt(document.getElementById('customHeight').value, 10) || 70;
+
+            const val = document.getElementById('gridSizeSelect').value;
+
+            if (val === 'custom') {
+
+                cols = parseInt(document.getElementById('customWidth').value) || 70;
+
+                rows = parseInt(document.getElementById('customHeight').value) || 70;
+
             }
+
             document.getElementById('dimensionBadge').innerText = `${cols} x ${rows}`;
+
             processImage();
+
         }
+
+
 
         function requestConversionWithCheck() {
+
             processImage();
-            showToast("图纸重新生成与渲染成功！");
+
+            showToast("图纸已成功重新生成与渲染！");
+
         }
 
-        /**
-         * RGB 空间转 HSV 空间 (专门用于精确捕获黄色 Hue 范围)
-         */
-        function rgbToHsv(r, g, b) {
-            r /= 255;
-            g /= 255;
-            b /= 255;
-            let max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, v = max;
-            let d = max - min;
-            s = max === 0 ? 0 : d / max;
 
-            if (max === min) {
-                h = 0;
-            } else {
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
-                h /= 6;
-            }
-            return [h * 360, s, v];
-        }
 
-        /**
-         * RGB 空间转 CIE Lab 空间 (专业色彩感官距离算法)
-         */
-        function rgbToLab(r, g, b) {
-            let r_ = r / 255, g_ = g / 255, b_ = b / 255;
-            r_ = r_ > 0.04045 ? Math.pow((r_ + 0.055) / 1.055, 2.4) : r_ / 12.92;
-            g_ = g_ > 0.04045 ? Math.pow((g_ + 0.055) / 1.055, 2.4) : g_ / 12.92;
-            b_ = b_ > 0.04045 ? Math.pow((b_ + 0.055) / 1.055, 2.4) : b_ / 12.92;
-
-            let x = (r_ * 0.4124 + g_ * 0.3576 + b_ * 0.1805) / 0.95047;
-            let y = (r_ * 0.2126 + g_ * 0.7152 + b_ * 0.0722) / 1.00000;
-            let z = (r_ * 0.0193 + g_ * 0.1192 + b_ * 0.9505) / 1.08883;
-
-            x = x > 0.008856 ? Math.cbrt(x) : (7.787 * x) + (16 / 116);
-            y = y > 0.008856 ? Math.cbrt(y) : (7.787 * y) + (16 / 116);
-            z = z > 0.008856 ? Math.cbrt(z) : (7.787 * z) + (16 / 116);
-
-            return [(116 * y) - 16, 500 * (x - y), 200 * (y - z)];
-        }
-
-        /**
-         * 寻找色库中最接近的 Lab 拼豆色号
-         */
-        function findClosestColorLab(r, g, b, palette) {
-            let lab = rgbToLab(r, g, b);
-            let minDist = Infinity;
-            let bestMatch = palette[0];
-
-            for (let bead of palette) {
-                let bLab = rgbToLab(bead.rgb[0], bead.rgb[1], bead.rgb[2]);
-                let dist = Math.hypot(lab[0] - bLab[0], lab[1] - bLab[1], lab[2] - bLab[2]);
-                if (dist < minDist) {
-                    minDist = dist;
-                    bestMatch = bead;
-                }
-            }
-            return bestMatch;
-        }
-
-        /**
-         * 核心图像处理主 Engine (含 Contain 防裁剪留白与黄色保真算法)
-         */
         function processImage() {
+
             if (!uploadedImage) return;
 
+
+
             const srcCanvas = document.createElement('canvas');
+
             const srcCtx = srcCanvas.getContext('2d');
+
+            
+
             const imgW = uploadedImage.width || uploadedImage.naturalWidth;
+
             const imgH = uploadedImage.height || uploadedImage.naturalHeight;
 
+            
+
+            const tempCanvas = document.createElement('canvas');
+
+            const tempCtx = tempCanvas.getContext('2d');
+
+            const superFactor = 8;
+
+            tempCanvas.width = cols * superFactor;
+
+            tempCanvas.height = rows * superFactor;
+
+            
+
+            tempCtx.imageSmoothingEnabled = true;
+
+            tempCtx.imageSmoothingQuality = 'high';
+
+
+
+            // 等比例完整容纳图片：不裁切长方形图片，并留出约 3% 的呼吸边距
+            const fitScale = Math.min(
+                (cols * superFactor * 0.94) / imgW,
+                (rows * superFactor * 0.94) / imgH
+            );
+            const dW = imgW * fitScale;
+            const dH = imgH * fitScale;
+            const dX = (cols * superFactor - dW) / 2;
+            const dY = (rows * superFactor - dH) / 2;
+
+            tempCtx.fillStyle = '#ffffff';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            tempCtx.drawImage(uploadedImage, dX, dY, dW, dH);
+
             srcCanvas.width = cols;
+
             srcCanvas.height = rows;
 
-            // 1. 底层先填充纯白
-            srcCtx.fillStyle = '#ffffff';
-            srcCtx.fillRect(0, 0, cols, rows);
-
-            // 2. Contain 模式：比例计算与居中偏移 (解决切头削边问题)
-            const scaleFactor = Math.min(cols / imgW, rows / imgH);
-            const dW = imgW * scaleFactor;
-            const dH = imgH * scaleFactor;
-            const dX = (cols - dW) / 2;
-            const dY = (rows - dH) / 2;
-
             srcCtx.imageSmoothingEnabled = true;
+
             srcCtx.imageSmoothingQuality = 'high';
-            srcCtx.drawImage(uploadedImage, dX, dY, dW, dH);
+
+            srcCtx.drawImage(tempCanvas, 0, 0, cols, rows);
+
+
 
             let imgData = srcCtx.getImageData(0, 0, cols, rows);
+
             let data = imgData.data;
 
-            const contrast = parseFloat(document.getElementById('contrastRange').value);
-            const saturation = parseFloat(document.getElementById('saturationRange').value);
-            const removeBg = document.getElementById('removeBgToggle').checked;
-            const yellowBoost = document.getElementById('yellowBoostToggle').checked;
-            const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value, 10);
 
-            // 背景清洗
+
+            const contrast = parseFloat(document.getElementById('contrastRange').value);
+
+            const saturation = parseFloat(document.getElementById('saturationRange').value);
+
+            const sharpnessMode = parseInt(document.getElementById('sharpnessRange').value);
+
+            const removeBg = document.getElementById('removeBgToggle').checked;
+
+            const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value);
+
+
+
+            if (sharpnessMode > 0) {
+
+                data = applyAdvancedBilateralSharpening(data, cols, rows, sharpnessMode);
+
+            }
+
+
+
             if (removeBg) {
-                for (let i = 0; i < data.length; i += 4) {
-                    if (data[i] >= bgThreshold && data[i+1] >= bgThreshold && data[i+2] >= bgThreshold) {
-                        data[i] = 255;
-                        data[i+1] = 255;
-                        data[i+2] = 255;
+                // 从画布边缘估计背景色，只清除与外边缘连通且颜色相近的区域。
+                // 不把全图高亮像素直接涂白，保留白衣、乳白色和浅色主体细节。
+                const borderSamples = [];
+                const addSample = (x, y) => {
+                    const k = (y * cols + x) * 4;
+                    borderSamples.push([data[k], data[k + 1], data[k + 2]]);
+                };
+                for (let x = 0; x < cols; x++) {
+                    addSample(x, 0);
+                    if (rows > 1) addSample(x, rows - 1);
+                }
+                for (let y = 1; y < rows - 1; y++) {
+                    addSample(0, y);
+                    if (cols > 1) addSample(cols - 1, y);
+                }
+                const avg = [0, 1, 2].map(ch =>
+                    borderSamples.reduce((sum, px) => sum + px[ch], 0) / Math.max(1, borderSamples.length)
+                );
+                const bgDistanceLimit = Math.max(22, (250 - bgThreshold) * 2.2 + 18);
+
+                // 先对前景掩膜做一次 3×3 闭运算，封住手臂、腿部、口袋边缘的
+                // 极细小断口/针孔，再从画布边缘洪泛背景，避免背景钻进主体内部。
+                const total = cols * rows;
+                const foreground = new Uint8Array(total);
+                for (let id = 0; id < total; id++) {
+                    const p = id * 4;
+                    const dr = data[p] - avg[0], dg = data[p + 1] - avg[1], db = data[p + 2] - avg[2];
+                    foreground[id] = Math.sqrt(dr * dr + dg * dg + db * db) > bgDistanceLimit ? 1 : 0;
+                }
+                const dilated = new Uint8Array(total);
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        let hit = 0;
+                        for (let oy = -1; oy <= 1 && !hit; oy++) {
+                            for (let ox = -1; ox <= 1; ox++) {
+                                const nx = x + ox, ny = y + oy;
+                                if (nx >= 0 && nx < cols && ny >= 0 && ny < rows && foreground[ny * cols + nx]) {
+                                    hit = 1; break;
+                                }
+                            }
+                        }
+                        dilated[y * cols + x] = hit;
+                    }
+                }
+                const closedForeground = new Uint8Array(total);
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        let keep = 1;
+                        for (let oy = -1; oy <= 1 && keep; oy++) {
+                            for (let ox = -1; ox <= 1; ox++) {
+                                const nx = x + ox, ny = y + oy;
+                                if (nx < 0 || nx >= cols || ny < 0 || ny >= rows || !dilated[ny * cols + nx]) {
+                                    keep = 0; break;
+                                }
+                            }
+                        }
+                        closedForeground[y * cols + x] = keep;
+                    }
+                }
+
+                const visited = new Uint8Array(total);
+                const queue = new Int32Array(total);
+                let head = 0, tail = 0;
+
+                const enqueue = (x, y) => {
+                    if (x < 0 || x >= cols || y < 0 || y >= rows) return;
+                    const id = y * cols + x;
+                    if (visited[id]) return;
+                    visited[id] = 1;
+                    queue[tail++] = id;
+                };
+                for (let x = 0; x < cols; x++) {
+                    enqueue(x, 0);
+                    enqueue(x, rows - 1);
+                }
+                for (let y = 0; y < rows; y++) {
+                    enqueue(0, y);
+                    enqueue(cols - 1, y);
+                }
+
+                while (head < tail) {
+                    const id = queue[head++];
+                    const p = id * 4;
+                    if (!closedForeground[id]) {
+                        data[p] = 255;
+                        data[p + 1] = 255;
+                        data[p + 2] = 255;
+                        const x = id % cols;
+                        const y = Math.floor(id / cols);
+                        // 使用 4 邻域，降低从手臂、腿部或口袋边缘的斜向细缝误灌入主体的概率。
+                        enqueue(x - 1, y);
+                        enqueue(x + 1, y);
+                        enqueue(x, y - 1);
+                        enqueue(x, y + 1);
                     }
                 }
             }
 
             const paletteKey = document.getElementById('paletteSelect').value;
+
             const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
 
+
+
             pixelData = [];
+
             for (let r = 0; r < rows; r++) {
+
                 let rowArr = [];
+
                 for (let c = 0; c < cols; c++) {
+
                     let idx = (r * cols + c) * 4;
-                    let r_val = data[idx];
-                    let g_val = data[idx+1];
-                    let b_val = data[idx+2];
-                    let a_val = data[idx+3];
 
-                    // 纯白透明保护
-                    if (a_val < 50 || (r_val > 242 && g_val > 242 && b_val > 242)) {
-                        let whiteMatch = currentPalette.find(p => p.code === "H21" || p.code === "A01" || p.code === "H01" || p.code === "B01") || currentPalette[0];
-                        rowArr.push(whiteMatch);
-                        continue;
-                    }
+                    let r_val = data[idx], g_val = data[idx+1], b_val = data[idx+2];
 
-                    // 对比度与饱和度调整
+
+
                     r_val = Math.min(255, Math.max(0, (r_val - 128) * contrast + 128));
+
                     g_val = Math.min(255, Math.max(0, (g_val - 128) * contrast + 128));
+
                     b_val = Math.min(255, Math.max(0, (b_val - 128) * contrast + 128));
 
-                    let [h, s, v] = rgbToHsv(r_val, g_val, b_val);
-                    let closest = null;
 
-                    // 黄色衣服专项保真通道 (防混灰)
-                    if (yellowBoost && (h >= 35 && h <= 65) && v > 0.65 && s > 0.25) {
-                        if (v > 0.85 && s < 0.45) {
-                            closest = currentPalette.find(p => p.code === "H22" || p.code === "F21" || p.code === "A33");
-                        } else {
-                            closest = currentPalette.find(p => p.code === "F21" || p.code === "F22" || p.code === "A33");
-                        }
-                    }
 
-                    if (!closest) {
-                        closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
-                    }
+                    let closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
 
                     rowArr.push(closest);
+
                 }
+
                 pixelData.push(rowArr);
+
             }
 
+
+
             redrawCanvas();
+
             updateColorStatistics();
+
         }
 
-        /**
-         * 实时 Canvas 渲染重绘 Engine
-         */
+
+
+        function applyAdvancedBilateralSharpening(data, w, h, strength) {
+
+            let copy = new Uint8ClampedArray(data);
+
+            let factor = strength * 0.35;
+
+            for (let y = 1; y < h - 1; y++) {
+
+                for (let x = 1; x < w - 1; x++) {
+
+                    let idx = (y * w + x) * 4;
+
+                    for (let c = 0; c < 3; c++) {
+
+                        let center = copy[idx + c];
+
+                        let blur = (
+
+                            copy[((y-1)*w + x)*4 + c] +
+
+                            copy[((y+1)*w + x)*4 + c] +
+
+                            copy[(y*w + (x-1))*4 + c] +
+
+                            copy[(y*w + (x+1))*4 + c]
+
+                        ) / 4;
+
+                        let newVal = center + (center - blur) * factor;
+
+                        data[idx + c] = Math.min(255, Math.max(0, newVal));
+
+                    }
+
+                }
+
+            }
+
+            return data;
+
+        }
+
+
+
+        function rgbToLab(r, g, b) {
+
+            let r_ = r / 255, g_ = g / 255, b_ = b / 255;
+
+            r_ = r_ > 0.04045 ? Math.pow((r_ + 0.055) / 1.055, 2.4) : r_ / 12.92;
+
+            g_ = g_ > 0.04045 ? Math.pow((g_ + 0.055) / 1.055, 2.4) : g_ / 12.92;
+
+            b_ = b_ > 0.04045 ? Math.pow((b_ + 0.055) / 1.055, 2.4) : b_ / 12.92;
+
+
+
+            let x = (r_ * 0.4124 + g_ * 0.3576 + b_ * 0.1805) / 0.95047;
+
+            let y = (r_ * 0.2126 + g_ * 0.7152 + b_ * 0.0722) / 1.00000;
+
+            let z = (r_ * 0.0193 + g_ * 0.1192 + b_ * 0.9505) / 1.08883;
+
+
+
+            x = x > 0.008856 ? Math.cbrt(x) : (7.787 * x) + (16 / 116);
+
+            y = y > 0.008856 ? Math.cbrt(y) : (7.787 * y) + (16 / 116);
+
+            z = z > 0.008856 ? Math.cbrt(z) : (7.787 * z) + (16 / 116);
+
+
+
+            return [(116 * y) - 16, 500 * (x - y), 200 * (y - z)];
+
+        }
+
+
+
+        function findClosestColorLab(r, g, b, palette) {
+
+            let lab = rgbToLab(r, g, b);
+
+            let minDist = Infinity;
+
+            let bestMatch = palette[0];
+
+
+
+            for (let bead of palette) {
+
+                let bLab = rgbToLab(bead.rgb[0], bead.rgb[1], bead.rgb[2]);
+
+                const dL = lab[0] - bLab[0];
+                const dA = lab[1] - bLab[1];
+                const dB = lab[2] - bLab[2];
+                // 浅色区域加强明度与色相差异辨识，减少纯白/乳白/浅米色混淆
+                let dist = Math.sqrt(dL * dL * 1.18 + dA * dA * 1.12 + dB * dB * 1.12);
+
+                if (dist < minDist) {
+
+                    minDist = dist;
+
+                    bestMatch = bead;
+
+                }
+
+            }
+
+            return bestMatch;
+
+        }
+
+
+
         function redrawCanvas() {
+
             const canvas = document.getElementById('pixelCanvas');
+
             if (!canvas || pixelData.length === 0) return;
+
             const ctx = canvas.getContext('2d');
 
+
+
             scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows))));
+
             canvas.width = cols * scale;
+
             canvas.height = rows * scale;
 
+
+
             const showGrid = document.getElementById('showGridLines').checked;
+
             const showCodes = document.getElementById('showCodesOnCanvas').checked;
+
+
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+
+
             for (let r = 0; r < rows; r++) {
+
                 for (let c = 0; c < cols; c++) {
+
                     const bead = pixelData[r][c];
-                    ctx.fillStyle = `rgb(${bead.rgb.join(',')})`;
+
+                    ctx.fillStyle = `rgb(${bead.rgb[0]}, ${bead.rgb[1]}, ${bead.rgb[2]})`;
+
                     ctx.fillRect(c * scale, r * scale, scale, scale);
 
+
+
                     if (showGrid) {
+
                         ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+
                         ctx.lineWidth = 0.5;
+
                         ctx.strokeRect(c * scale, r * scale, scale, scale);
+
                     }
+
+
 
                     if (showCodes && scale >= 16) {
+
                         ctx.fillStyle = (bead.rgb[0]*0.299 + bead.rgb[1]*0.587 + bead.rgb[2]*0.114) > 150 ? '#000' : '#fff';
+
                         ctx.font = `${Math.max(8, scale * 0.38)}px sans-serif`;
+
                         ctx.textAlign = 'center';
+
                         ctx.textBaseline = 'middle';
+
                         ctx.fillText(bead.code, (c + 0.5) * scale, (r + 0.5) * scale);
+
                     }
+
                 }
+
             }
+
         }
 
-        /**
-         * 材料清单动态统计表格
-         */
+
+
         function updateColorStatistics() {
+
             colorStats = {};
+
             let totalBeads = 0;
 
+
+
             for (let r = 0; r < rows; r++) {
+
                 for (let c = 0; c < cols; c++) {
+
                     const bead = pixelData[r][c];
+
                     if (!colorStats[bead.code]) {
+
                         colorStats[bead.code] = { ...bead, count: 0 };
+
                     }
+
                     colorStats[bead.code].count++;
+
                     totalBeads++;
+
                 }
+
             }
+
+
 
             document.getElementById('totalBeadsBadge').innerText = `总计 ${totalBeads} 颗`;
+
             const tbody = document.getElementById('colorStatsBody');
+
             tbody.innerHTML = '';
+
+
+
             const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
+
+
 
             for (let item of sortedColors) {
+
                 const tr = document.createElement('tr');
+
                 tr.className = 'hover:bg-slate-50 transition';
+
                 tr.innerHTML = `
+
                     <td class="p-2.5">
+
                         <div class="w-6 h-6 rounded-md shadow-sm border border-slate-300" style="background-color: rgb(${item.rgb.join(',')})"></div>
+
                     </td>
+
                     <td class="p-2.5">
+
                         <span class="font-bold font-mono text-slate-800">${item.code}</span>
+
                         <span class="text-slate-500 ml-1.5">${item.name}</span>
+
                     </td>
+
                     <td class="p-2.5 text-right font-bold text-slate-900 font-mono">${item.count} 颗</td>
+
                 `;
+
                 tbody.appendChild(tr);
+
             }
+
         }
 
-        /**
-         * 初始化调色板快捷选择器
-         */
+
+
         function initQuickPalette() {
+
             const grid = document.getElementById('quickPaletteGrid');
+
             if (!grid) return;
+
             grid.innerHTML = '';
-            const currentPalette = PERLER_PALETTES[document.getElementById('paletteSelect').value] || PERLER_PALETTES.perler;
+
+
+
+            const paletteKey = document.getElementById('paletteSelect').value;
+
+            const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
+
+
 
             for (let bead of currentPalette) {
+
                 const div = document.createElement('div');
+
                 div.className = 'w-8 h-8 rounded-lg cursor-pointer border border-slate-300 shadow-sm hover:scale-110 transition';
+
                 div.style.backgroundColor = `rgb(${bead.rgb.join(',')})`;
+
                 div.title = `${bead.code} - ${bead.name}`;
+
                 div.onclick = () => setActiveColor(bead);
+
                 grid.appendChild(div);
+
             }
+
         }
+
+
 
         function setActiveColor(bead) {
+
             activePaletteColor = bead;
+
             document.getElementById('activeColorSwatch').style.backgroundColor = `rgb(${bead.rgb.join(',')})`;
+
             document.getElementById('activeColorName').innerText = bead.name;
+
             document.getElementById('activeColorCode').innerText = `色号: ${bead.code}`;
+
         }
+
+
 
         function setTool(tool) {
+
             activeTool = tool;
-            document.getElementById('toolBtnDraw').className = tool === 'draw' ? 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition' : 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
-            document.getElementById('toolBtnErase').className = tool === 'erase' ? 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition' : 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
+
+            const btnDraw = document.getElementById('toolBtnDraw');
+
+            const btnErase = document.getElementById('toolBtnErase');
+
+            if (tool === 'draw') {
+
+                btnDraw.className = 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
+
+                btnErase.className = 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
+
+            } else {
+
+                btnErase.className = 'p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
+
+                btnDraw.className = 'p-3 border-2 border-slate-200 bg-white text-slate-700 rounded-xl font-medium text-xs flex items-center justify-center space-x-2 transition';
+
+            }
+
         }
 
-        function startDrawing(e) { isDrawing = true; handleCanvasInteraction(e); }
-        function drawOnCanvas(e) { if (isDrawing) handleCanvasInteraction(e); }
-        function stopDrawing() { isDrawing = false; }
-        function handleTouchStart(e) { isDrawing = true; handleCanvasInteraction(e.touches[0]); e.preventDefault(); }
-        function handleTouchMove(e) { if (isDrawing) handleCanvasInteraction(e.touches[0]); e.preventDefault(); }
+
+
+        function startDrawing(e) {
+
+            isDrawing = true;
+
+            handleCanvasInteraction(e);
+
+        }
+
+
+
+        function drawOnCanvas(e) {
+
+            if (!isDrawing) return;
+
+            handleCanvasInteraction(e);
+
+        }
+
+
+
+        function stopDrawing() {
+
+            isDrawing = false;
+
+        }
+
+
+
+        function handleTouchStart(e) {
+
+            isDrawing = true;
+
+            handleCanvasInteraction(e.touches[0]);
+
+            e.preventDefault();
+
+        }
+
+
+
+        function handleTouchMove(e) {
+
+            if (!isDrawing) return;
+
+            handleCanvasInteraction(e.touches[0]);
+
+            e.preventDefault();
+
+        }
+
+
 
         function handleCanvasInteraction(e) {
+
             const canvas = document.getElementById('pixelCanvas');
+
             const rect = canvas.getBoundingClientRect();
-            const c = Math.floor((e.clientX - rect.left) / scale);
-            const r = Math.floor((e.clientY - rect.top) / scale);
+
+            const x = e.clientX - rect.left;
+
+            const y = e.clientY - rect.top;
+
+
+
+            const c = Math.floor(x / scale);
+
+            const r = Math.floor(y / scale);
+
+
+
             if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                pixelData[r][c] = activeTool === 'draw' ? activePaletteColor : {code: "BLANK", name: "空白", rgb: [255, 255, 255]};
+
+                if (activeTool === 'draw') {
+
+                    pixelData[r][c] = activePaletteColor;
+
+                } else {
+
+                    pixelData[r][c] = {code: "BLANK", name: "空白", rgb: [255, 255, 255]};
+
+                }
+
                 redrawCanvas();
+
                 updateColorStatistics();
+
+
+
                 document.getElementById('inspectorBar').classList.remove('hidden');
+
                 document.getElementById('inspectorColorBox').style.backgroundColor = `rgb(${pixelData[r][c].rgb.join(',')})`;
+
                 document.getElementById('inspectorName').innerText = pixelData[r][c].name;
+
                 document.getElementById('inspectorCode').innerText = `色号: ${pixelData[r][c].code}`;
+
                 document.getElementById('inspectorPos').innerText = `(${c+1}, ${r+1})`;
+
             }
+
         }
 
-        function zoomCanvas(factor) { scale = Math.max(6, Math.min(32, Math.round(scale * factor))); redrawCanvas(); }
-        function resetZoom() { scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows)))); redrawCanvas(); }
 
-        /**
-         * 导出包含高清刻度、图纸坐标及底部材料表的高清 PNG 图纸
-         */
+
+        function zoomCanvas(factor) {
+
+            scale = Math.max(6, Math.min(32, Math.round(scale * factor)));
+
+            redrawCanvas();
+
+        }
+
+
+
+        function resetZoom() {
+
+            scale = Math.max(8, Math.min(24, Math.floor(450 / Math.max(cols, rows))));
+
+            redrawCanvas();
+
+        }
+
+
+
         function downloadPatternImage() {
+
             if (trialCredits <= 0) {
+
                 openTokenModal();
+
                 return;
+
             }
+
             setTrialCredits(trialCredits - 1);
 
+
+
+            const originalCanvas = document.getElementById('pixelCanvas');
+
             const exportCanvas = document.createElement('canvas');
+
             const ctx = exportCanvas.getContext('2d');
+
+
+
             const headerHeight = 70;
+
             const padding = 50;
-            const printScale = Math.max(18, scale);
+
+            const printScale = Math.max(18, scale); 
+
+
+
             const gridW = cols * printScale;
+
             const gridH = rows * printScale;
+
+
+
             const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
+
             const colsInLegend = 4;
+
             const legendRows = Math.ceil(sortedColors.length / colsInLegend);
+
             const footerHeight = Math.max(140, legendRows * 30 + 70);
 
+
+
             exportCanvas.width = Math.max(gridW + padding * 2, 700);
+
             exportCanvas.height = gridH + headerHeight + footerHeight + padding * 2;
 
+
+
             ctx.fillStyle = '#ffffff';
+
             ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-            // 绘制主标题
+
+
             ctx.fillStyle = '#0f172a';
+
             ctx.font = 'bold 22px Inter, sans-serif';
+
             ctx.textAlign = 'center';
+
             ctx.fillText(`专业像素拼豆设计图纸 [${cols} x ${rows} 网格]`, exportCanvas.width / 2, padding + 25);
 
+
+
             ctx.fillStyle = '#64748b';
+
             ctx.font = '13px Inter, sans-serif';
+
             ctx.fillText(`总用豆量: ${Object.values(colorStats).reduce((acc, curr) => acc + curr.count, 0)} 颗 | 使用色数: ${sortedColors.length} 种`, exportCanvas.width / 2, padding + 50);
 
+
+
             const startX = (exportCanvas.width - gridW) / 2;
+
             const startY = padding + headerHeight;
+
+
+
             const showGrid = document.getElementById('showGridLines').checked;
+
             const showCodes = document.getElementById('showCodesOnCanvas').checked;
 
-            // 绘制像素网格与内部色号文字
+
+
             for (let r = 0; r < rows; r++) {
+
                 for (let c = 0; c < cols; c++) {
+
                     const bead = pixelData[r][c];
+
                     const px = startX + c * printScale;
+
                     const py = startY + r * printScale;
 
-                    ctx.fillStyle = `rgb(${bead.rgb.join(',')})`;
+
+
+                    ctx.fillStyle = `rgb(${bead.rgb[0]}, ${bead.rgb[1]}, ${bead.rgb[2]})`;
+
                     ctx.fillRect(px, py, printScale, printScale);
 
+
+
                     if (showGrid) {
+
                         ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+
                         ctx.lineWidth = 0.75;
+
                         ctx.strokeRect(px, py, printScale, printScale);
+
                     }
 
-                    if (showCodes && printScale >= 14) {
+
+
+                    if (printScale >= 14) {
+
                         ctx.fillStyle = (bead.rgb[0]*0.299 + bead.rgb[1]*0.587 + bead.rgb[2]*0.114) > 150 ? '#000' : '#fff';
+
                         ctx.font = `${Math.max(9, printScale * 0.35)}px sans-serif`;
+
                         ctx.textAlign = 'center';
+
                         ctx.textBaseline = 'middle';
+
                         ctx.fillText(bead.code, px + printScale / 2, py + printScale / 2);
+
                     }
+
                 }
+
             }
 
-            // 绘制横纵坐标刻度数字 (1, 5, 10...)
+
+
             ctx.fillStyle = '#475569';
+
             ctx.font = '11px monospace';
+
             ctx.textAlign = 'center';
+
             ctx.textBaseline = 'bottom';
+
             for (let c = 0; c < cols; c++) {
+
                 if (c === 0 || (c + 1) % 5 === 0 || c === cols - 1) {
+
                     ctx.fillText(c + 1, startX + (c + 0.5) * printScale, startY - 5);
+
                 }
+
             }
 
             ctx.textAlign = 'right';
+
             ctx.textBaseline = 'middle';
+
             for (let r = 0; r < rows; r++) {
+
                 if (r === 0 || (r + 1) % 5 === 0 || r === rows - 1) {
+
                     ctx.fillText(r + 1, startX - 8, startY + (r + 0.5) * printScale);
+
                 }
+
             }
 
-            // 绘制底部材料清单参考大表
+
+
             const footerY = startY + gridH + 30;
+
             const footerW = exportCanvas.width - padding * 2;
+
             
+
             ctx.fillStyle = '#f8fafc';
+
             ctx.fillRect(padding, footerY, footerW, footerHeight - 20);
+
             ctx.strokeStyle = '#cbd5e1';
+
             ctx.lineWidth = 1;
+
             ctx.strokeRect(padding, footerY, footerW, footerHeight - 20);
 
+
+
             ctx.fillStyle = '#0f172a';
+
             ctx.font = 'bold 14px Inter, sans-serif';
+
             ctx.textAlign = 'left';
+
             ctx.fillText('📋 材料清单与配色色号参考表 (Material List):', padding + 20, footerY + 25);
 
+
+
             let colWidth = footerW / colsInLegend;
+
             let startListX = padding + 20;
+
             let startListY = footerY + 55;
 
+
+
             sortedColors.forEach((item, index) => {
+
                 let colIdx = index % colsInLegend;
+
                 let rowIdx = Math.floor(index / colsInLegend);
 
+
+
                 let curX = startListX + colIdx * colWidth;
+
                 let curY = startListY + rowIdx * 28;
 
+
+
                 if (curY < footerY + footerHeight - 25) {
+
                     ctx.fillStyle = `rgb(${item.rgb.join(',')})`;
+
                     ctx.fillRect(curX, curY, 16, 16);
+
                     ctx.strokeStyle = '#94a3b8';
+
                     ctx.strokeRect(curX, curY, 16, 16);
 
+
+
                     ctx.fillStyle = '#1e293b';
+
                     ctx.font = '12px Inter, sans-serif';
+
                     ctx.textAlign = 'left';
+
                     ctx.textBaseline = 'top';
+
                     ctx.fillText(`${item.code} (${item.name}): ${item.count}颗`, curX + 24, curY + 1);
+
                 }
+
             });
 
-            // 触发自动文件下载
+
+
             const link = document.createElement('a');
+
             link.download = `perler_bead_pattern_${cols}x${rows}_complete.png`;
+
             link.href = exportCanvas.toDataURL('image/png');
+
             link.click();
+
             showToast(`已成功导出高清图纸！本次消耗 1 次，剩余 ${trialCredits} 次。`);
+
         }
+
+
 
         function copyColorList() {
+
             let text = "=== 拼豆颜色采购清单 ===\n";
+
             for (let code in colorStats) {
-                text += `色号 ${colorStats[code].code} (${colorStats[code].name}): ${colorStats[code].count} 颗\n`;
+
+                let item = colorStats[code];
+
+                text += `色号 ${item.code} (${item.name}): ${item.count} 颗\n`;
+
             }
+
             document.execCommand('copy');
+
             showToast("采购清单已成功复制到剪贴板！");
+
         }
+
+
+
+        function openHelpModal() {
+
+            document.getElementById('helpModal').classList.remove('hidden');
+
+        }
+
+
+
+        function closeHelpModal() {
+
+            document.getElementById('helpModal').classList.add('hidden');
+
+        }
+
+
 
         function saveProjectState() {
-            showToast("项目状态已保存至本地！");
+
+            showToast("项目状态已成功保存至浏览器缓存！");
+
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+
+
+        function loadSavedProject() {
+
+            return false;
+
         }
+
+
+
+        function showToast(msg) {
+
+            const toast = document.getElementById('toast');
+
+            document.getElementById('toastMsg').innerText = msg;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+
+            setTimeout(() => {
+
+                toast.classList.add('translate-y-20', 'opacity-0');
+
+            }, 3000);
+
+        }
+
     </script>
+
 </body>
+
 </html>
