@@ -86,25 +86,23 @@
                 <input type="file" id="imageLoader" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
             </div>
 
-            <!-- 网格尺寸选择（支持自定义，最大100x100） -->
+            <!-- 网格尺寸选择 -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">2. 拼豆底板规格 (网格)</label>
-                <div class="flex items-center space-x-2">
-                    <select id="gridSizeSelect" class="flex-1 border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
-                        <option value="70" selected>70 × 70 标准方格</option>
-                        <option value="50">50 × 50 迷你方格</option>
-                        <option value="30">30 × 30 小巧方格</option>
-                        <option value="90">90 × 90 大号方格</option>
-                        <option value="100">100 × 100 超大方格</option>
-                        <option value="custom">自定义大小...</option>
-                    </select>
-                </div>
-                <!-- 自定义输入框（默认隐藏） -->
-                <div id="customSizeContainer" class="hidden mt-2 flex items-center space-x-2">
-                    <input type="number" id="customGridSize" min="10" max="100" value="70" class="w-full border border-gray-300 rounded-xl p-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="输入网格大小 (10-100)">
+                <select id="gridSizeSelect" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                    <option value="70" selected>70 × 70 标准方格</option>
+                    <option value="50">50 × 50 迷你方格</option>
+                    <option value="30">30 × 30 小巧方格</option>
+                    <option value="90">90 × 90 大号方格</option>
+                    <option value="100">100 × 100 超大方格</option>
+                    <option value="custom">自定义尺寸...</option>
+                </select>
+                <!-- 自定义尺寸输入框 -->
+                <div id="customSizeBox" class="hidden mt-2 flex items-center space-x-2">
+                    <input type="number" id="customSizeInput" min="10" max="100" value="70" class="w-full border border-gray-300 rounded-xl p-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="输入10-100的网格数">
                     <span class="text-xs text-gray-500">格</span>
                 </div>
-                <p class="text-xs text-gray-400 mt-1">✨ 支持最高 100×100 网格，长图自动等比缩放留白不裁剪。</p>
+                <p class="text-xs text-gray-400 mt-1">✨ 支持最高 100x100，长方形原图自动等比缩放居中留白不裁剪。</p>
             </div>
 
             <!-- 色系选择 -->
@@ -201,10 +199,10 @@
                 <p class="text-xs text-gray-500 mt-1">添加作者微信获取专属导出卡密授权码解锁额外次数</p>
             </div>
 
-            <!-- 去掉下划线，改用加粗清晰显示微信号 -->
+            <!-- 去掉下划线，清晰粗体显示微信号 -->
             <div class="bg-indigo-50/60 border border-indigo-100 rounded-xl p-4 mb-5 text-center">
                 <p class="text-xs text-indigo-600 font-medium mb-1">步骤 1：添加微信获取卡密</p>
-                <p class="text-base font-mono font-bold text-indigo-900">微信号：<span id="wechatIdDisplay" class="text-indigo-600 font-extrabold not-italic">DD2025_0101_</span></p>
+                <p class="text-base font-mono font-bold text-indigo-900">微信号：<span class="text-indigo-600 font-extrabold not-italic underline-none">DD2025_0101_</span></p>
                 <p class="text-[10px] text-gray-400 mt-1">(添加时请备注：拼豆图纸卡密)</p>
             </div>
 
@@ -263,32 +261,28 @@
         };
 
         let uploadedImage = null;
-        let cols = 70;
-        let rows = 70;
+        let gridSize = 70;
         let currentPixelData = [];
 
-        // 监听网格大小下拉框
+        // 网格尺寸选择逻辑
         document.getElementById('gridSizeSelect').addEventListener('change', function(e) {
             const val = e.target.value;
-            const customContainer = document.getElementById('customSizeContainer');
-            if(val === 'custom') {
-                customContainer.classList.remove('hidden');
-                cols = parseInt(document.getElementById('customGridSize').value) || 70;
+            const customBox = document.getElementById('customSizeBox');
+            if (val === 'custom') {
+                customBox.classList.remove('hidden');
+                gridSize = parseInt(document.getElementById('customSizeInput').value) || 70;
             } else {
-                customContainer.classList.add('hidden');
-                cols = parseInt(val);
+                customBox.classList.add('hidden');
+                gridSize = parseInt(val);
             }
-            rows = cols;
-            if(uploadedImage) processImage();
+            if (uploadedImage) processImage();
         });
 
-        // 监听自定义网格输入
-        document.getElementById('customGridSize').addEventListener('input', function(e) {
+        document.getElementById('customSizeInput').addEventListener('input', function(e) {
             let val = parseInt(e.target.value);
-            if(val >= 10 && val <= 100) {
-                cols = val;
-                rows = val;
-                if(uploadedImage) processImage();
+            if (val >= 10 && val <= 100) {
+                gridSize = val;
+                if (uploadedImage) processImage();
             }
         });
 
@@ -308,7 +302,7 @@
             }
         });
 
-        // 监听调节项改变实时刷新
+        // 监听参数微调
         document.getElementById('contrastRange').addEventListener('input', (e) => {
             document.getElementById('contrastVal').innerText = e.target.value;
             if(uploadedImage) processImage();
@@ -317,7 +311,7 @@
         document.getElementById('bgCleanToggle').addEventListener('change', () => { if(uploadedImage) processImage(); });
         document.getElementById('skinRefineToggle').addEventListener('change', () => { if(uploadedImage) processImage(); });
 
-        // 核心处理函数（包含动态网格、等比居中留白、防手臂误删、浅色提纯）
+        // 核心图像处理函数（绝对居中不裁剪，比例与色彩完全正常）
         function processImage() {
             if (!uploadedImage) return;
 
@@ -329,14 +323,17 @@
 
             const canvas = document.getElementById('pixelCanvas');
             const ctx = canvas.getContext('2d');
+            
+            const cols = gridSize;
+            const rows = gridSize;
             canvas.width = cols;
             canvas.height = rows;
 
-            // 1. 底色填充纯白
+            // 1. 画布整体填充纯白背景
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, cols, rows);
 
-            // 2. 长方形原图等比例缩放居中（Contain Mode - 绝不裁剪）
+            // 2. 长方形图片等比例缩放居中（Contain Mode - 完整显示不裁剪）
             const imgW = uploadedImage.width;
             const imgH = uploadedImage.height;
             const scale = Math.min(cols / imgW, rows / imgH);
@@ -359,7 +356,7 @@
                 }
             }
 
-            // 4. 颜色匹配与高级提纯算法
+            // 4. 标准欧氏距离色号匹配与浅色/皮肤提纯
             currentPixelData = [];
             const colorCounts = {};
 
@@ -393,6 +390,7 @@
                         }
                     }
 
+                    // 回写像素颜色至预览画布
                     data[idx] = bestBead.rgb[0];
                     data[idx+1] = bestBead.rgb[1];
                     data[idx+2] = bestBead.rgb[2];
@@ -404,11 +402,11 @@
             }
 
             ctx.putImageData(imgData, 0, 0);
-            updateStatsAndMaterials(colorCounts);
+            updateStatsAndMaterials(colorCounts, cols, rows);
         }
 
         // 更新统计与材料采购清单
-        function updateStatsAndMaterials(counts) {
+        function updateStatsAndMaterials(counts, cols, rows) {
             const materialListEl = document.getElementById('materialList');
             materialListEl.innerHTML = '';
             
@@ -458,17 +456,16 @@
             }
         }
 
-        // 修改为直接下载 PNG 高清图纸
+        // 直接下载 PNG 高清图纸
         function requestExportPNG() {
             if (freeQuota > 0) {
                 freeQuota--;
                 localStorage.setItem('bead_free_quota', freeQuota);
                 updateQuotaDisplay();
                 
-                // 执行 PNG 下载
                 const canvas = document.getElementById('pixelCanvas');
                 const link = document.createElement('a');
-                link.download = `bead_pattern_${cols}x${rows}.png`;
+                link.download = `bead_pattern_${gridSize}x${gridSize}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
