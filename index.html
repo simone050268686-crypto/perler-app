@@ -1385,7 +1385,7 @@
         }
 
 // ==========================================
-// 修复版：保留真实光影与自然过渡的拼豆算法
+// 终极真实质感版：多色交织纹理 + 结构化黑边描边
 // ==========================================
 function processImage() {
     if (!uploadedImage) return;
@@ -1406,7 +1406,6 @@ function processImage() {
     tempCtx.imageSmoothingEnabled = true;
     tempCtx.imageSmoothingQuality = 'high';
 
-    // 等比例完整容纳图片，保留完美构图与呼吸边距
     const fitScale = Math.min(
         (cols * superFactor * 0.94) / imgW,
         (rows * superFactor * 0.94) / imgH
@@ -1432,7 +1431,7 @@ function processImage() {
     const contrast = parseFloat(document.getElementById('contrastRange').value);
     const removeBg = document.getElementById('removeBgToggle').checked;
 
-    // 2. 智能轻量背景清理（严格限制仅清除外围纯空背景，绝不吞噬内部）
+    // 2. 精准背景清理（严格只清理外围纯白空背景，绝不误伤内部浅色毛发）
     if (removeBg) {
         const total = cols * rows;
         const visited = new Uint8Array(total);
@@ -1447,7 +1446,6 @@ function processImage() {
             queue[tail++] = id;
         };
 
-        // 从四角出发，只清理非常接近纯白（>248）的外围空背景
         for (let x = 0; x < cols; x++) { enqueue(x, 0); enqueue(x, rows - 1); }
         for (let y = 0; y < rows; y++) { enqueue(0, y); enqueue(cols - 1, y); }
 
@@ -1465,7 +1463,14 @@ function processImage() {
     const paletteKey = document.getElementById('paletteSelect').value;
     const currentPalette = PERLER_PALETTES[paletteKey] || PERLER_PALETTES.perler;
 
-    // 3. Lab 空间色彩精准映射（依靠科学的色差距离，让白色毛发显示出自然的 H2/H3/H10 渐变）
+    // 3. 【核心改进】Bayer 4x4 有序抖动矩阵（让相似颜色自然交织堆叠，消除大色块死板感）
+    const bayerMatrix = [
+        [  0,  8,  2, 10 ],
+        [ 12,  4, 14,  6 ],
+        [  3, 11,  1,  9 ],
+        [ 15,  7, 13,  5 ]
+    ];
+
     pixelData = [];
     for (let r = 0; r < rows; r++) {
         let rowArr = [];
@@ -1473,9 +1478,16 @@ function processImage() {
             let idx = (r * cols + c) * 4;
             let r_val = data[idx], g_val = data[idx+1], b_val = data[idx+2];
 
+            // 调整对比度
             r_val = Math.min(255, Math.max(0, (r_val - 128) * contrast + 128));
             g_val = Math.min(255, Math.max(0, (g_val - 128) * contrast + 128));
             b_val = Math.min(255, Math.max(0, (b_val - 128) * contrast + 128));
+
+            // 加入微弱的 Bayer 矩阵抖动量，使相近色（如白、象牙白、米色、浅灰）自然交织
+            let matrixVal = (bayerMatrix[r % 4][c % 4] / 16 - 0.5) * 18;
+            r_val = Math.min(255, Math.max(0, r_val + matrixVal));
+            g_val = Math.min(255, Math.max(0, g_val + matrixVal));
+            b_val = Math.min(255, Math.max(0, b_val + matrixVal));
 
             let closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
             rowArr.push(closest);
@@ -1483,47 +1495,53 @@ function processImage() {
         pixelData.push(rowArr);
     }
 
-    // 4. 温和去噪：只消除极少数孤立杂色，保持整体色块连贯，不破坏光影
-    applyGentleSmoothing(pixelData, cols, rows);
+    // 4. 【核心改进】结构化边缘与五官黑边描边（让眼睛、舌头边缘和外轮廓极具立体感）
+    applyStructuralOutlines(pixelData, cols, rows, currentPalette, data);
 
     redrawCanvas();
     updateColorStatistics();
 }
 
-// 辅助函数：极其温和的同色归并（消除杂点但不破坏轮廓）
-function applyGentleSmoothing(grid, w, h) {
-    let copy = grid.map(row => [...row]);
+// 辅助函数：精准结构化描边算法
+function applyStructuralOutlines(grid, w, h, palette, rawData) {
+    // 找到最深色（黑色 H7 或最深炭灰）
+    let darkBead = palette.reduce((prev, curr) => {
+        let sumPrev = prev.rgb[0] + prev.rgb[1] + prev.rgb[2];
+        let sumCurr = curr.rgb[0] + curr.rgb[1] + curr.rgb[2];
+        return sumPrev < sumCurr ? prev : curr;
+    }, palette[0]);
+
+    let cloneGrid = grid.map(row => [...row]);
+
     for (let r = 1; r < h - 1; r++) {
         for (let c = 1; c < w - 1; c++) {
-            let current = copy[r][c];
-            let counts = {};
-            for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                    let n = copy[r + dr][c + dc];
-                    counts[n.code] = (counts[n.code] || 0) + 1;
-                }
-            }
-            let dominantCode = current.code;
-            let maxCount = 0;
-            for (let code in counts) {
-                if (counts[code] > maxCount) {
-                    maxCount = counts[code];
-                    dominantCode = code;
-                }
-            }
-            // 只有当周围 8 个格子里有 7 个以上完全一致时，才把孤立杂点融合同化
-            if (maxCount >= 7 && dominantCode !== current.code) {
-                for (let bead of PERLER_PALETTES[document.getElementById('paletteSelect').value] || PERLER_PALETTES.perler) {
-                    if (bead.code === dominantCode) {
-                        grid[r][c] = bead;
-                        break;
-                    }
+            let current = cloneGrid[r][c];
+            let isBg = (current.rgb[0] > 245 && current.rgb[1] > 245 && current.rgb[2] > 245);
+
+            if (!isBg) {
+                // 检查上下左右是否有背景或颜色反差极大（如眼睛、舌头轮廓、外边缘）
+                let neighbors = [
+                    cloneGrid[r-1][c], cloneGrid[r+1][c],
+                    cloneGrid[r][c-1], cloneGrid[r][c+1]
+                ];
+                let touchingBg = neighbors.some(n => n.rgb[0] > 245 && n.rgb[1] > 245 && n.rgb[2] > 245);
+                
+                // 计算当前像素与周围的亮度差，用于提取五官与结构边界
+                let pIdx = (r * w + c) * 4;
+                let lum = rawData[pIdx]*0.299 + rawData[pIdx+1]*0.587 + rawData[pIdx+2]*0.114;
+                let isDarkFeature = (lum < 75); // 眼睛、黑鼻头的核心区域保持深色
+
+                if (touchingBg) {
+                    // 外轮廓边缘自动描上一圈精美黑边，显得立体
+                    grid[r][c] = darkBead;
+                } else if (isDarkFeature) {
+                    // 确保眼睛和鼻子深邃有神
+                    grid[r][c] = darkBead;
                 }
             }
         }
     }
 }
-
 
 
 
