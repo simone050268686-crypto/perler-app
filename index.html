@@ -26,8 +26,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-slate-900 leading-tight">拼豆设计大师 Pro <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold ml-1">五官超清精修版</span></h1>
-                    <p class="text-xs text-slate-500">8倍超采样五官锁定、多阶清透肤色还原与专业坐标图纸</p>
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">拼豆设计大师 Pro <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold ml-1">人像&萌宠全兼容版</span></h1>
+                    <p class="text-xs text-slate-500">智能防破洞抠图、自适应白毛/肤色清透还原与五官高光锁定</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -59,7 +59,7 @@
             
             <!-- Tabs Navigation -->
             <div class="flex bg-slate-100 p-1 rounded-xl mb-5">
-                <button onclick="switchTab('import')" id="tabBtnImport" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition">1. 图片与尺寸</button>
+                <button onclick="switchTab('import')" id="tabBtnImport" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition">1. 图片与算法</button>
                 <button onclick="switchTab('palette')" id="tabBtnPalette" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">2. 色库与精简</button>
                 <button onclick="switchTab('tools')" id="tabBtnTools" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">3. 手动精修</button>
             </div>
@@ -75,7 +75,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         </div>
                         <p class="text-sm font-medium text-slate-700">点击或拖拽照片到此处上传</p>
-                        <p class="text-xs text-slate-400 mt-0.5">支持人像、萌宠、动漫插画 (PNG/JPG/WEBP)</p>
+                        <p class="text-xs text-slate-400 mt-0.5">自动兼容人像写真、白色萌宠、动漫插画</p>
                     </div>
                 </div>
 
@@ -91,23 +91,13 @@
 
                 <hr class="border-slate-100">
 
-                <!-- 专属智能场景预设 -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-indigo-600 mb-1">✨ 场景渲染模式</label>
-                    <select id="presetModeSelect" class="w-full bg-indigo-50/70 border border-indigo-200 text-slate-900 font-medium text-xs rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="applyPresetMode(this.value)">
-                        <option value="portrait_hd" selected>👩 超清人像/美女五官模式 (五官极度清晰+清透白皙肤色)</option>
-                        <option value="pet_fur">🐾 白色萌宠/毛发立体模式 (专为白狗增强毛流阴影+外描边)</option>
-                        <option value="anime_outline">🎀 动漫插画/手绘描边模式 (鲜艳净色块+外圈黑边)</option>
-                    </select>
-                </div>
-
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">网格尺寸规格</label>
-                    <select id="gridSizeSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="updateGridSizeSelection()">
-                        <option value="50">50 x 50 (标准双模板)</option>
-                        <option value="70">70 x 70 (精致大图)</option>
-                        <option value="85">85 x 85 (萌宠黄金尺寸)</option>
-                        <option value="100" selected>100 x 100 (👑 推荐：人像五官超清巨幅还原)</option>
+                    <select id="gridSizeSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="updateGridSizeSelection()">
+                        <option value="50">50 x 50 (标准挂件/双模板)</option>
+                        <option value="70">70 x 70 (精致中等大图)</option>
+                        <option value="90" selected>90 x 90 (👑 黄金全兼容尺寸：白狗/美女均极清晰)</option>
+                        <option value="100">100 x 100 (巨幅超清还原)</option>
                         <option value="custom">自定义行列尺寸...</option>
                     </select>
                 </div>
@@ -115,11 +105,11 @@
                 <div id="customSizeContainer" class="hidden grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">宽度 (列)</label>
-                        <input type="number" id="customWidth" value="100" min="15" max="160" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-xl px-3 py-2" oninput="triggerReprocess()">
+                        <input type="number" id="customWidth" value="90" min="15" max="160" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-xl px-3 py-2" oninput="triggerReprocess()">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">高度 (行)</label>
-                        <input type="number" id="customHeight" value="100" min="15" max="160" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-xl px-3 py-2" oninput="triggerReprocess()">
+                        <input type="number" id="customHeight" value="90" min="15" max="160" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-xl px-3 py-2" oninput="triggerReprocess()">
                     </div>
                 </div>
 
@@ -127,56 +117,56 @@
                 <div class="space-y-3 pt-1 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>五官与发丝拉普拉斯边缘锐化</span>
-                            <span id="sharpnessVal" class="font-mono text-indigo-600">极强五官锐化 (3级)</span>
+                            <span>五官与毛流边缘锐化</span>
+                            <span id="sharpnessVal" class="font-mono text-indigo-600">精细增强 (2.0)</span>
                         </div>
-                        <input type="range" id="sharpnessRange" min="0" max="4" step="0.5" value="3" class="w-full accent-indigo-600" oninput="updateSharpnessLabel(this.value); triggerReprocess()">
+                        <input type="range" id="sharpnessRange" min="0" max="3.5" step="0.5" value="2.0" class="w-full accent-indigo-600" oninput="updateSharpnessLabel(this.value); triggerReprocess()">
                     </div>
 
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩对比度校正 (Contrast)</span>
-                            <span id="contrastVal" class="font-mono text-indigo-600">1.15</span>
+                            <span>清透度 / 对比度校正 (Gamma)</span>
+                            <span id="contrastVal" class="font-mono text-indigo-600">1.10</span>
                         </div>
-                        <input type="range" id="contrastRange" min="0.8" max="1.6" step="0.05" value="1.15" class="w-full accent-indigo-600" oninput="document.getElementById('contrastVal').innerText=parseFloat(this.value).toFixed(2); triggerReprocess()">
+                        <input type="range" id="contrastRange" min="0.8" max="1.5" step="0.05" value="1.10" class="w-full accent-indigo-600" oninput="document.getElementById('contrastVal').innerText=parseFloat(this.value).toFixed(2); triggerReprocess()">
                     </div>
 
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>色彩饱和度 (Saturation)</span>
-                            <span id="saturationVal" class="font-mono text-indigo-600">1.05</span>
+                            <span>嘴唇/腮红/舌头色彩还原度</span>
+                            <span id="saturationVal" class="font-mono text-indigo-600">1.15</span>
                         </div>
-                        <input type="range" id="saturationRange" min="0.6" max="1.6" step="0.05" value="1.05" class="w-full accent-indigo-600" oninput="document.getElementById('saturationVal').innerText=parseFloat(this.value).toFixed(2); triggerReprocess()">
+                        <input type="range" id="saturationRange" min="0.6" max="1.6" step="0.05" value="1.15" class="w-full accent-indigo-600" oninput="document.getElementById('saturationVal').innerText=parseFloat(this.value).toFixed(2); triggerReprocess()">
                     </div>
 
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>白毛阴影增强 (仅拍纯白宠物时调高，人像请保持0%)</span>
-                            <span id="claheVal" class="font-mono text-indigo-600">0%</span>
+                            <span>浅色纹理微层次 (自适应防死白/防脏脸)</span>
+                            <span id="detailVal" class="font-mono text-indigo-600">25%</span>
                         </div>
-                        <input type="range" id="claheRange" min="0" max="80" step="5" value="0" class="w-full accent-indigo-600" oninput="document.getElementById('claheVal').innerText=this.value+'%'; triggerReprocess()">
+                        <input type="range" id="detailRange" min="0" max="60" step="5" value="25" class="w-full accent-indigo-600" oninput="document.getElementById('detailVal').innerText=this.value+'%'; triggerReprocess()">
                     </div>
                 </div>
 
-                <!-- 背景与轮廓设置 -->
+                <!-- 背景与智能轮廓设置 -->
                 <div class="space-y-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
                     <label class="flex items-center space-x-2.5 cursor-pointer">
                         <input type="checkbox" id="removeBgToggle" checked onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
-                        <span class="text-xs font-bold text-slate-800">将背景转换为纯白色 (智能抠图清洗)</span>
+                        <span class="text-xs font-bold text-slate-800">防破洞边缘抠图 (保护白狗额头与白衣)</span>
                     </label>
                     <div id="bgThresholdContainer">
                         <div class="flex justify-between text-[11px] font-medium text-slate-500 mb-0.5">
-                            <span>背景判定灵敏度阈值</span>
-                            <span id="bgThresholdVal">215</span>
+                            <span>背景纯度判定阈值 (越高越不会误吞白毛)</span>
+                            <span id="bgThresholdVal">242</span>
                         </div>
-                        <input type="range" id="bgThresholdRange" min="160" max="250" step="5" value="215" class="w-full accent-indigo-600" oninput="document.getElementById('bgThresholdVal').innerText=this.value; triggerReprocess()">
+                        <input type="range" id="bgThresholdRange" min="200" max="253" step="1" value="242" class="w-full accent-indigo-600" oninput="document.getElementById('bgThresholdVal').innerText=this.value; triggerReprocess()">
                     </div>
 
                     <hr class="border-slate-200/60 my-1">
 
                     <label class="flex items-center space-x-2.5 cursor-pointer">
-                        <input type="checkbox" id="autoOutlineToggle" onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
-                        <span class="text-xs font-bold text-slate-800">主体外轮廓自动加黑边 (适合白宠/卡通贴纸)</span>
+                        <input type="checkbox" id="softOutlineToggle" checked onchange="triggerReprocess()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                        <span class="text-xs font-bold text-slate-800">智能断续阴影外轮廓 (凸显白宠轮廓且不生硬)</span>
                     </label>
                 </div>
             </div>
@@ -187,27 +177,26 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">色号标准库</label>
                     <select id="paletteSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess(); initQuickPalette();">
-                        <option value="portrait_classic" selected>👑 经典人像清透色库 (38色：左图原版色系+清透肤色扩展)</option>
-                        <option value="master64">全能大师色库 (64色：含丰富宠物冷暖灰与渐变色)</option>
-                        <option value="perler27">原版经典 Perler 27色 (100% 复刻你最初的色库)</option>
+                        <option value="universal45" selected>👑 全能清透色库 (45色：精准复刻白宠奶白灰阶+美女清透肤色)</option>
+                        <option value="perler27">经典原版 27色 (极简纯净色系)</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">最大颜色种类限制</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">最大颜色种类限制 (自动保护粉舌头/红唇)</label>
                     <select id="colorLimitSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" onchange="triggerReprocess()">
-                        <option value="0" selected>使用全色库 (最还原，五官细节零丢失)</option>
-                        <option value="32">限制最多 32 种颜色</option>
-                        <option value="24">限制最多 24 种颜色</option>
-                        <option value="18">限制最多 18 种颜色</option>
+                        <option value="0" selected>不限制 (最细腻还原)</option>
+                        <option value="28">限制最多 28 种颜色</option>
+                        <option value="22">限制最多 22 种颜色</option>
+                        <option value="16">限制最多 16 种颜色</option>
                     </select>
                 </div>
 
                 <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl space-y-1.5">
-                    <p class="text-xs text-indigo-800 font-bold">💡 为什么现在人脸立刻变清晰了？</p>
+                    <p class="text-xs text-indigo-800 font-bold">💡 为什么这套算法能同时兼容美女和白狗？</p>
                     <p class="text-[11px] text-indigo-700 leading-relaxed">
-                        1. 恢复了 <strong>8倍超采样直接映射 + 双边拉普拉斯锐化</strong>，眼珠高光、双眼皮、鼻头和嘴唇微笑线不再被模糊。<br>
-                        2. 针对美女写真关闭了会让脸部发脏的“局部阴影放大”，保留干净白皙的瓷白、象牙与浅肤色过渡。
+                        1. <strong>防破洞梯度墙</strong>：当背景遇到白狗头顶时，靠毛发微梯度自动刹住，绝不再把额头挖空成白背景。<br>
+                        2. <strong>高光提亮保护</strong>：限制浅色区变暗，白狗主体以 <code>H2乳白</code>、<code>H3浅米</code>、<code>M13藕荷浅灰</code> 为主，干净蓬松；同时美女脸部保持白皙零噪点。
                     </p>
                 </div>
             </div>
@@ -251,15 +240,15 @@
             <div class="space-y-2">
                 <label class="flex items-center space-x-2.5 cursor-pointer">
                     <input type="checkbox" id="showGridLines" checked onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
-                    <span class="text-xs font-medium text-slate-700">显示柔和网格参考线 (不遮挡人脸)</span>
+                    <span class="text-xs font-medium text-slate-700">显示网格参考线</span>
                 </label>
                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                    <input type="checkbox" id="showMajorGridLines" onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
-                    <span class="text-xs font-medium text-slate-700">加粗显示 10x10 分割线 (拼豆定位用)</span>
+                    <input type="checkbox" id="showMajorGridLines" checked onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                    <span class="text-xs font-medium text-slate-700">显示 5格/10格 坐标定位线</span>
                 </label>
                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                    <input type="checkbox" id="showCodesOnCanvas" onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
-                    <span class="text-xs font-medium text-slate-700">在预览画布内显示色号 (导出大图时会自动包含)</span>
+                    <input type="checkbox" id="showCodesOnCanvas" checked onchange="redrawCanvas()" class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                    <span class="text-xs font-medium text-slate-700">在图纸格内显示色号</span>
                 </label>
             </div>
 
@@ -283,12 +272,12 @@
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-2">
                         <h2 class="text-base font-bold text-slate-800">专业拼豆图纸实时工作台</h2>
-                        <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">100 x 100</span>
+                        <span id="dimensionBadge" class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">90 x 90</span>
                         <span id="activeColorsBadge" class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">0 种颜色</span>
                     </div>
                     <div class="flex items-center space-x-1.5">
                         <button onclick="zoomCanvas(1.25)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition text-xs font-medium">
-                            🔍+ 放大
+                            🔍+ 放大看色号
                         </button>
                         <button onclick="zoomCanvas(0.8)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition text-xs font-medium">
                             🔍- 缩小
@@ -329,8 +318,8 @@
             <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col max-h-72">
                 <div class="flex items-center justify-between mb-2.5">
                     <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
-                        <span>拼豆颜色采购清单</span>
-                        <span id="totalBeadsBadge" class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-md font-semibold">总计 0 颗</span>
+                        <span>拼豆色号用量统计表 (不含外部纯白背景)</span>
+                        <span id="totalBeadsBadge" class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-md font-semibold">有效主体 0 颗</span>
                     </h3>
                     <button onclick="copyColorList()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1">
                         <span>📋 复制清单</span>
@@ -359,10 +348,10 @@
     <!-- Help Modal -->
     <div id="helpModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
-            <h3 class="text-lg font-bold text-slate-900">📖 拼豆设计大师 Pro - 使用指南</h3>
+            <h3 class="text-lg font-bold text-slate-900">📖 拼豆设计大师 Pro - 全兼容说明</h3>
             <div class="space-y-2.5 text-xs text-slate-600 leading-relaxed">
-                <p><strong>1. 真人美女/写真照片怎么转最清晰？</strong><br>保持默认的 <code>👩 超清人像/美女五官模式</code>（100x100 网格 + 3级拉普拉斯锐化 + 经典人像清透38色库）。该模式不添加杂色阴影，眼珠高光、睫毛、鼻梁和嘴唇轮廓最清晰干净。</p>
-                <p><strong>2. 纯白比熊/马尔济斯等浅色宠物怎么转？</strong><br>切换到 <code>🐾 白色萌宠/毛发立体模式</code>，系统会自动开启白毛阴影增强与外轮廓包边，让白毛分出层次。</p>
+                <p><strong>1. 为什么现在白狗和美女照片不用切换模式就能同时很清晰？</strong><br>新版内置了 <code>Sobel 梯度锁边抠图</code> 与 <code>高光伽马保护</code>：遇到白色小狗的额头和耳朵时，哪怕毛发接近纯白，系统也能识别出毛发微纹理而不会把额头误当成背景掏空；同时对浅色区域进行提亮保护，白毛只会用 <code>H2乳白</code>、<code>H3浅米</code>、<code>M13藕荷浅灰</code> 柔和过渡，绝不会变成黑泥狗。</p>
+                <p><strong>2. 如果遇到背景偏灰的照片怎么办？</strong><br>只需把左侧的 <code>背景纯度判定阈值</code> 从 242 稍微往左调到 220~230 即可。</p>
                 <p><strong>3. 免费试用与卡密获取：</strong><br>首次导出高清图纸完全免费！次数用完后联系授权微信号 <strong>DD2025_0101_</strong> 获取专属卡密。</p>
             </div>
             <div class="flex justify-end pt-2">
@@ -407,76 +396,66 @@
 
     <script>
         // ============================================================================
-        // 1. 色库定义：将你左图最干净的 27 色经典库与柔和人像肤色完美融合 (剔除会让脸部发脏的紫灰/暗绿杂色)
+        // 1. 全能 45 色标准色库 (对标参考图5白狗色号与美女清透色系，剔除一切显脏暗沉杂色)
         // ============================================================================
         const PERLER_CLASSIC_27 = [
-            {code: "H21", name: "纯白色",   rgb: [255, 255, 255], isWhite: true},
+            {code: "H1",  name: "纯白色",   rgb: [255, 255, 255], isWhite: true},
             {code: "H2",  name: "乳白/象牙", rgb: [250, 248, 240]},
-            {code: "H22", name: "奶油色",   rgb: [255, 245, 220]},
-            {code: "H3",  name: "浅米色",   rgb: [240, 225, 205]},
-            {code: "E14", name: "浅肤色",   rgb: [255, 220, 200]},
-            {code: "E15", name: "粉嫩红",   rgb: [255, 180, 190]},
-            {code: "E20", name: "珊瑚粉",   rgb: [245, 130, 150]},
-            {code: "E21", name: "鲜红色",   rgb: [225, 40, 50]},
-            {code: "E22", name: "深酒红",   rgb: [140, 20, 30]},
-            {code: "H10", name: "高级银灰", rgb: [195, 195, 195]},
-            {code: "H14", name: "暖灰棕",   rgb: [160, 140, 130]},
-            {code: "H9",  name: "经典灰",   rgb: [130, 130, 130]},
-            {code: "H8",  name: "深炭灰",   rgb: [50, 50, 50]},
-            {code: "H7",  name: "纯黑色",   rgb: [20, 20, 20], isBlack: true},
-            {code: "M12", name: "焦糖色",   rgb: [175, 115, 70]},
-            {code: "M11", name: "蜜糖棕",   rgb: [140, 95, 60]},
-            {code: "M8",  name: "经典深棕", rgb: [100, 70, 50]},
-            {code: "F21", name: "明黄色",   rgb: [255, 230, 40]},
-            {code: "F22", name: "金黄色",   rgb: [245, 175, 20]},
-            {code: "F24", name: "日落橙",   rgb: [245, 110, 20]},
+            {code: "H22", name: "奶油色",   rgb: [255, 245, 222]},
+            {code: "H3",  name: "浅米色",   rgb: [240, 228, 212]},
+            {code: "E14", name: "浅肤色",   rgb: [255, 222, 202]},
+            {code: "E15", name: "粉嫩红",   rgb: [255, 182, 192], isPinkRed: true},
+            {code: "E20", name: "珊瑚粉",   rgb: [245, 132, 148], isPinkRed: true},
+            {code: "E21", name: "鲜红色",   rgb: [225, 42, 52],   isPinkRed: true},
+            {code: "E22", name: "深酒红",   rgb: [145, 25, 35],   isPinkRed: true},
+            {code: "H10", name: "高级银灰", rgb: [206, 206, 208]},
+            {code: "H14", name: "暖灰棕",   rgb: [176, 162, 150]},
+            {code: "H9",  name: "经典灰",   rgb: [140, 140, 142]},
+            {code: "H8",  name: "深炭灰",   rgb: [58, 58, 62]},
+            {code: "H7",  name: "纯黑色",   rgb: [20, 20, 22],    isBlack: true},
+            {code: "M12", name: "焦糖色",   rgb: [178, 118, 75]},
+            {code: "M11", name: "蜜糖棕",   rgb: [142, 96, 62]},
+            {code: "M8",  name: "经典深棕", rgb: [98, 68, 48]},
+            {code: "F21", name: "明黄色",   rgb: [255, 230, 45]},
+            {code: "F22", name: "金黄色",   rgb: [245, 175, 25]},
+            {code: "F24", name: "日落橙",   rgb: [245, 115, 25]},
             {code: "C3",  name: "天空蓝",   rgb: [120, 190, 245]},
             {code: "C13", name: "湖蓝",     rgb: [50, 130, 210]},
             {code: "C27", name: "群青",     rgb: [30, 85, 175]},
             {code: "A23", name: "浅草绿",   rgb: [180, 225, 160]},
             {code: "G04", name: "橄榄绿",   rgb: [110, 145, 65]},
             {code: "G14", name: "森林绿",   rgb: [35, 110, 55]},
-            {code: "G21", name: "墨绿",     rgb: [15, 60, 30]}
+            {code: "G21", name: "墨绿",     rgb: [22, 62, 36]}
         ];
 
-        // 38色清透人像库：在左图 27 色基础上，仅补充清透肤色、眼瞳深棕与唇彩过渡，绝不混入脏灰紫
-        const PORTRAIT_CLEAN_38 = [
+        // 45色全能清透色库：专为同时还原“雪白小狗蓬松毛流”与“美女清透五官”设计
+        const UNIVERSAL_45_PALETTE = [
             ...PERLER_CLASSIC_27,
-            {code: "E1",  name: "瓷白肌",   rgb: [254, 236, 224]},
-            {code: "E2",  name: "杏仁浅肤", rgb: [248, 206, 182]},
-            {code: "E3",  name: "蜜桃暖肤", rgb: [238, 188, 160]},
-            {code: "E4",  name: "柔和阴影肤",rgb: [216, 164, 136]},
-            {code: "E5",  name: "鼻影暖棕", rgb: [192, 138, 112]},
-            {code: "R1",  name: "豆沙红唇", rgb: [205, 75, 85]},
-            {code: "M5",  name: "浅卡其棕", rgb: [215, 190, 165]},
-            {code: "M9",  name: "深咖发色", rgb: [68, 45, 35]},
-            {code: "H11", name: "极浅云灰", rgb: [225, 225, 225]},
-            {code: "H12", name: "中深炭灰", rgb: [85, 85, 88]},
-            {code: "H16", name: "柔和墨黑", rgb: [35, 35, 38]}
-        ];
-
-        // 64色全能大师库（包含拍白狗、动漫所需的更多冷暖灰与彩色）
-        const MASTER_64_PALETTE = [
-            ...PORTRAIT_CLEAN_38,
-            {code: "M1",  name: "冷云白灰", rgb: [235, 237, 240]},
-            {code: "M2",  name: "暖米灰",   rgb: [222, 214, 204]},
-            {code: "M3",  name: "燕麦灰",   rgb: [204, 192, 178]},
-            {code: "M13", name: "藕荷浅灰", rgb: [214, 200, 204]},
-            {code: "M4",  name: "亚麻深灰", rgb: [145, 132, 120]},
-            {code: "H15", name: "岩板灰",   rgb: [108, 110, 114]},
-            {code: "E6",  name: "阳光小麦", rgb: [226, 152, 114]},
-            {code: "E16", name: "樱花腮红", rgb: [248, 162, 174]},
-            {code: "P1",  name: "浅丁香粉", rgb: [238, 214, 228]},
-            {code: "F1",  name: "奶酪浅黄", rgb: [254, 242, 176]},
-            {code: "G1",  name: "薄荷绿",   rgb: [148, 208, 168]},
-            {code: "C1",  name: "冰川浅蓝", rgb: [212, 234, 248]},
-            {code: "V1",  name: "薰衣草紫", rgb: [208, 192, 232]},
-            {code: "V2",  name: "香芋紫",   rgb: [166, 138, 204]}
+            // 白宠与高光专属极浅过渡阶 (RGB 均在 210~246 之间，确保白狗绝不变黑泥狗)
+            {code: "M1",  name: "极浅云灰", rgb: [238, 238, 240]},
+            {code: "M2",  name: "暖米白灰", rgb: [230, 222, 212]},
+            {code: "M13", name: "浅藕荷灰", rgb: [226, 212, 216]},
+            {code: "M3",  name: "浅燕麦灰", rgb: [212, 200, 188]},
+            {code: "M14", name: "淡紫暖灰", rgb: [196, 182, 188]},
+            {code: "M4",  name: "柔和亚麻", rgb: [162, 148, 136]},
+            // 人像清透肤色与舌头/唇彩专属色阶
+            {code: "E1",  name: "瓷白肌",   rgb: [254, 238, 228]},
+            {code: "E2",  name: "粉白肌",   rgb: [252, 226, 214]},
+            {code: "E3",  name: "杏仁暖肤", rgb: [244, 202, 178]},
+            {code: "E4",  name: "蜜桃肤色", rgb: [236, 184, 158]},
+            {code: "E5",  name: "柔和鼻影", rgb: [208, 154, 128]},
+            {code: "E16", name: "甜美腮红", rgb: [248, 158, 170], isPinkRed: true},
+            {code: "R1",  name: "水红舌/唇",rgb: [228, 92, 102],  isPinkRed: true},
+            {code: "R2",  name: "豆沙红",   rgb: [188, 72, 82],   isPinkRed: true},
+            // 眼瞳与发丝柔和暗部
+            {code: "M5",  name: "浅卡其",   rgb: [218, 196, 172]},
+            {code: "M9",  name: "深咖眼瞳", rgb: [68, 46, 36]},
+            {code: "H12", name: "中炭灰",   rgb: [92, 92, 96]},
+            {code: "H16", name: "柔和墨黑", rgb: [36, 36, 40]}
         ];
 
         const PERLER_PALETTES = {
-            portrait_classic: PORTRAIT_CLEAN_38,
-            master64: MASTER_64_PALETTE,
+            universal45: UNIVERSAL_45_PALETTE,
             perler27: PERLER_CLASSIC_27
         };
 
@@ -497,7 +476,6 @@
             return [(116 * y) - 16, 500 * (x - y), 200 * (y - z)];
         }
 
-        // 预计算 Lab
         Object.values(PERLER_PALETTES).forEach(pal => {
             pal.forEach(bead => {
                 bead.lab = rgbToLab(bead.rgb[0], bead.rgb[1], bead.rgb[2]);
@@ -509,11 +487,11 @@
         let pixelData = [];
         let bgMaskGlobal = null;
         let colorStats = {};
-        let cols = 100;
-        let rows = 100;
-        let scale = 6;
+        let cols = 90;
+        let rows = 90;
+        let scale = 7;
         let activeTool = 'draw';
-        let activePaletteColor = PORTRAIT_CLEAN_38[0];
+        let activePaletteColor = UNIVERSAL_45_PALETTE[0];
         let isDrawing = false;
         let trialCredits = getTrialCredits();
 
@@ -563,58 +541,10 @@
                     }
                 });
             }
-            setActiveColor(PORTRAIT_CLEAN_38[0]);
+            setActiveColor(UNIVERSAL_45_PALETTE[0]);
             createDefaultDemoImage();
             initQuickPalette();
         });
-
-        // --- 预设模式一键切换 ---
-        function applyPresetMode(mode) {
-            const sharpEl = document.getElementById('sharpnessRange');
-            const contrastEl = document.getElementById('contrastRange');
-            const satEl = document.getElementById('saturationRange');
-            const claheEl = document.getElementById('claheRange');
-            const outlineEl = document.getElementById('autoOutlineToggle');
-            const palEl = document.getElementById('paletteSelect');
-            const limitEl = document.getElementById('colorLimitSelect');
-
-            if (mode === 'portrait_hd') {
-                // 超清人像五官模式：完全复刻左图的高锐度+清透干净脸部
-                sharpEl.value = 3;
-                contrastEl.value = 1.15;
-                satEl.value = 1.05;
-                claheEl.value = 0; // 绝不放大脸部杂色阴影
-                outlineEl.checked = false;
-                palEl.value = 'portrait_classic';
-                limitEl.value = '0';
-            } else if (mode === 'pet_fur') {
-                // 白色萌宠毛发模式：开启局部毛发微反差 + 外圈深色描边
-                sharpEl.value = 2.5;
-                contrastEl.value = 1.15;
-                satEl.value = 1.05;
-                claheEl.value = 55;
-                outlineEl.checked = true;
-                palEl.value = 'master64';
-                limitEl.value = '24';
-            } else if (mode === 'anime_outline') {
-                // 动漫插画模式
-                sharpEl.value = 3;
-                contrastEl.value = 1.20;
-                satEl.value = 1.15;
-                claheEl.value = 0;
-                outlineEl.checked = true;
-                palEl.value = 'master64';
-                limitEl.value = '24';
-            }
-
-            updateSharpnessLabel(sharpEl.value);
-            document.getElementById('contrastVal').innerText = parseFloat(contrastEl.value).toFixed(2);
-            document.getElementById('saturationVal').innerText = parseFloat(satEl.value).toFixed(2);
-            document.getElementById('claheVal').innerText = claheEl.value + '%';
-            initQuickPalette();
-            triggerReprocess();
-            showToast("已切换模式并重新渲染图纸！");
-        }
 
         function openTokenModal() { document.getElementById('tokenModal').classList.remove('hidden'); }
         function closeTokenModal() { document.getElementById('tokenModal').classList.add('hidden'); }
@@ -656,10 +586,10 @@
 
         function updateSharpnessLabel(val) {
             const v = parseFloat(val);
-            if (v === 0) document.getElementById('sharpnessVal').innerText = '柔和采样 (0级)';
-            else if (v <= 1.5) document.getElementById('sharpnessVal').innerText = `标准锐化 (${v}级)`;
-            else if (v <= 2.5) document.getElementById('sharpnessVal').innerText = `精细微缩增强 (${v}级)`;
-            else document.getElementById('sharpnessVal').innerText = `极强五官锐化 (${v}级)`;
+            if (v === 0) document.getElementById('sharpnessVal').innerText = `柔和采样 (0)`;
+            else if (v <= 1.5) document.getElementById('sharpnessVal').innerText = `自然锐化 (${v})`;
+            else if (v <= 2.5) document.getElementById('sharpnessVal').innerText = `精细增强 (${v})`;
+            else document.getElementById('sharpnessVal').innerText = `强力锐化 (${v})`;
         }
 
         function switchTab(tab) {
@@ -685,14 +615,14 @@
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, 240, 240);
 
-            ctx.fillStyle = '#dcd4c8';
+            ctx.fillStyle = '#e5ded4';
             ctx.beginPath(); ctx.ellipse(65, 115, 32, 55, 0.2, 0, Math.PI*2); ctx.fill();
             ctx.beginPath(); ctx.ellipse(175, 115, 32, 55, -0.2, 0, Math.PI*2); ctx.fill();
 
-            const grad = ctx.createRadialGradient(120, 110, 15, 120, 120, 75);
+            const grad = ctx.createRadialGradient(120, 105, 15, 120, 120, 75);
             grad.addColorStop(0, '#fcfaf5');
-            grad.addColorStop(0.7, '#eee6da');
-            grad.addColorStop(1, '#d5c8b8');
+            grad.addColorStop(0.75, '#f2ece1');
+            grad.addColorStop(1, '#dfd5c6');
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(120, 120, 65, 0, Math.PI * 2); ctx.fill();
 
@@ -735,7 +665,7 @@
                     }
                     resetZoom();
                     processImage();
-                    showToast("照片上传成功！已生成超清五官图纸。");
+                    showToast("照片上传成功！已生成全兼容高清图纸。");
                 };
                 img.src = e.target.result;
             };
@@ -763,11 +693,11 @@
         function triggerReprocess() {
             const val = document.getElementById('gridSizeSelect').value;
             if (val === 'custom') {
-                cols = Math.min(160, Math.max(15, parseInt(document.getElementById('customWidth').value, 10) || 100));
-                rows = Math.min(160, Math.max(15, parseInt(document.getElementById('customHeight').value, 10) || 100));
+                cols = Math.min(160, Math.max(15, parseInt(document.getElementById('customWidth').value, 10) || 90));
+                rows = Math.min(160, Math.max(15, parseInt(document.getElementById('customHeight').value, 10) || 90));
             } else {
-                cols = parseInt(val, 10) || 100;
-                rows = parseInt(val, 10) || 100;
+                cols = parseInt(val, 10) || 90;
+                rows = parseInt(val, 10) || 90;
             }
             document.getElementById('dimensionBadge').innerText = `${cols} x ${rows}`;
             processImage();
@@ -779,7 +709,7 @@
         }
 
         // ============================================================================
-        // 2. 核心图像转拼豆管线（100% 恢复你左图最清晰的 8倍超采样 + 拉普拉斯边缘增强核心）
+        // 2. 核心自适应图像转拼豆管线 (同时完美处理白狗毛发与美女五官)
         // ============================================================================
         function processImage() {
             if (!uploadedImage) return;
@@ -790,7 +720,7 @@
             const imgW = uploadedImage.width || uploadedImage.naturalWidth || 240;
             const imgH = uploadedImage.height || uploadedImage.naturalHeight || 240;
 
-            // Step 1: 100% 采用你原版效果最好的 8倍超采样 + Canvas 高质量插值缩放 (不加暗部晕染权重，确保眼白和眼神光极度清晰)
+            // Step 1: 8倍超采样平滑缩放
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             const superFactor = 8;
@@ -801,8 +731,8 @@
             tempCtx.imageSmoothingQuality = 'high';
 
             const fitScale = Math.min(
-                (cols * superFactor * 0.94) / imgW,
-                (rows * superFactor * 0.94) / imgH
+                (cols * superFactor * 0.92) / imgW,
+                (rows * superFactor * 0.92) / imgH
             );
             const dW = imgW * fitScale;
             const dH = imgH * fitScale;
@@ -819,39 +749,42 @@
             srcCtx.imageSmoothingQuality = 'high';
             srcCtx.drawImage(tempCanvas, 0, 0, cols, rows);
 
-            let imgData = srcCtx.getImageData(0, 0, cols, rows);
-            let data = imgData.data;
+            let rawImgData = srcCtx.getImageData(0, 0, cols, rows);
+            // 保留一份未经锐化的原始干净像素，用于防破洞抠图和浅色高光保护
+            let cleanData = new Uint8ClampedArray(rawImgData.data);
+            let data = rawImgData.data;
 
             const contrast = parseFloat(document.getElementById('contrastRange').value);
             const saturation = parseFloat(document.getElementById('saturationRange').value);
             const sharpnessMode = parseFloat(document.getElementById('sharpnessRange').value);
-            const claheStrength = parseInt(document.getElementById('claheRange').value, 10) / 100;
+            const detailStrength = parseInt(document.getElementById('detailRange').value, 10) / 100;
             const removeBg = document.getElementById('removeBgToggle').checked;
             const bgThreshold = parseInt(document.getElementById('bgThresholdRange').value, 10);
-            const autoOutline = document.getElementById('autoOutlineToggle').checked;
+            const softOutline = document.getElementById('softOutlineToggle').checked;
             const colorLimit = parseInt(document.getElementById('colorLimitSelect').value, 10);
 
-            // Step 2: 恢复你原版左图的拉普拉斯锐化算子 (让眼睛、睫毛、发丝、锁骨项链极度清晰)
-            if (sharpnessMode > 0) {
-                data = applyAdvancedBilateralSharpening(data, cols, rows, sharpnessMode);
-            }
-
-            // Step 3: 智能边缘洪泛抠图 (保留主体内部的白衣、眼神光和浅色皮肤)
+            // Step 2: 防破洞边缘洪泛抠图 (在未锐化的干净图像上进行，结合梯度锁边，绝不吞噬白狗额头)
             const total = cols * rows;
             bgMaskGlobal = new Uint8Array(total);
             if (removeBg) {
-                bgMaskGlobal = applyFloodFillWhiteBg(data, cols, rows, bgThreshold);
+                bgMaskGlobal = computeSafeBackgroundMask(cleanData, cols, rows, bgThreshold);
             }
 
-            // Step 4: 可选白毛阴影增强（默认对人像为 0%，仅在拍纯白宠物时拉高）
-            if (claheStrength > 0) {
-                data = applyWhiteFurShadowBoost(data, bgMaskGlobal, cols, rows, claheStrength);
+            // Step 3: 自适应柔和细节增强 (仅对非肤色的高亮白毛区做极温和的纹理拉开，且绝不压黑)
+            if (detailStrength > 0) {
+                data = applyAdaptiveSoftTexture(data, bgMaskGlobal, cols, rows, detailStrength);
             }
 
-            // Step 5: 对比度与饱和度微调 + Lab 精准色差匹配
+            // Step 4: 保边五官锐化 (对高亮白毛限制下压幅度，防止白狗变脏灰泥狗；对五官深色全额锐化)
+            if (sharpnessMode > 0) {
+                data = applyHighlightSafeSharpening(data, bgMaskGlobal, cols, rows, sharpnessMode);
+            }
+
+            // Step 5: 对比度与饱和度校正 + 智能色彩映射
             const paletteKey = document.getElementById('paletteSelect').value;
-            const currentPalette = PERLER_PALETTES[paletteKey] || PORTRAIT_CLEAN_38;
-            const whiteBead = currentPalette[0];
+            const currentPalette = PERLER_PALETTES[paletteKey] || UNIVERSAL_45_PALETTE;
+            const whiteBead = currentPalette[0]; // H1 纯白
+            const creamBead = currentPalette.find(b => b.code === 'H2') || whiteBead; // H2 乳白
 
             let gridBeads = [];
             for (let r = 0; r < rows; r++) {
@@ -866,12 +799,12 @@
                     let idx = id * 4;
                     let r_val = data[idx], g_val = data[idx + 1], b_val = data[idx + 2];
 
-                    // 对比度校正
-                    r_val = (r_val - 128) * contrast + 128;
-                    g_val = (g_val - 128) * contrast + 128;
-                    b_val = (b_val - 128) * contrast + 128;
+                    // 柔和对比度校正（以 145 为轴心，保护浅色区不被压暗）
+                    r_val = (r_val - 145) * contrast + 145;
+                    g_val = (g_val - 145) * contrast + 145;
+                    b_val = (b_val - 145) * contrast + 145;
 
-                    // 饱和度校正
+                    // 饱和度增强（让粉舌头、红唇、腮红更鲜活）
                     if (saturation !== 1.0) {
                         const gray = 0.299 * r_val + 0.587 * g_val + 0.114 * b_val;
                         r_val = gray + (r_val - gray) * saturation;
@@ -883,20 +816,29 @@
                     g_val = Math.min(255, Math.max(0, g_val));
                     b_val = Math.min(255, Math.max(0, b_val));
 
-                    let closest = findClosestColorLab(r_val, g_val, b_val, currentPalette);
+                    let closest = findClosestColorSmart(r_val, g_val, b_val, currentPalette);
+
+                    // 关键细节：主体内部的接近纯白区域（如白狗额头高光），优先转为 H2 乳白，以便与外部 H1 纯白背景自然区分（但保留眼珠里的纯白眼神光）
+                    if (closest.isWhite) {
+                        const rawLum = 0.299 * cleanData[idx] + 0.587 * cleanData[idx + 1] + 0.114 * cleanData[idx + 2];
+                        if (rawLum < 252) {
+                            closest = creamBead;
+                        }
+                    }
+
                     rowArr.push(closest);
                 }
                 gridBeads.push(rowArr);
             }
 
-            // Step 6: 可选外轮廓自动描边 (针对白色宠物或贴纸)
-            if (autoOutline && removeBg) {
-                applySubjectAutoOutline(gridBeads, bgMaskGlobal, currentPalette, cols, rows);
+            // Step 6: 复刻参考图5的“断续式阴影外轮廓” (绝不生硬全包黑线，根据边缘明暗自适应点缀 H7/H8/H14)
+            if (softOutline && removeBg) {
+                applyNaturalShadowOutline(gridBeads, cleanData, bgMaskGlobal, currentPalette, cols, rows);
             }
 
-            // Step 7: 可选颜色数量精简
+            // Step 7: 颜色精简（带粉舌头/红唇/眼神光保护锁）
             if (colorLimit > 0) {
-                quantizeGridPaletteCount(gridBeads, bgMaskGlobal, cols, rows, colorLimit);
+                quantizeGridPaletteSafe(gridBeads, bgMaskGlobal, cols, rows, colorLimit);
             }
 
             pixelData = gridBeads;
@@ -904,135 +846,136 @@
             updateColorStatistics();
         }
 
-        // 你原版左图最核心的拉普拉斯锐化函数
-        function applyAdvancedBilateralSharpening(data, w, h, strength) {
-            let copy = new Uint8ClampedArray(data);
-            let factor = strength * 0.35;
-            for (let y = 1; y < h - 1; y++) {
-                for (let x = 1; x < w - 1; x++) {
-                    let idx = (y * w + x) * 4;
-                    for (let c = 0; c < 3; c++) {
-                        let center = copy[idx + c];
-                        let blur = (
-                            copy[((y - 1) * w + x) * 4 + c] +
-                            copy[((y + 1) * w + x) * 4 + c] +
-                            copy[(y * w + (x - 1)) * 4 + c] +
-                            copy[(y * w + (x + 1)) * 4 + c]
-                        ) / 4;
-                        let newVal = center + (center - blur) * factor;
-                        data[idx + c] = Math.min(255, Math.max(0, newVal));
-                    }
-                }
-            }
-            return data;
-        }
-
-        // 你原版左图的边缘漫水抠图函数（并记录 bgMask）
-        function applyFloodFillWhiteBg(data, cols, rows, bgThreshold) {
+        // --- 核心子算法 1：防破洞梯度墙抠图 (彻底解决白狗额头/下巴被误吞问题) ---
+        function computeSafeBackgroundMask(cleanData, w, h, bgThreshold) {
+            const total = w * h;
             const borderSamples = [];
             const addSample = (x, y) => {
-                const k = (y * cols + x) * 4;
-                borderSamples.push([data[k], data[k + 1], data[k + 2]]);
+                const k = (y * w + x) * 4;
+                // 只采集四周高亮度背景样本
+                if (cleanData[k] > 200 && cleanData[k + 1] > 200 && cleanData[k + 2] > 200) {
+                    borderSamples.push([cleanData[k], cleanData[k + 1], cleanData[k + 2]]);
+                }
             };
-            for (let x = 0; x < cols; x++) {
-                addSample(x, 0);
-                if (rows > 1) addSample(x, rows - 1);
-            }
-            for (let y = 1; y < rows - 1; y++) {
-                addSample(0, y);
-                if (cols > 1) addSample(cols - 1, y);
-            }
-            const avg = [0, 1, 2].map(ch =>
-                borderSamples.reduce((sum, px) => sum + px[ch], 0) / Math.max(1, borderSamples.length)
-            );
-            const bgDistanceLimit = Math.max(22, (250 - bgThreshold) * 2.2 + 18);
+            for (let x = 0; x < w; x++) { addSample(x, 0); if (h > 1) addSample(x, h - 1); }
+            for (let y = 1; y < h - 1; y++) { addSample(0, y); if (w > 1) addSample(w - 1, y); }
 
-            const total = cols * rows;
-            const foreground = new Uint8Array(total);
-            for (let id = 0; id < total; id++) {
-                const p = id * 4;
-                const dr = data[p] - avg[0], dg = data[p + 1] - avg[1], db = data[p + 2] - avg[2];
-                foreground[id] = Math.sqrt(dr * dr + dg * dg + db * db) > bgDistanceLimit ? 1 : 0;
-            }
-            const dilated = new Uint8Array(total);
-            for (let y = 0; y < rows; y++) {
-                for (let x = 0; x < cols; x++) {
-                    let hit = 0;
-                    for (let oy = -1; oy <= 1 && !hit; oy++) {
-                        for (let ox = -1; ox <= 1; ox++) {
-                            const nx = x + ox, ny = y + oy;
-                            if (nx >= 0 && nx < cols && ny >= 0 && ny < rows && foreground[ny * cols + nx]) {
-                                hit = 1; break;
-                            }
+            const avg = borderSamples.length > 0
+                ? [0, 1, 2].map(ch => borderSamples.reduce((s, px) => s + px[ch], 0) / borderSamples.length)
+                : [255, 255, 255];
+
+            // 严格限制漫水容差：默认 bgThreshold=242 时，容差仅为 13，绝不误吞 RGB=238 的白毛
+            const maxDist = Math.max(6, (255 - bgThreshold) * 1.45);
+
+            // 计算局部纹理梯度与邻域微方差：纯白背景的方差几乎为 0，而白狗毛发边缘存在微梯度
+            const isForeground = new Uint8Array(total);
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const id = y * w + x;
+                    const p = id * 4;
+                    const dr = cleanData[p] - avg[0], dg = cleanData[p + 1] - avg[1], db = cleanData[p + 2] - avg[2];
+                    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+
+                    // 检测 3x3 邻域内的最大颜色跳变（纹理守卫）
+                    let localGrad = 0;
+                    if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
+                        const lumC = 0.299 * cleanData[p] + 0.587 * cleanData[p + 1] + 0.114 * cleanData[p + 2];
+                        const neighbors = [id - 1, id + 1, id - w, id + w];
+                        for (let nid of neighbors) {
+                            const np = nid * 4;
+                            const lumN = 0.299 * cleanData[np] + 0.587 * cleanData[np + 1] + 0.114 * cleanData[np + 2];
+                            localGrad = Math.max(localGrad, Math.abs(lumC - lumN));
                         }
                     }
-                    dilated[y * cols + x] = hit;
-                }
-            }
-            const closedForeground = new Uint8Array(total);
-            for (let y = 0; y < rows; y++) {
-                for (let x = 0; x < cols; x++) {
-                    let keep = 1;
-                    for (let oy = -1; oy <= 1 && keep; oy++) {
-                        for (let ox = -1; ox <= 1; ox++) {
-                            const nx = x + ox, ny = y + oy;
-                            if (nx < 0 || nx >= cols || ny < 0 || ny >= rows || !dilated[ny * cols + nx]) {
-                                keep = 0; break;
-                            }
-                        }
+
+                    // 只要颜色偏离背景色，或者局部有毛发/皮肤边缘梯度，立即判定为前景主体
+                    if (dist > maxDist || localGrad > 4.5) {
+                        isForeground[id] = 1;
                     }
-                    closedForeground[y * cols + x] = keep;
                 }
             }
 
+            // 5x5 形态学闭运算（先膨胀2格再腐蚀2格），把白狗头顶蓬松毛发之间的任何微小缝隙彻底焊死，防止背景漫水漏进额头！
+            const dilateStep = (src) => {
+                const dst = new Uint8Array(total);
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        let hit = 0;
+                        for (let oy = -1; oy <= 1 && !hit; oy++) {
+                            for (let ox = -1; ox <= 1; ox++) {
+                                const nx = x + ox, ny = y + oy;
+                                if (nx >= 0 && nx < w && ny >= 0 && ny < h && src[ny * w + nx]) { hit = 1; break; }
+                            }
+                        }
+                        dst[y * w + x] = hit;
+                    }
+                }
+                return dst;
+            };
+            const erodeStep = (src) => {
+                const dst = new Uint8Array(total);
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        let keep = 1;
+                        for (let oy = -1; oy <= 1 && keep; oy++) {
+                            for (let ox = -1; ox <= 1; ox++) {
+                                const nx = x + ox, ny = y + oy;
+                                if (nx < 0 || nx >= w || ny < 0 || ny >= h || !src[ny * w + nx]) { keep = 0; break; }
+                            }
+                        }
+                        dst[y * w + x] = keep;
+                    }
+                }
+                return dst;
+            };
+
+            let sealedFg = dilateStep(dilateStep(isForeground));
+            sealedFg = erodeStep(erodeStep(sealedFg));
+
+            // 从四周边缘进行 4 邻域安全漫水
             const bgMask = new Uint8Array(total);
             const visited = new Uint8Array(total);
             const queue = new Int32Array(total);
             let head = 0, tail = 0;
 
             const enqueue = (x, y) => {
-                if (x < 0 || x >= cols || y < 0 || y >= rows) return;
-                const id = y * cols + x;
-                if (visited[id]) return;
+                if (x < 0 || x >= w || y < 0 || y >= h) return;
+                const id = y * w + x;
+                if (visited[id] || sealedFg[id]) return;
                 visited[id] = 1;
+                bgMask[id] = 1;
                 queue[tail++] = id;
             };
-            for (let x = 0; x < cols; x++) {
-                enqueue(x, 0);
-                enqueue(x, rows - 1);
-            }
-            for (let y = 0; y < rows; y++) {
-                enqueue(0, y);
-                enqueue(cols - 1, y);
-            }
+
+            for (let x = 0; x < w; x++) { enqueue(x, 0); enqueue(x, h - 1); }
+            for (let y = 0; y < h; y++) { enqueue(0, y); enqueue(w - 1, y); }
 
             while (head < tail) {
                 const id = queue[head++];
-                const p = id * 4;
-                if (!closedForeground[id]) {
-                    bgMask[id] = 1;
-                    data[p] = 255;
-                    data[p + 1] = 255;
-                    data[p + 2] = 255;
-                    const x = id % cols;
-                    const y = Math.floor(id / cols);
-                    enqueue(x - 1, y);
-                    enqueue(x + 1, y);
-                    enqueue(x, y - 1);
-                    enqueue(x, y + 1);
-                }
+                const x = id % w, y = Math.floor(id / w);
+                enqueue(x - 1, y); enqueue(x + 1, y); enqueue(x, y - 1); enqueue(x, y + 1);
             }
+
             return bgMask;
         }
 
-        // 仅针对白色萌宠模式开启的毛发微反差函数
-        function applyWhiteFurShadowBoost(data, bgMask, w, h, strength) {
-            let copy = new Uint8ClampedArray(data);
-            const radius = 3;
+        // --- 核心子算法 2：自适应浅色微纹理增强 (识别白毛与人脸：白毛温和拉开层次，红润肤色保持平滑) ---
+        function applyAdaptiveSoftTexture(data, bgMask, w, h, strength) {
+            const copy = new Uint8ClampedArray(data);
+            const radius = 2;
             for (let y = 0; y < h; y++) {
                 for (let x = 0; x < w; x++) {
                     const id = y * w + x;
                     if (bgMask[id]) continue;
+
+                    const idx = id * 4;
+                    const r = copy[idx], g = copy[idx + 1], b = copy[idx + 2];
+                    const curL = 0.299 * r + 0.587 * g + 0.114 * b;
+
+                    // 判断是否为暖调人像皮肤 (R 明显大于 B，且 G 适中)：若是人脸皮肤，降低局部反差，防止脸部起斑！
+                    const isSkinTone = (r > g && g > b && (r - b) > 18 && curL > 130);
+                    const localFactor = isSkinTone ? strength * 0.25 : strength * 0.85;
+
                     let sumL = 0, count = 0;
                     for (let oy = -radius; oy <= radius; oy++) {
                         for (let ox = -radius; ox <= radius; ox++) {
@@ -1046,9 +989,10 @@
                     }
                     if (!count) continue;
                     const meanL = sumL / count;
-                    const idx = id * 4;
-                    const curL = 0.299 * copy[idx] + 0.587 * copy[idx + 1] + 0.114 * copy[idx + 2];
-                    const diff = (curL - meanL) * strength * 1.6;
+                    // 限制最大下压幅度（最多只允许压暗 14 个色阶），确保白毛永远不会变成深棕/深灰泥色！
+                    let diff = (curL - meanL) * localFactor;
+                    diff = Math.max(-14, Math.min(18, diff));
+
                     for (let c = 0; c < 3; c++) {
                         data[idx + c] = Math.min(255, Math.max(0, copy[idx + c] + diff));
                     }
@@ -1057,8 +1001,39 @@
             return data;
         }
 
-        // 你原版左图最干净的 Lab 色差公式（去除了对白色的错误惩罚，保证眼白与高光清透）
-        function findClosestColorLab(r, g, b, palette) {
+        // --- 核心子算法 3：高光保护型五官锐化 (五官眼鼻100%锐化，浅白毛发限制黑化晕染) ---
+        function applyHighlightSafeSharpening(data, bgMask, w, h, strength) {
+            let copy = new Uint8ClampedArray(data);
+            let factor = strength * 0.32;
+            for (let y = 1; y < h - 1; y++) {
+                for (let x = 1; x < w - 1; x++) {
+                    const id = y * w + x;
+                    if (bgMask[id]) continue;
+                    let idx = id * 4;
+                    const lum = 0.299 * copy[idx] + 0.587 * copy[idx + 1] + 0.114 * copy[idx + 2];
+
+                    for (let c = 0; c < 3; c++) {
+                        let center = copy[idx + c];
+                        let blur = (
+                            copy[((y - 1) * w + x) * 4 + c] +
+                            copy[((y + 1) * w + x) * 4 + c] +
+                            copy[(y * w + (x - 1)) * 4 + c] +
+                            copy[(y * w + (x + 1)) * 4 + c]
+                        ) / 4;
+                        let delta = (center - blur) * factor;
+                        // 若当前是明亮的白色毛发或高光皮肤 (lum > 185)，限制向暗部锐化下压的幅度，防止产生黑灰噪点
+                        if (lum > 185 && delta < -12) {
+                            delta = -12;
+                        }
+                        data[idx + c] = Math.min(255, Math.max(0, center + delta));
+                    }
+                }
+            }
+            return data;
+        }
+
+        // --- 核心子算法 4：智能 Lab 色差匹配 ---
+        function findClosestColorSmart(r, g, b, palette) {
             let lab = rgbToLab(r, g, b);
             let minDist = Infinity;
             let bestMatch = palette[0];
@@ -1069,7 +1044,8 @@
                 const dL = lab[0] - bLab[0];
                 const dA = lab[1] - bLab[1];
                 const dB = lab[2] - bLab[2];
-                let dist = Math.sqrt(dL * dL * 1.18 + dA * dA * 1.12 + dB * dB * 1.12);
+                // 加强色相 a/b 轴权重，让粉舌头、红唇、腮红和暖米色毛发准确命中
+                let dist = Math.sqrt(dL * dL * 1.15 + dA * dA * 1.25 + dB * dB * 1.20);
                 if (dist < minDist) {
                     minDist = dist;
                     bestMatch = bead;
@@ -1078,25 +1054,37 @@
             return bestMatch;
         }
 
-        function applySubjectAutoOutline(grid, bgMask, palette, w, h) {
+        // --- 核心子算法 5：复刻参考图5的“自然断续阴影轮廓” ---
+        function applyNaturalShadowOutline(grid, cleanData, bgMask, palette, w, h) {
             const blackBead = palette.find(b => b.code === 'H7') || palette[0];
             const darkGrayBead = palette.find(b => b.code === 'H8') || blackBead;
+            const warmGrayBead = palette.find(b => b.code === 'H14') || darkGrayBead;
 
             for (let r = 1; r < h - 1; r++) {
                 for (let c = 1; c < w - 1; c++) {
                     const id = r * w + c;
                     if (bgMask[id]) continue;
+
                     const touchBg = bgMask[(r - 1) * w + c] || bgMask[(r + 1) * w + c] || bgMask[r * w + (c - 1)] || bgMask[r * w + (c + 1)];
-                    if (touchBg) {
-                        const cur = grid[r][c];
-                        const lum = 0.299 * cur.rgb[0] + 0.587 * cur.rgb[1] + 0.114 * cur.rgb[2];
-                        grid[r][c] = lum > 180 ? blackBead : darkGrayBead;
+                    if (!touchBg) continue;
+
+                    const p = id * 4;
+                    const rawLum = 0.299 * cleanData[p] + 0.587 * cleanData[p + 1] + 0.114 * cleanData[p + 2];
+
+                    // 像图5一样：如果边缘本身有一点阴影或转折 (rawLum < 236)，用 H7/H8 锚定轮廓；如果是极亮的高光毛尖 (rawLum >= 236)，只用柔和的浅米/暖灰过渡，不画死黑线！
+                    if (rawLum < 215) {
+                        grid[r][c] = blackBead;
+                    } else if (rawLum < 236) {
+                        grid[r][c] = (r + c) % 2 === 0 ? blackBead : warmGrayBead;
+                    } else if (grid[r][c].isWhite) {
+                        grid[r][c] = warmGrayBead;
                     }
                 }
             }
         }
 
-        function quantizeGridPaletteCount(grid, bgMask, w, h, maxColors) {
+        // --- 核心子算法 6：带五官/粉舌头保护锁的颜色精简 ---
+        function quantizeGridPaletteSafe(grid, bgMask, w, h, maxColors) {
             const freq = {};
             const beadMap = {};
             for (let r = 0; r < h; r++) {
@@ -1111,10 +1099,12 @@
             let codes = Object.keys(freq);
             if (codes.length <= maxColors) return;
 
+            // 给纯黑 H7、乳白 H2 以及画面中出现的粉红/鲜红（舌头/嘴唇）加上免死金牌权重，绝不被合并成棕色！
             codes.sort((a, b) => {
-                const scoreA = freq[a] + (a === 'H7' || a === 'E21' || a === 'H21' ? 99999 : 0);
-                const scoreB = freq[b] + (b === 'H7' || b === 'E21' || b === 'H21' ? 99999 : 0);
-                return scoreB - scoreA;
+                const ba = beadMap[a], bb = beadMap[b];
+                const protectA = (a === 'H7' || a === 'H2' || a === 'H1' || ba.isPinkRed) ? 50000 : 0;
+                const protectB = (b === 'H7' || b === 'H2' || b === 'H1' || bb.isPinkRed) ? 50000 : 0;
+                return (freq[b] + protectB) - (freq[a] + protectA);
             });
 
             const keptBeads = codes.slice(0, maxColors).map(code => beadMap[code]);
@@ -1122,7 +1112,7 @@
 
             for (let i = maxColors; i < codes.length; i++) {
                 const dropBead = beadMap[codes[i]];
-                remap[codes[i]] = findClosestColorLab(dropBead.rgb[0], dropBead.rgb[1], dropBead.rgb[2], keptBeads);
+                remap[codes[i]] = findClosestColorSmart(dropBead.rgb[0], dropBead.rgb[1], dropBead.rgb[2], keptBeads);
             }
 
             for (let r = 0; r < h; r++) {
@@ -1137,7 +1127,7 @@
         }
 
         // ============================================================================
-        // 3. 实时工作台渲染（柔和网格线，不切割破坏人脸）
+        // 3. 实时工作台渲染
         // ============================================================================
         function redrawCanvas() {
             const canvas = document.getElementById('pixelCanvas');
@@ -1163,15 +1153,15 @@
                     ctx.fillRect(x, y, scale, scale);
 
                     if (showGrid) {
-                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.09)';
                         ctx.lineWidth = 0.5;
                         ctx.strokeRect(x, y, scale, scale);
                     }
 
                     if (showCodes && scale >= 12) {
                         const lum = bead.rgb[0] * 0.299 + bead.rgb[1] * 0.587 + bead.rgb[2] * 0.114;
-                        ctx.fillStyle = lum > 150 ? '#000000' : '#ffffff';
-                        ctx.font = `${Math.max(7, Math.floor(scale * 0.36))}px sans-serif`;
+                        ctx.fillStyle = lum > 145 ? '#1e293b' : '#ffffff';
+                        ctx.font = `bold ${Math.max(7, Math.floor(scale * 0.36))}px Inter, monospace`;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(bead.code, x + scale / 2, y + scale / 2);
@@ -1180,18 +1170,18 @@
             }
 
             if (showMajor) {
-                for (let c = 10; c < cols; c += 10) {
+                for (let c = 5; c < cols; c += 5) {
                     ctx.beginPath();
-                    ctx.strokeStyle = 'rgba(71, 85, 105, 0.28)';
-                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = (c % 10 === 0) ? 'rgba(15, 23, 42, 0.42)' : 'rgba(15, 23, 42, 0.18)';
+                    ctx.lineWidth = (c % 10 === 0) ? 1.2 : 0.7;
                     ctx.moveTo(c * scale, 0);
                     ctx.lineTo(c * scale, rows * scale);
                     ctx.stroke();
                 }
-                for (let r = 10; r < rows; r += 10) {
+                for (let r = 5; r < rows; r += 5) {
                     ctx.beginPath();
-                    ctx.strokeStyle = 'rgba(71, 85, 105, 0.28)';
-                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = (r % 10 === 0) ? 'rgba(15, 23, 42, 0.42)' : 'rgba(15, 23, 42, 0.18)';
+                    ctx.lineWidth = (r % 10 === 0) ? 1.2 : 0.7;
                     ctx.moveTo(0, r * scale);
                     ctx.lineTo(cols * scale, r * scale);
                     ctx.stroke();
@@ -1201,21 +1191,24 @@
 
         function updateColorStatistics() {
             colorStats = {};
-            let totalBeads = 0;
+            let subjectBeads = 0;
 
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
+                    const isExternalBg = bgMaskGlobal && bgMaskGlobal[r * cols + c];
+                    if (isExternalBg) continue;
+
                     const bead = pixelData[r][c];
                     if (!colorStats[bead.code]) {
                         colorStats[bead.code] = { ...bead, count: 0 };
                     }
                     colorStats[bead.code].count++;
-                    totalBeads++;
+                    subjectBeads++;
                 }
             }
 
             const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
-            document.getElementById('totalBeadsBadge').innerText = `总计 ${totalBeads} 颗`;
+            document.getElementById('totalBeadsBadge').innerText = `有效主体 ${subjectBeads} 颗`;
             document.getElementById('activeColorsBadge').innerText = `${sortedColors.length} 种颜色`;
 
             const tbody = document.getElementById('colorStatsBody');
@@ -1243,7 +1236,7 @@
             if (!grid) return;
             grid.innerHTML = '';
             const paletteKey = document.getElementById('paletteSelect').value;
-            const currentPalette = PERLER_PALETTES[paletteKey] || PORTRAIT_CLEAN_38;
+            const currentPalette = PERLER_PALETTES[paletteKey] || UNIVERSAL_45_PALETTE;
 
             for (let bead of currentPalette) {
                 const div = document.createElement('div');
@@ -1301,7 +1294,7 @@
                     redrawCanvas();
                     updateColorStatistics();
                 } else {
-                    pixelData[r][c] = PORTRAIT_CLEAN_38[0];
+                    pixelData[r][c] = UNIVERSAL_45_PALETTE[0];
                     if (bgMaskGlobal) bgMaskGlobal[r * cols + c] = 1;
                     redrawCanvas();
                     updateColorStatistics();
@@ -1311,7 +1304,7 @@
                 document.getElementById('inspectorColorBox').style.backgroundColor = `rgb(${pixelData[r][c].rgb.join(',')})`;
                 document.getElementById('inspectorName').innerText = pixelData[r][c].name;
                 document.getElementById('inspectorCode').innerText = `色号: ${pixelData[r][c].code}`;
-                document.getElementById('inspectorPos').innerText = `(${c + 1}, ${r + 1})`;
+                document.getElementById('inspectorPos').innerText = `第 ${c + 1} 列, 第 ${r + 1} 行`;
             }
         }
 
@@ -1326,7 +1319,7 @@
         }
 
         // ============================================================================
-        // 4. 导出超清拼豆图纸（恢复左图清爽的无粗黑线遮挡版式 + 四周坐标）
+        // 4. 导出超清拼豆图纸 (带四边坐标与清晰色号表)
         // ============================================================================
         function downloadPatternImage() {
             if (trialCredits <= 0) {
@@ -1338,35 +1331,35 @@
             const exportCanvas = document.createElement('canvas');
             const ctx = exportCanvas.getContext('2d');
 
-            const headerHeight = 70;
-            const padding = 50;
-            const printScale = Math.max(18, scale);
-
-            const gridW = cols * printScale;
-            const gridH = rows * printScale;
+            const cell = 20;
+            const padX = 60;
+            const headerH = 80;
+            const gridW = cols * cell;
+            const gridH = rows * cell;
 
             const sortedColors = Object.values(colorStats).sort((a, b) => b.count - a.count);
-            const colsInLegend = 4;
-            const legendRows = Math.ceil(sortedColors.length / colsInLegend);
-            const footerHeight = Math.max(140, legendRows * 30 + 70);
+            const legendCols = 5;
+            const legendRows = Math.ceil(sortedColors.length / legendCols);
+            const footerH = Math.max(130, legendRows * 28 + 75);
 
-            exportCanvas.width = Math.max(gridW + padding * 2, 700);
-            exportCanvas.height = gridH + headerHeight + footerHeight + padding * 2;
+            exportCanvas.width = Math.max(gridW + padX * 2, 860);
+            exportCanvas.height = headerH + gridH + footerH + 45;
 
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#faf8f5';
             ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
+            const totalSubject = sortedColors.reduce((acc, cur) => acc + cur.count, 0);
             ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 22px Inter, sans-serif';
+            ctx.font = 'bold 20px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(`专业像素拼豆设计图纸 [${cols} x ${rows} 网格]`, exportCanvas.width / 2, padding + 25);
+            ctx.fillText(`专业像素拼豆设计图纸 [${cols} × ${rows} 网格]`, exportCanvas.width / 2, 36);
 
             ctx.fillStyle = '#64748b';
             ctx.font = '13px Inter, sans-serif';
-            ctx.fillText(`总用豆量: ${sortedColors.reduce((acc, curr) => acc + curr.count, 0)} 颗 | 使用色数: ${sortedColors.length} 种`, exportCanvas.width / 2, padding + 50);
+            ctx.fillText(`有效主体豆量: ${totalSubject} 颗  |  使用色数: ${sortedColors.length} 种`, exportCanvas.width / 2, 58);
 
-            const startX = (exportCanvas.width - gridW) / 2;
-            const startY = padding + headerHeight;
+            const startX = Math.floor((exportCanvas.width - gridW) / 2);
+            const startY = headerH;
 
             const showGrid = document.getElementById('showGridLines').checked;
             const showMajor = document.getElementById('showMajorGridLines').checked;
@@ -1374,115 +1367,106 @@
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
                     const bead = pixelData[r][c];
-                    const px = startX + c * printScale;
-                    const py = startY + r * printScale;
+                    const px = startX + c * cell;
+                    const py = startY + r * cell;
 
                     ctx.fillStyle = `rgb(${bead.rgb[0]}, ${bead.rgb[1]}, ${bead.rgb[2]})`;
-                    ctx.fillRect(px, py, printScale, printScale);
+                    ctx.fillRect(px, py, cell, cell);
 
                     if (showGrid) {
                         ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
-                        ctx.lineWidth = 0.75;
-                        ctx.strokeRect(px, py, printScale, printScale);
+                        ctx.lineWidth = 0.6;
+                        ctx.strokeRect(px, py, cell, cell);
                     }
 
-                    if (printScale >= 14) {
-                        ctx.fillStyle = (bead.rgb[0] * 0.299 + bead.rgb[1] * 0.587 + bead.rgb[2] * 0.114) > 150 ? '#000' : '#fff';
-                        ctx.font = `${Math.max(9, printScale * 0.35)}px sans-serif`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(bead.code, px + printScale / 2, py + printScale / 2);
-                    }
+                    const lum = bead.rgb[0] * 0.299 + bead.rgb[1] * 0.587 + bead.rgb[2] * 0.114;
+                    ctx.fillStyle = lum > 145 ? '#1e293b' : '#ffffff';
+                    ctx.font = 'bold 8px Inter, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(bead.code, px + cell / 2, py + cell / 2);
                 }
             }
 
             if (showMajor) {
-                for (let c = 10; c < cols; c += 10) {
+                for (let c = 0; c <= cols; c += 5) {
                     ctx.beginPath();
-                    ctx.strokeStyle = 'rgba(15, 23, 42, 0.35)';
-                    ctx.lineWidth = 1.2;
-                    ctx.moveTo(startX + c * printScale, startY);
-                    ctx.lineTo(startX + c * printScale, startY + gridH);
+                    ctx.strokeStyle = (c % 10 === 0) ? 'rgba(15, 23, 42, 0.55)' : 'rgba(15, 23, 42, 0.22)';
+                    ctx.lineWidth = (c % 10 === 0) ? 1.4 : 0.8;
+                    ctx.moveTo(startX + c * cell, startY);
+                    ctx.lineTo(startX + c * cell, startY + gridH);
                     ctx.stroke();
                 }
-                for (let r = 10; r < rows; r += 10) {
+                for (let r = 0; r <= rows; r += 5) {
                     ctx.beginPath();
-                    ctx.strokeStyle = 'rgba(15, 23, 42, 0.35)';
-                    ctx.lineWidth = 1.2;
-                    ctx.moveTo(startX, startY + r * printScale);
-                    ctx.lineTo(startX + gridW, startY + r * printScale);
+                    ctx.strokeStyle = (r % 10 === 0) ? 'rgba(15, 23, 42, 0.55)' : 'rgba(15, 23, 42, 0.22)';
+                    ctx.lineWidth = (r % 10 === 0) ? 1.4 : 0.8;
+                    ctx.moveTo(startX, startY + r * cell);
+                    ctx.lineTo(startX + gridW, startY + r * cell);
                     ctx.stroke();
                 }
             }
 
-            // 四周坐标数字标注
-            ctx.fillStyle = '#475569';
-            ctx.font = '11px monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            for (let c = 0; c < cols; c++) {
-                if (c === 0 || (c + 1) % 5 === 0 || c === cols - 1) {
-                    ctx.fillText(c + 1, startX + (c + 0.5) * printScale, startY - 5);
-                }
+            // 四周坐标刻度
+            ctx.fillStyle = '#334155';
+            ctx.font = 'bold 11px monospace';
+            for (let c = 5; c <= cols; c += 5) {
+                const cx = startX + (c - 0.5) * cell;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(c, cx, startY - 6);
+                ctx.textBaseline = 'top';
+                ctx.fillText(c, cx, startY + gridH + 6);
             }
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'middle';
-            for (let r = 0; r < rows; r++) {
-                if (r === 0 || (r + 1) % 5 === 0 || r === rows - 1) {
-                    ctx.fillText(r + 1, startX - 8, startY + (r + 0.5) * printScale);
-                }
+            for (let r = 5; r <= rows; r += 5) {
+                const cy = startY + (r - 0.5) * cell;
+                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'right';
+                ctx.fillText(r, startX - 8, cy);
+                ctx.textAlign = 'left';
+                ctx.fillText(r, startX + gridW + 8, cy);
             }
 
-            const footerY = startY + gridH + 30;
-            const footerW = exportCanvas.width - padding * 2;
-
-            ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(padding, footerY, footerW, footerHeight - 20);
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(padding, footerY, footerW, footerHeight - 20);
-
+            // 底部统计表
+            const footerY = startY + gridH + 36;
             ctx.fillStyle = '#0f172a';
             ctx.font = 'bold 14px Inter, sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText('📋 材料清单与配色色号参考表 (Material List):', padding + 20, footerY + 25);
+            ctx.fillText('色号用量统计 (Material List):', startX, footerY + 15);
+            ctx.textAlign = 'right';
+            ctx.fillText(`主体总计: ${totalSubject} 颗`, startX + gridW, footerY + 15);
 
-            let colWidth = footerW / colsInLegend;
-            let startListX = padding + 20;
-            let startListY = footerY + 55;
+            const colW = gridW / legendCols;
+            sortedColors.forEach((item, idx) => {
+                const colIdx = idx % legendCols;
+                const rowIdx = Math.floor(idx / legendCols);
+                const lx = startX + colIdx * colW;
+                const ly = footerY + 34 + rowIdx * 25;
 
-            sortedColors.forEach((item, index) => {
-                let colIdx = index % colsInLegend;
-                let rowIdx = Math.floor(index / colsInLegend);
+                ctx.fillStyle = `rgb(${item.rgb.join(',')})`;
+                ctx.fillRect(lx, ly, 15, 15);
+                ctx.strokeStyle = '#64748b';
+                ctx.lineWidth = 0.8;
+                ctx.strokeRect(lx, ly, 15, 15);
 
-                let curX = startListX + colIdx * colWidth;
-                let curY = startListY + rowIdx * 28;
-
-                if (curY < footerY + footerHeight - 25) {
-                    ctx.fillStyle = `rgb(${item.rgb.join(',')})`;
-                    ctx.fillRect(curX, curY, 16, 16);
-                    ctx.strokeStyle = '#94a3b8';
-                    ctx.strokeRect(curX, curY, 16, 16);
-
-                    ctx.fillStyle = '#1e293b';
-                    ctx.font = '12px Inter, sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-                    ctx.fillText(`${item.code} (${item.name}): ${item.count}颗`, curX + 24, curY + 1);
-                }
+                ctx.fillStyle = '#1e293b';
+                ctx.font = 'bold 11.5px monospace';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText(`${item.code} (${item.name}): ${item.count}`, lx + 21, ly + 1);
             });
 
             const link = document.createElement('a');
-            link.download = `perler_bead_pattern_${cols}x${rows}_complete.png`;
+            link.download = `perler_bead_pattern_${cols}x${rows}.png`;
             link.href = exportCanvas.toDataURL('image/png');
             link.click();
-            showToast(`已成功导出高清图纸！本次消耗 1 次，剩余 ${trialCredits} 次。`);
+            showToast(`已成功导出超清图纸！剩余导出额度 ${trialCredits} 次。`);
         }
 
         function copyColorList() {
-            let text = "=== 拼豆颜色采购清单 ===\n";
-            for (let code in colorStats) {
-                let item = colorStats[code];
+            let text = `=== 拼豆颜色采购清单 (${cols}x${rows}) ===\n`;
+            const sorted = Object.values(colorStats).sort((a, b) => b.count - a.count);
+            for (let item of sorted) {
                 text += `色号 ${item.code} (${item.name}): ${item.count} 颗\n`;
             }
             navigator.clipboard.writeText(text);
